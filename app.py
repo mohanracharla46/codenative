@@ -8,6 +8,11 @@ import subprocess
 import tempfile
 from datetime import datetime
 from functools import wraps
+import psycopg2
+import psycopg2.extras
+from dotenv import load_dotenv
+
+load_dotenv() # Load variables from .env
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = os.urandom(24)  # Secret key for session management
@@ -37,10 +42,37 @@ def login_required(f):
 
 
 def get_db_connection():
-    """Create a database connection"""
+    """Create a database connection (PostgreSQL if DATABASE_URL exists, else SQLite)"""
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url:
+        try:
+            # Handle potential 'postgres://' vs 'postgresql://' issue common in some platforms
+            if db_url.startswith("postgres://"):
+                db_url = db_url.replace("postgres://", "postgresql://", 1)
+            
+            conn = psycopg2.connect(db_url, cursor_factory=psycopg2.extras.RealDictCursor)
+            return conn
+        except Exception as e:
+            print(f"PostgreSQL connection failed: {e}. Falling back to SQLite.")
+    
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
+
+def execute_query(conn, query, params=None):
+    """Abstraction layer to handle different SQL placeholders (?, %s)"""
+    is_pg = hasattr(conn, 'cursor_factory') # Basic check for psycopg2 connection
+    if is_pg:
+        query = query.replace('?', '%s')
+        # PostgreSQL doesn't support INSERT OR REPLACE, use INSERT ... ON CONFLICT
+        if 'INSERT OR REPLACE' in query:
+            # We specifically handle the content table case
+            query = query.replace('INSERT OR REPLACE INTO content', 'INSERT INTO content')
+            query += ' ON CONFLICT (language, topic_slug) DO UPDATE SET topic_title = EXCLUDED.topic_title, content_html = EXCLUDED.content_html, order_index = EXCLUDED.order_index'
+    
+    cursor = conn.cursor()
+    cursor.execute(query, params or ())
+    return cursor
 
 def hash_password(password):
     """Hash a password using SHA-256"""
@@ -122,14 +154,14 @@ def signup():
         # Insert user into database
         conn = get_db_connection()
         try:
-            conn.execute(
+            execute_query(conn,
                 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
                 (name, email, hashed_password)
             )
             conn.commit()
             conn.close()
             return jsonify({"message": "Account created successfully"}), 201
-        except sqlite3.IntegrityError:
+        except (sqlite3.IntegrityError, psycopg2.IntegrityError):
             conn.close()
             return jsonify({"message": "Email already exists"}), 409
 
@@ -153,7 +185,7 @@ def signin():
 
         # Check credentials
         conn = get_db_connection()
-        user = conn.execute(
+        user = execute_query(conn,
             'SELECT * FROM users WHERE email = ? AND password = ?',
             (email, hashed_password)
         ).fetchone()
@@ -163,7 +195,7 @@ def signin():
             # Promote specific email to admin for development/access
             if email == 'racharlamohan16@gmail.com' and not user['is_admin']:
                 conn = get_db_connection()
-                conn.execute('UPDATE users SET is_admin = 1 WHERE id = ?', (user['id'],))
+                execute_query(conn, 'UPDATE users SET is_admin = 1 WHERE id = ?', (user['id'],))
                 conn.commit()
                 conn.close()
                 user = dict(user)
@@ -245,9 +277,11 @@ def terms_conditions():
 @admin_required
 def admin_dashboard():
     conn = get_db_connection()
-    contents = conn.execute('SELECT * FROM content ORDER BY language, order_index').fetchall()
-    users_count = conn.execute('SELECT COUNT(*) FROM users').fetchone()[0]
-    all_users = conn.execute('SELECT id, name, email, is_admin, created_at FROM users ORDER BY id DESC').fetchall()
+    contents = execute_query(conn, 'SELECT * FROM content ORDER BY language, order_index').fetchall()
+    users_count = execute_query(conn, 'SELECT COUNT(*) FROM users').fetchone()
+    users_count = users_count[0] if isinstance(users_count, tuple) else (users_count.get('count') if hasattr(users_count, 'get') else list(users_count.values())[0])
+    
+    all_users = execute_query(conn, 'SELECT id, name, email, is_admin, created_at FROM users ORDER BY id DESC').fetchall()
     conn.close()
     return render_template("admin/dashboard.html", contents=contents, users_count=users_count, all_users=all_users)
 
@@ -263,7 +297,7 @@ def add_content():
         order_index = data.get('order_index', 0)
 
         conn = get_db_connection()
-        conn.execute('''
+        execute_query(conn, '''
             INSERT OR REPLACE INTO content (language, topic_slug, topic_title, content_html, order_index)
             VALUES (?, ?, ?, ?, ?)
         ''', (language, topic_slug, topic_title, content_html, order_index))
@@ -278,7 +312,7 @@ def add_content():
 def delete_content(id):
     try:
         conn = get_db_connection()
-        conn.execute('DELETE FROM content WHERE id = ?', (id,))
+        execute_query(conn, 'DELETE FROM content WHERE id = ?', (id,))
         conn.commit()
         conn.close()
         return jsonify({"message": "Content deleted successfully"}), 200
@@ -289,14 +323,14 @@ def delete_content(id):
 @app.route("/api/content/<language>")
 def get_language_content(language):
     conn = get_db_connection()
-    topics = conn.execute('SELECT topic_slug, topic_title FROM content WHERE language = ? ORDER BY order_index', (language.lower(),)).fetchall()
+    topics = execute_query(conn, 'SELECT topic_slug, topic_title FROM content WHERE language = ? ORDER BY order_index', (language.lower(),)).fetchall()
     conn.close()
     return jsonify([dict(t) for t in topics])
 
 @app.route("/api/content/<language>/<topic_slug>")
 def get_topic_content(language, topic_slug):
     conn = get_db_connection()
-    topic = conn.execute('SELECT * FROM content WHERE language = ? AND topic_slug = ?', (language.lower(), topic_slug)).fetchone()
+    topic = execute_query(conn, 'SELECT * FROM content WHERE language = ? AND topic_slug = ?', (language.lower(), topic_slug)).fetchone()
     conn.close()
     if topic:
         return jsonify(dict(topic))
@@ -402,6 +436,7 @@ def run():
 
 
 if __name__ == "__main__":
-    # Initialize database on startup
-    init_db()
+    # In SQLite mode we can init local db, for Supabase you did it manually
+    if not os.environ.get('DATABASE_URL'):
+        init_db()
     app.run(debug=True)
