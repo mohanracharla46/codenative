@@ -103,102 +103,32 @@ body {
 }
 
 /* Main Header (Top Bar) */
-.header.small-header {
+.header.main-tutorial-header {
     background: #ffffff !important;
-    height: 72px;
+    height: 64px;
     border-bottom: 1px solid #f1f5f9;
-    box-shadow: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Logo left, actions right */
-    padding: 0 40px;
-    z-index: 1000;
-}
-
-.header.small-header .container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 100%; /* Take full width */
-}
-
-.header.small-header .logo { margin: 0; }
-.header.small-header .logo img { height: 38px; }
-
-.btn-header-dash {
-    background: rgba(99, 102, 241, 0.08);
-    color: #6366f1;
-    padding: 10px 24px;
-    border-radius: 12px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.2s;
-}
-
-.btn-settings-gear {
-    background: #f1f5f9;
-    color: #475569;
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-}
-
-/* Secondary Sticky Header (Progress & Controls) */
-.progress-sub-header {
-    height: 60px;
-    background: #ffffff;
-    border-bottom: 1px solid #f1f5f9;
-    padding: 0 40px 0 280px;
+    padding: 0 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: sticky;
-    top: 72px;
-    z-index: 999;
+    top: 0;
+    z-index: 1200;
 }
 
-.header-progress-group {
+.header-left {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
 }
 
-.progress-label-text {
-    font-size: 10px;
-    font-weight: 800;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.logo-img {
+    height: 32px;
 }
 
-.progress-bar-outer {
-    width: 200px;
-    height: 6px;
-    background: #f1f5f9;
-    border-radius: 10px;
-}
-
-.progress-bar-inner {
-    height: 100%;
-    background: linear-gradient(to right, #38bdf8, #818cf8);
-    border-radius: 10px;
-}
-
-.progress-pct {
-    font-size: 11px;
-    font-weight: 700;
-    color: #64748b;
+.header-right {
+    display: flex;
+    align-items: center;
 }
 
 .nav-controls {
@@ -504,37 +434,28 @@ body {
         box-shadow: 20px 0 50px rgba(0,0,0,0.1);
     }
 
-    .small-header {
+    .main-tutorial-header {
         margin-left: 0 !important;
-        padding: 0 15px !important;
-        justify-content: space-between;
-    }
-
-    .progress-sub-header {
-        padding: 0 15px !important;
-        top: 72px;
-        height: 50px;
-    }
-
-    .progress-label-text, .progress-bar-outer, .progress-pct {
-        display: none; /* Hide progress details on mobile to save space */
-    }
-
-    .progress-sub-header::after {
-        content: attr(data-progress);
-        font-size: 12px;
-        font-weight: 700;
-        color: #6366f1;
+        padding: 0 12px !important;
+        height: 60px;
+        position: sticky;
+        top: 0;
+        z-index: 1100;
+        border-bottom: 1px solid #f1f5f9;
     }
 
     .tutorial-content {
         margin-left: 0 !important;
-        padding: 24px 15px !important;
+        padding: 20px 12px !important;
     }
 
     .menu-toggle {
         display: flex;
-        margin-right: 15px;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        font-size: 16px;
+        margin-right: 12px;
     }
 
     .nav-controls {

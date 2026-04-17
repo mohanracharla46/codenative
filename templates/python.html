@@ -43,19 +43,29 @@
 </head>
 
 <body>
-    <header class="header small-header">
-        <div class="container header-inner">
-            <div class="logo">
-                <button class="menu-toggle" id="sidebarToggle" aria-label="Toggle Menu">
-                    <i class="fas fa-bars"></i>
+    <header class="header main-tutorial-header">
+        <div class="header-left">
+            <button class="menu-toggle" id="sidebarToggle" aria-label="Toggle Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a href="/"><img src="/static/images/CodeNative.png" alt="CodeNative" class="logo-img"></a>
+        </div>
+        
+        <div class="header-center">
+            <div class="nav-controls">
+                <button class="btn-nav-control" id="prevTopic" title="Previous Lesson">
+                    <i class="fas fa-chevron-left"></i> <span>Previous</span>
                 </button>
-                <a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a>
+                <button class="btn-nav-control" id="nextTopic" title="Next Lesson">
+                    <span>Next</span> <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
-            <div class="header-actions">
-                <a href="/dashboard" class="btn-header-dash">
-                    <i class="fas fa-user-circle"></i> Dashboard
-                </a>
-            </div>
+        </div>
+
+        <div class="header-right">
+            <a href="/dashboard" class="btn-dashboard-minimal" title="Dashboard">
+                <i class="fas fa-th-large"></i>
+            </a>
         </div>
     </header>
 
@@ -64,50 +74,18 @@
         <button class="sidebar-close" id="sidebarClose" aria-label="Close Menu">
             <i class="fas fa-times"></i>
         </button>
-        <div class="sidebar-course-card">
-            <i class="fab fa-python"></i>
-            <div class="sidebar-course-info">
-                <h3>Python Core</h3>
-                <span>65% Completed</span>
-            </div>
-        </div>
 
         <ul id="sidebarTopics" class="sidebar-menu">
             <!-- Topics will be loaded here -->
         </ul>
 
         <div class="sidebar-footer-nav">
-            <div class="sidebar-pro-badge">
-                <span id="proBadgeLabel" style="font-size: 10px; font-weight: 800; color: #6366f1; text-transform: uppercase;">Pro Access</span>
-                <p style="font-size: 11px; margin: 8px 0 12px; color: #64748b;">Unlock advanced AI & Machine Learning paths.</p>
-                <button style="width: 100%; padding: 10px; background: #6366f1; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">Upgrade to Pro</button>
-            </div>
             <ul>
                 <li><i class="far fa-question-circle"></i> Help</li>
             </ul>
         </div>
     </div>
 
-    <header class="progress-sub-header">
-        <div class="header-progress-group">
-            <button class="menu-toggle" id="menuToggle" aria-label="Open Menu">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="progress-label-text">Course Progress</div>
-            <div class="progress-bar-outer">
-                <div class="progress-bar-inner" style="width: 65%;"></div>
-            </div>
-            <div class="progress-pct">65%</div>
-        </div>
-
-        <div class="nav-controls">
-            <button class="btn-nav-control" id="prevBtn">Previous</button>
-            <button class="btn-nav-control primary" id="nextBtn">Next</button>
-            <div class="user-profile-avatar">
-                <i class="far fa-user"></i>
-            </div>
-        </div>
-    </header>
 
     <!-- Content -->
     <div class="tutorial-content">
@@ -175,8 +153,6 @@
                 <i class="fas fa-arrow-right"></i>
             </button>
         </div>
-    </div>
-
     </div>
 
     <script>
