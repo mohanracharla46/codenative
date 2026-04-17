@@ -78,6 +78,18 @@
     </header>
 
     <div class="hero">
+        <div class="hero-bg-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <!-- Floating Tech Logos -->
+            <div class="floating-logo logo-python"><i class="fab fa-python"></i></div>
+            <div class="floating-logo logo-js"><i class="fab fa-js"></i></div>
+            <div class="floating-logo logo-java"><i class="fab fa-java"></i></div>
+            <div class="floating-logo logo-cpp"><i class="fas fa-code"></i></div>
+            <div class="floating-logo logo-html"><i class="fab fa-html5"></i></div>
+            <div class="floating-logo logo-css"><i class="fab fa-css3-alt"></i></div>
+        </div>
         <div class="container">
             <div class="content">
                 <div class="left-section">
@@ -101,7 +113,7 @@
 
     <div class="container">
         <div class="c-container">
-            <div class="c-left-section">
+            <div class="c-left-section reveal-left">
                 <h1 class="c-head">C Programming</h1>
                 <p class="c-tagline">The Foundation of Every Great Developer.</p>
                 <div class="action-buttons">
@@ -111,7 +123,7 @@
                 </div>
             </div>
 
-            <div class="c-right-section">
+            <div class="c-right-section reveal-right">
                 <video class="myVideo" width="400" height="360" muted loop>
                     <source src="{{ url_for('static', filename='videos/C snippet.mp4') }}" type="video/mp4">
                 </video>
@@ -119,7 +131,7 @@
         </div>
 
         <div class="java-container">
-            <div class="c-left-section">
+            <div class="c-left-section reveal-right">
                 <h1 class="java-head">Java</h1>
                 <p class="java-tagline">Powering the World's Applications.</p>
                 <div class="action-buttons">
@@ -129,7 +141,7 @@
                 </div>
             </div>
 
-            <div class="c-right-section">
+            <div class="c-right-section reveal-left">
                 <video class="myVideo" width="400" height="300" muted loop>
                     <source src="{{ url_for('static', filename='videos/java snippet.mp4') }}" type="video/mp4">
                 </video>
@@ -137,7 +149,7 @@
         </div>
 
         <div class="c-container">
-            <div class="c-left-section">
+            <div class="c-left-section reveal-left">
                 <h1 class="c-head">Python</h1>
                 <p class="c-tagline">The Language That Powers the Future.</p>
                 <div class="action-buttons">
@@ -147,7 +159,7 @@
                 </div>
             </div>
 
-            <div class="c-right-section">
+            <div class="c-right-section reveal-right">
                 <video class="myVideo" width="400" height="300" muted loop>
                     <source src="{{ url_for('static', filename='videos/python snippet.mp4') }}" type="video/mp4">
                 </video>
@@ -155,7 +167,7 @@
         </div>
 
         <div class="java-container">
-            <div class="c-left-section">
+            <div class="c-left-section reveal-right">
                 <h1 class="java-head">HTML & CSS</h1>
                 <p class="java-tagline">Build Beautiful and Responsive Websites.</p>
                 <div class="action-buttons">
@@ -165,7 +177,7 @@
                 </div>
             </div>
 
-            <div class="c-right-section">
+            <div class="c-right-section reveal-left">
                 <video class="myVideo" width="400" height="300" muted loop>
                     <source src="{{ url_for('static', filename='videos/html snippet.mp4') }}" type="video/mp4">
                 </video>
@@ -173,7 +185,7 @@
         </div>
 
         <div class="c-container">
-            <div class="c-left-section">
+            <div class="c-left-section reveal-left">
                 <h1 class="c-head">JavaScript</h1>
                 <p class="c-tagline">Make Your Websites Interactive and Dynamic.</p>
                 <div class="action-buttons">
@@ -183,7 +195,7 @@
                 </div>
             </div>
 
-            <div class="c-right-section">
+            <div class="c-right-section reveal-right">
                 <video class="myVideo" width="400" height="300" muted loop>
                     <source src="{{ url_for('static', filename='videos/js snippet.mp4') }}" type="video/mp4">
                 </video>
@@ -329,6 +341,18 @@
         }, options);
 
         videos.forEach(video => observer.observe(video));
+
+        // Scroll Reveal Animation
+        const revealElements = document.querySelectorAll('.reveal-left, .reveal-right, .reveal-up');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal-active');
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+        revealElements.forEach(el => revealObserver.observe(el));
 
         // Mobile Menu Toggle for Home Page
         const mobileMenuToggle = document.getElementById('mobileMenuToggle');

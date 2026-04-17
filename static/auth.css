@@ -8,8 +8,8 @@
 
 body {
     font-family: 'Inter', 'Segoe UI', sans-serif;
-    background: #121212;
-    /* Specific Light Black for Login Page in Dark Mode */
+    background: #f8fafc;
+    /* Specific Light White for Login Page */
     background-attachment: fixed;
     color: var(--text-main);
     line-height: 1.6;
