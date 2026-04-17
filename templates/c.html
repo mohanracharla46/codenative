@@ -46,6 +46,9 @@
     <header class="header small-header">
         <div class="container header-inner">
             <div class="logo">
+                <button class="menu-toggle" id="sidebarToggle" aria-label="Toggle Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a>
             </div>
             <div class="header-actions">
@@ -375,5 +378,24 @@ int main() {
 </script>
 
 <script src="/static/c.js"></script>
+    <script>
+        // Sidebar Toggle for Mobile
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.tutorial-sidebar');
+
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.toggle('active');
+            });
+
+            // Close sidebar when clicking outside
+            document.addEventListener('click', (e) => {
+                if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== sidebarToggle) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        }
+    </script>
 </body>
 </html>
