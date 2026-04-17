@@ -128,8 +128,9 @@ def admin_required(f):
     return decorated_function
 
 
-# Initialize database on startup
-init_db()
+# Initialize database on startup (Only for local SQLite)
+if not os.environ.get('DATABASE_URL'):
+    init_db()
 
 # Authentication Routes
 @app.route("/signin.html")
