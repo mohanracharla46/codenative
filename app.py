@@ -96,6 +96,9 @@ def admin_required(f):
     return decorated_function
 
 
+# Initialize database on startup
+init_db()
+
 # Authentication Routes
 @app.route("/signin.html")
 def signin_page():
