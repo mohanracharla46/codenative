@@ -329,11 +329,17 @@
             threshold: 0.5
         };
 
+        // Video Intersection Observer
         let observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 const vid = entry.target;
                 if (entry.isIntersecting) {
-                    vid.play();
+                    const playPromise = vid.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            // Auto-play was prevented or interrupted.
+                        });
+                    }
                 } else {
                     vid.pause();
                 }
