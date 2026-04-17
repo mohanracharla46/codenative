@@ -53,8 +53,12 @@ def get_db_connection():
             conn = psycopg2.connect(db_url, cursor_factory=psycopg2.extras.RealDictCursor)
             return conn
         except Exception as e:
-            print(f"PostgreSQL connection failed: {e}. Falling back to SQLite.")
+            # If we are in production (on Render), we MUST use the cloud DB. Do not fallback.
+            print(f"CRITICAL: Supabase connection failed: {e}")
+            if os.environ.get('RENDER'):
+                raise Exception(f"Failed to connect to Supabase: {e}")
     
+    # Only fallback to SQLite if NOT on Render
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
