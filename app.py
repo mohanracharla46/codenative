@@ -85,8 +85,19 @@ def hash_password(password):
 def init_db():
     """Initialize the database with users and content tables"""
     conn = get_db_connection()
-    # Create users table
-    conn.execute('''
+    is_pg = hasattr(conn, 'cursor_factory')
+    
+    # SQL for Users Table
+    users_sql = '''
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            is_admin INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -95,17 +106,21 @@ def init_db():
             is_admin INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    ''')
+    '''
     
-    # Check if is_admin column exists (migration)
-    cursor = conn.execute("PRAGMA table_info(users)")
-    columns = [col[1] for col in cursor.fetchall()]
-    if 'is_admin' not in columns:
-        conn.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0")
-        conn.commit()
-
-    # Create content table
-    conn.execute('''
+    # SQL for Content Table
+    content_sql = '''
+        CREATE TABLE IF NOT EXISTS content (
+            id SERIAL PRIMARY KEY,
+            language TEXT NOT NULL,
+            topic_slug TEXT NOT NULL,
+            topic_title TEXT NOT NULL,
+            content_html TEXT NOT NULL,
+            order_index INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(language, topic_slug)
+        )
+    ''' if is_pg else '''
         CREATE TABLE IF NOT EXISTS content (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             language TEXT NOT NULL,
@@ -116,8 +131,36 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(language, topic_slug)
         )
-    ''')
-    conn.commit()
+    '''
+
+    if is_pg:
+        cursor = conn.cursor()
+        cursor.execute(users_sql)
+        cursor.execute(content_sql)
+        
+        # Check if is_admin column exists (Postgres migration)
+        cursor.execute("""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name='users' AND column_name='is_admin'
+        """)
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0")
+        
+        conn.commit()
+    else:
+        # SQLite
+        conn.execute(users_sql)
+        conn.execute(content_sql)
+        
+        # Check if is_admin column exists (SQLite migration)
+        cursor = conn.execute("PRAGMA table_info(users)")
+        columns = [col[1] for col in cursor.fetchall()]
+        if 'is_admin' not in columns:
+            conn.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0")
+        
+        conn.commit()
+    
     conn.close()
     print("Database initialized successfully!")
 
