@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <!-- Primary Meta Tags -->
+    <title>Sign In - Code Native</title>
+    <meta name="title" content="Sign In - Code Native">
+    <meta name="description"
+        content="Sign in to your Code Native account to access interactive coding tutorials and compilers. Start your learning journey today.">
+    <meta name="keywords" content="sign in, login, Code Native, coding tutorials, learn programming, online compiler">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://codenative.in/signin.html">
+    <meta property="og:title" content="Sign In - Code Native">
+    <meta property="og:description"
+        content="Sign in to your Code Native account to access interactive coding tutorials and compilers.">
+    <meta property="og:image" content="{{ url_for('static', filename='images/LMS image.jpg') }}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://codenative.in/signin.html">
+    <meta property="twitter:title" content="Sign In - Code Native">
+    <meta property="twitter:description"
+        content="Sign in to your Code Native account to access interactive coding tutorials and compilers.">
+    <meta property="twitter:image" content="{{ url_for('static', filename='images/LMS image.jpg') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <style>
+        /* Custom Alert Styles */
+        .custom-alert {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            min-width: 300px;
+            max-width: 500px;
+            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .custom-alert.show {
+            top: 30px;
+        }
+
+        .alert-content {
+            background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(79, 70, 229, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .alert-icon {
+            font-size: 32px;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .alert-message {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .alert-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .alert-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Custom Alert Box -->
+    <div class="custom-alert" id="customAlert">
+        <div class="alert-content">
+            <div class="alert-icon"></div>
+            <div class="alert-message" id="alertMessage">Happy Learning!</div>
+            <button class="alert-close" onclick="closeAlert()">&times;</button>
+        </div>
+    </div>
+
+    <!-- Simplified Auth Page (No Global Header) -->
+    <div class="auth-container">
+        <div class="auth-card glass" id="signinCard">
+            <div class="auth-header">
+                <div class="logo-section">
+                    <img src="{{ url_for('static', filename='/images/CodeNative.png') }}" alt="CodeNative Logo"
+                        class="auth-logo">
+                </div>
+                <h1 class="auth-title">Welcome Back</h1>
+                <p class="auth-subtitle">Sign in to continue your coding journey</p>
+            </div>
+
+            <!-- Sign In Form -->
+            <form id="signinForm" class="auth-form">
+                <div class="form-group">
+                    <label for="signin-email" class="form-label">Email Address</label>
+                    <input type="email" id="signin-email" name="email" class="form-input" placeholder="you@example.com"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="signin-password" class="form-label">Password</label>
+                    <input type="password" id="signin-password" name="password" class="form-input"
+                        placeholder="Enter your password" required>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-submit">Sign In</button>
+
+                <div class="divider">
+                    <span>or</span>
+                </div>
+
+                <div class="social-buttons">
+                    <button type="button" class="btn-social btn-google">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path
+                                d="M19.6 10.227c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 01-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.35z"
+                                fill="#4285F4" />
+                            <path
+                                d="M10 20c2.7 0 4.964-.895 6.618-2.423l-3.232-2.509c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.76-5.595-4.123H1.064v2.59A9.996 9.996 0 0010 20z"
+                                fill="#34A853" />
+                            <path
+                                d="M4.405 11.9c-.2-.6-.314-1.24-.314-1.9 0-.66.114-1.3.314-1.9V5.51H1.064A9.996 9.996 0 000 10c0 1.614.386 3.14 1.064 4.49l3.34-2.59z"
+                                fill="#FBBC05" />
+                            <path
+                                d="M10 3.977c1.468 0 2.786.505 3.823 1.496l2.868-2.868C14.959.99 12.695 0 10 0 6.09 0 2.71 2.24 1.064 5.51l3.34 2.59C5.19 5.736 7.395 3.977 10 3.977z"
+                                fill="#EA4335" />
+                        </svg>
+                        Continue with Google
+                    </button>
+                    <button type="button" class="btn-social btn-github">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 0C4.477 0 0 4.477 0 10c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0110 4.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C17.137 18.165 20 14.418 20 10c0-5.523-4.477-10-10-10z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Continue with GitHub
+                    </button>
+                </div>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="#" id="showSignup" class="toggle-link">Sign up</a></p>
+            </div>
+        </div>
+
+        <!-- Sign Up Form (Hidden by default) -->
+        <div class="auth-card glass" id="signupCard" style="display: none;">
+            <div class="auth-header">
+                <div class="logo-section">
+                    <img src="{{ url_for('static', filename='/images/CodeNative.png') }}" alt="CodeNative Logo"
+                        class="auth-logo">
+                </div>
+                <h1 class="auth-title">Create Account</h1>
+                <p class="auth-subtitle">Start your coding journey today</p>
+            </div>
+
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <label for="signup-name" class="form-label">Full Name</label>
+                    <input type="text" id="signup-name" name="name" class="form-input" placeholder="John Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-email" class="form-label">Email Address</label>
+                    <input type="email" id="signup-email" name="email" class="form-input" placeholder="you@example.com"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-password" class="form-label">Password</label>
+                    <input type="password" id="signup-password" name="password" class="form-input"
+                        placeholder="Create a strong password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="signup-confirm-password" class="form-label">Confirm Password</label>
+                    <input type="password" id="signup-confirm-password" name="confirm_password" class="form-input"
+                        placeholder="Confirm your password" required>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="terms" required>
+                        <span>I agree to the <a href="#" class="terms-link">Terms & Conditions</a></span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-submit">Create Account</button>
+
+                <div class="divider">
+                    <span>or</span>
+                </div>
+
+                <div class="social-buttons">
+                    <button type="button" class="btn-social btn-google">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path
+                                d="M19.6 10.227c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 01-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.35z"
+                                fill="#4285F4" />
+                            <path
+                                d="M10 20c2.7 0 4.964-.895 6.618-2.423l-3.232-2.509c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.76-5.595-4.123H1.064v2.59A9.996 9.996 0 0010 20z"
+                                fill="#34A853" />
+                            <path
+                                d="M4.405 11.9c-.2-.6-.314-1.24-.314-1.9 0-.66.114-1.3.314-1.9V5.51H1.064A9.996 9.996 0 000 10c0 1.614.386 3.14 1.064 4.49l3.34-2.59z"
+                                fill="#FBBC05" />
+                            <path
+                                d="M10 3.977c1.468 0 2.786.505 3.823 1.496l2.868-2.868C14.959.99 12.695 0 10 0 6.09 0 2.71 2.24 1.064 5.11l3.34 2.59C5.19 5.736 7.395 3.977 10 3.977z"
+                                fill="#EA4335" />
+                        </svg>
+                        Continue with Google
+                    </button>
+                    <button type="button" class="btn-social btn-github">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 0C4.477 0 0 4.477 0 10c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0110 4.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C17.137 18.165 20 14.418 20 10c0-5.523-4.477-10-10-10z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Continue with GitHub
+                    </button>
+                </div>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="#" id="showSignin" class="toggle-link">Sign in</a></p>
+            </div>
+        </div>
+
+        <!-- Animated Background -->
+        <div class="background-animation">
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+            <div class="circle circle-3"></div>
+        </div>
+    </div>
+
+    <script>
+        // Custom Alert Functions
+        function showAlert(message) {
+            const alert = document.getElementById('customAlert');
+            const alertMessage = document.getElementById('alertMessage');
+            alertMessage.textContent = message;
+            alert.classList.add('show');
+
+            // Auto close after 3 seconds
+            setTimeout(() => {
+                closeAlert();
+            }, 3000);
+        }
+
+        function closeAlert() {
+            const alert = document.getElementById('customAlert');
+            alert.classList.remove('show');
+        }
+
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            // Toggle between sign in and sign up forms
+            const signinCard = document.getElementById('signinCard');
+            const signupCard = document.getElementById('signupCard');
+            const showSignupBtn = document.getElementById('showSignup');
+            const showSigninBtn = document.getElementById('showSignin');
+
+            if (showSignupBtn) {
+                showSignupBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    signinCard.style.display = 'none';
+                    signupCard.style.display = 'block';
+                });
+            }
+
+            if (showSigninBtn) {
+                showSigninBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    signupCard.style.display = 'none';
+                    signinCard.style.display = 'block';
+                });
+            }
+
+            // Check for login_required error
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('error') === 'login_required') {
+                showAlert('Please sign in to access the learning content. 🚀');
+            }
+
+            // Handle Sign In Form Submission
+            document.getElementById('signinForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = {
+                    email: formData.get('email'),
+                    password: formData.get('password')
+                };
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const nextParam = urlParams.get('next');
+                const fetchUrl = nextParam ? `/signin?next=${encodeURIComponent(nextParam)}` : '/signin';
+
+                try {
+                    const response = await fetch(fetchUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        const userName = result.user?.name || 'there';
+                        showAlert(`Welcome back, ${userName}! Happy Learning! 🎓`);
+                        setTimeout(() => {
+                            window.location.href = result.next || '/';
+                        }, 1500);
+                    } else {
+                        showAlert(result.message || 'Sign in failed');
+                    }
+                } catch (error) {
+                    showAlert('An error occurred. Please try again.');
+                    console.error('Error:', error);
+                }
+            });
+
+            // Handle Sign Up Form Submission
+            document.getElementById('signupForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const password = formData.get('password');
+                const confirmPassword = formData.get('confirm_password');
+
+                if (password !== confirmPassword) {
+                    showAlert('Passwords do not match!');
+                    return;
+                }
+
+                const signupData = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    password: password
+                };
+
+                try {
+                    const response = await fetch('/signup', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(signupData)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        const userName = signupData.name || 'there';
+                        showAlert(`Welcome, ${userName}! Happy Learning! `);
+                        setTimeout(() => {
+                            signupCard.style.display = 'none';
+                            signinCard.style.display = 'block';
+                        }, 1500);
+                    } else {
+                        showAlert(result.message || 'Sign up failed');
+                    }
+                } catch (error) {
+                    showAlert('An error occurred. Please try again.');
+                    console.error('Error:', error);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

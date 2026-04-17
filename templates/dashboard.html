@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Code Native</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/dashboard.css">
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/static/theme.js"></script>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo">
+                <a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a>
+            </div>
+            <div class="header-actions">
+                <a href="/dashboard" class="btn-dashboard active">
+                    <i class="fas fa-user-circle"></i> Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-profile">
+                    <div class="profile-avatar">
+                        <img src="https://ui-avatars.com/api/?name={{ session.get('user_name', 'User') }}&background=6366f1&color=fff" alt="Avatar">
+                    </div>
+                    <div class="profile-info">
+                        <h3>{{ session.get('user_name', 'Guest') }}</h3>
+                        <span>{{ session.get('user_email', 'guest@example.com') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-group">
+                    <span class="menu-title">Main Menu</span>
+                    <a href="/dashboard" class="menu-item active">
+                        <i class="fas fa-th-large"></i> Overview
+                    </a>
+                    <a href="/roadmap.html" class="menu-item">
+                        <i class="fas fa-route"></i> Roadmap
+                    </a>
+                    <a href="/compiler.html" class="menu-item">
+                        <i class="fas fa-terminal"></i> Playgrounds
+                    </a>
+                </div>
+
+                <div class="menu-group">
+                    <span class="menu-title">My Courses</span>
+                    <a href="/python.html" class="course-nav-item">
+                        <div class="course-icon python-bg">
+                            <i class="fab fa-python"></i>
+                        </div>
+                        <div class="course-details">
+                            <span class="course-name">Python Core</span>
+                            <span class="course-progress">65% Completed</span>
+                        </div>
+                    </a>
+                    <a href="/c.html" class="course-nav-item">
+                        <div class="course-icon c-bg">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="course-details">
+                            <span class="course-name">C Architecture</span>
+                            <span class="course-progress">30% Completed</span>
+                        </div>
+                    </a>
+                    <a href="/java.html" class="course-nav-item">
+                        <div class="course-icon java-bg">
+                            <i class="fab fa-java"></i>
+                        </div>
+                        <div class="course-details">
+                            <span class="course-name">Java Masterclass</span>
+                            <span class="course-progress">10% Completed</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <div class="welcome-section">
+                <h1>Welcome back, <span style="background: linear-gradient(to right, #6366f1, #8b5cf6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ session.get('user_name', 'Scholar') }}!</span> 👋</h1>
+                <p>Track your progress and pick up exactly where you left off.</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon icon-blue">
+                        <i class="far fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Study Hours</h3>
+                        <p>12.5 hrs</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-purple">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Certificates</h3>
+                        <p>1 / 3</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-orange">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Day Streak</h3>
+                        <p>5 Days</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Learning Activity (Heatmap) -->
+            <div class="activity-section">
+                <div class="activity-header">
+                    <h2 class="section-title" style="margin-bottom: 0;"><i class="fas fa-calendar-check"></i> Learning Activity</h2>
+                    <div class="streak-badge">
+                        <i class="fas fa-fire"></i> 5 Day Streak
+                    </div>
+                </div>
+                
+                <div class="heatmap-card">
+                    <div class="heatmap-stats">
+                        <div class="h-stat">
+                            <span class="h-stat-num">142</span>
+                            <span class="h-stat-text">Total Practices</span>
+                        </div>
+                        <div class="h-stat">
+                            <span class="h-stat-num">12</span>
+                            <span class="h-stat-text">Max Streak</span>
+                        </div>
+                        <div class="h-stat">
+                            <span class="h-stat-num">85%</span>
+                            <span class="h-stat-text">Consistency</span>
+                        </div>
+                    </div>
+
+                    <div class="heatmap-container">
+                        <div class="heatmap-months">
+                            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+                        </div>
+                        <div class="heatmap-grid" id="heatmapGrid">
+                            <!-- Squares will be generated here -->
+                        </div>
+                        <div class="heatmap-legend">
+                            <span>Less</span>
+                            <div class="legend-squares">
+                                <div class="sq level-0"></div>
+                                <div class="sq level-1"></div>
+                                <div class="sq level-2"></div>
+                                <div class="sq level-3"></div>
+                                <div class="sq level-4"></div>
+                            </div>
+                            <span>More</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Courses -->
+            <h2 class="section-title"><i class="fas fa-graduation-cap"></i> My Learning Path</h2>
+            <div class="course-grid">
+                <!-- Python Card -->
+                <div class="course-card">
+                    <div class="course-header" style="background: linear-gradient(135deg, #3776ab, #ffde57);">
+                        <span style="font-weight: 800; color: #fff;">PYTHON</span>
+                        <i class="fab fa-python" style="font-size: 24px; color: #fff;"></i>
+                    </div>
+                    <div class="course-body">
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Course Completion</span>
+                                <span>65%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%;"></div>
+                            </div>
+                        </div>
+                        <div class="course-footer">
+                            <span style="font-size: 13px; color: #64748b; font-weight: 600;">Last Topic: Dict Methods</span>
+                            <a href="/python.html" class="btn-resume">Resume Course</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- C Card -->
+                <div class="course-card">
+                    <div class="course-header" style="background: linear-gradient(135deg, #00599c, #004482);">
+                        <span style="font-weight: 800; color: #fff;">C PROGRAMMING</span>
+                        <i class="fas fa-code-branch" style="font-size: 24px; color: #fff;"></i>
+                    </div>
+                    <div class="course-body">
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Course Completion</span>
+                                <span>30%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 30%; background: #00599c;"></div>
+                            </div>
+                        </div>
+                        <div class="course-footer">
+                            <span style="font-size: 13px; color: #64748b; font-weight: 600;">Last Topic: Pointers</span>
+                            <a href="/c.html" class="btn-resume" style="background: #00599c;">Resume Course</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Java Card -->
+                <div class="course-card">
+                    <div class="course-header" style="background: linear-gradient(135deg, #ed8b00, #f8981d);">
+                        <span style="font-weight: 800; color: #fff;">JAVA</span>
+                        <i class="fab fa-java" style="font-size: 24px; color: #fff;"></i>
+                    </div>
+                    <div class="course-body">
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Course Completion</span>
+                                <span>10%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 10%; background: #ed8b00;"></div>
+                            </div>
+                        </div>
+                        <div class="course-footer">
+                            <span style="font-size: 13px; color: #64748b; font-weight: 600;">Last Topic: Classes & Objects</span>
+                            <a href="/java.html" class="btn-resume" style="background: #ed8b00;">Resume Course</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Access Section -->
+            <div style="margin-top: 40px; background: rgba(99, 102, 241, 0.05); padding: 30px; border-radius: 20px; border: 1px dashed var(--primary-color);">
+                <h3 style="margin-bottom: 15px; color: var(--primary-color); font-weight: 800;">🚀 Practice Makes Perfect</h3>
+                <p style="color: #64748b; margin-bottom: 20px;">Ready to test your knowledge? Head over to the interactive playground and write some code!</p>
+                <div style="display: flex; gap: 15px;">
+                    <a href="/compiler.html" class="btn-signup" style="padding: 12px 24px; background: var(--primary-color); color: white; display: inline-flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-terminal"></i> Open Playground
+                    </a>
+                    <a href="/roadmap.html" class="btn-signup" style="padding: 12px 24px; background: #fff; border: 1px solid #e2e8f0; color: #64748b; display: inline-flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-map"></i> View Roadmap
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+    <script>
+        // Heatmap Generation
+        const grid = document.getElementById('heatmapGrid');
+        const squares = 53 * 7;
+        
+        for (let i = 0; i < squares; i++) {
+            const sq = document.createElement('div');
+            sq.className = 'sq';
+            
+            // Mock activity data
+            const random = Math.random();
+            if (random > 0.95) sq.classList.add('level-4');
+            else if (random > 0.85) sq.classList.add('level-3');
+            else if (random > 0.7) sq.classList.add('level-2');
+            else if (random > 0.5) sq.classList.add('level-1');
+            else sq.classList.add('level-0');
+            
+            // Add tooltip mock
+            const date = new Array("Sun","Mon","Tue","Wed","Thu","Fri","Sat")[i % 7];
+            sq.title = `${date}: ${Math.floor(random * 10)} practices`;
+            
+            grid.appendChild(sq);
+        }
+    </script>
+</body>
+
+</html>

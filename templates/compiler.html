@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>Online C, Java, Python Compiler | Code Native</title>
+    <meta name="title" content="Online C, Java, Python Compiler | Code Native">
+    <meta name="description"
+        content="Run C, Java, Python, C++, and JavaScript code online with Code Native's fast and easy-to-use compiler. Practice coding instantly.">
+    <meta name="keywords"
+        content="online compiler, run code online, python compiler, java compiler, c compiler, javascript compiler, Code Native">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://codenative.in/compiler.html">
+    <meta property="og:title" content="Online C, Java, Python Compiler | Code Native">
+    <meta property="og:description"
+        content="Run C, Java, Python, C++, and JavaScript code online with Code Native's fast and easy-to-use compiler.">
+    <meta property="og:image" content="/static/images/LMS image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://codenative.in/compiler.html">
+    <meta property="twitter:title" content="Online C, Java, Python Compiler | Code Native">
+    <meta property="twitter:description"
+        content="Run C, Java, Python, C++, and JavaScript code online with Code Native's fast and easy-to-use compiler.">
+    <meta property="twitter:image" content="/static/images/LMS image.jpg">
+
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/static/theme.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/compiler.css">
+    <!-- Ace Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js"></script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo"><a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a></div>
+            <div class="header-actions">
+                {% if session.get('is_admin') %}
+                <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock" style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
+                {% endif %}
+                
+                {% if session.get('user_name') %}
+                <a href="/dashboard" class="btn-signup user-btn"><i class="fas fa-user-circle" style="margin-right: 8px; font-size: 16px;"></i>Dashboard</a>
+                {% else %}
+                <a href="/signin.html" class="btn-signup">Sign in</a>
+                {% endif %}
+
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="compiler-page">
+        <div class="compiler-hero">
+            <h1>Online Code Compiler</h1>
+            <p>Write, compile, and run code in multiple programming languages instantly</p>
+        </div>
+
+        <div class="playground-container">
+            <div class="playground-title-bar">
+                <div class="title-left">
+                    <i class="fas fa-terminal" style="margin-right: 10px; color: #a78bfa; font-size: 14px;"></i>
+                    <span>INTERACTIVE PLAYGROUND</span>
+                </div>
+                <div class="traffic-lights">
+                    <span class="light red"></span>
+                    <span class="light yellow"></span>
+                    <span class="light green"></span>
+                </div>
+            </div>
+
+            <div class="playground-tab-bar">
+                <div class="tab-item active">
+                    <span class="file-name">main.py</span>
+                    <div class="active-indicator"></div>
+                </div>
+                <div class="playground-controls">
+                    <div class="lang-selector">
+                        <select id="lang">
+                            <option value="71">Python</option>
+                            <option value="62">Java</option>
+                            <option value="50">C</option>
+                            <option value="54">C++</option>
+                            <option value="63">JavaScript</option>
+                        </select>
+                    </div>
+                    <button id="clearBtn" class="btn-playground-clear">Clear</button>
+                    <button id="runBtn" class="btn-playground-run"><i class="fas fa-play" style="font-size: 10px; margin-right: 6px;"></i> Run Code</button>
+                </div>
+            </div>
+
+            <div class="editor-section-new">
+                <div id="editor">print("Hello, Python Scholar!")</div>
+            </div>
+
+            <div class="playground-console">
+                <div class="console-label">CONSOLE OUTPUT</div>
+                <pre id="output">Press Run to execute.</pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/compiler.js"></script>
+</body>
+
+</html>

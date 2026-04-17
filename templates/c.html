@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>C Programming Tutorial | Code Native</title>
+    <meta name="title" content="C Programming Tutorial | Code Native">
+    <meta name="description"
+        content="Learn C programming from scratch in Telugu. Comprehensive tutorials covering syntax, variables, data types, and more, with an online compiler.">
+    <meta name="keywords"
+        content="learn C programming, C tutorial Telugu, C language, C syntax, C variables, online C compiler, Code Native">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://codenative.in/c.html">
+    <meta property="og:title" content="C Programming Tutorial | Code Native">
+    <meta property="og:description"
+        content="Learn C programming from scratch in Telugu. Comprehensive tutorials covering syntax, variables, data types, and more.">
+    <meta property="og:image" content="/static/images/LMS image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://codenative.in/c.html">
+    <meta property="twitter:title" content="C Programming Tutorial | Code Native">
+    <meta property="twitter:description"
+        content="Learn C programming from scratch in Telugu. Comprehensive tutorials covering syntax, variables, data types, and more.">
+    <meta property="twitter:image" content="/static/images/LMS image.jpg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/c.css">
+    <link rel="stylesheet" href="/static/compiler.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js"></script>
+    <script src="/static/theme.js"></script>
+</head>
+
+
+    <header class="header small-header">
+        <div class="container header-inner">
+            <div class="logo">
+                <a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a>
+            </div>
+            <div class="header-actions">
+                <a href="/dashboard" class="btn-header-dash">
+                    <i class="fas fa-user-circle"></i> Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="tutorial-sidebar">
+        <div class="sidebar-course-card">
+            <i class="fas fa-microchip" style="background: linear-gradient(135deg, #10b981, #34d399);"></i>
+            <div class="sidebar-course-info">
+                <h3>C Masterclass</h3>
+                <span>15% Completed</span>
+            </div>
+        </div>
+
+        <ul id="sidebarTopics" class="sidebar-menu">
+            <!-- Topics will be loaded here -->
+        </ul>
+
+        <div class="sidebar-footer-nav">
+            <div class="sidebar-pro-badge">
+                <span id="proBadgeLabel" style="font-size: 10px; font-weight: 800; color: #6366f1; text-transform: uppercase;">Pro Access</span>
+                <p style="font-size: 11px; margin: 8px 0 12px; color: #64748b;">Unlock advanced Data Structures paths.</p>
+                <button style="width: 100%; padding: 10px; background: #6366f1; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">Upgrade to Pro</button>
+            </div>
+            <ul>
+                <li><i class="far fa-question-circle"></i> Help</li>
+            </ul>
+        </div>
+    </div>
+
+    <header class="progress-sub-header">
+        <div class="header-progress-group">
+            <button class="menu-toggle" id="menuToggle" aria-label="Open Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="progress-label-text">Course Progress</div>
+            <div class="progress-bar-outer">
+                <div class="progress-bar-inner" style="width: 15%; background: #22c55e;"></div>
+            </div>
+            <div class="progress-pct">15%</div>
+        </div>
+
+        <div class="nav-controls">
+            <button class="btn-nav-control" id="prevBtn">Previous</button>
+            <button class="btn-nav-control primary" id="nextBtn">Next</button>
+            <div class="user-profile-avatar">
+                <i class="far fa-user"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="tutorial-content">
+        <div class="content-header">
+            <div class="breadcrumb-label">Module 01 • C Fundamentals</div>
+            {% if session.get('is_admin') %}
+            <a href="#" class="btn-edit-content" id="editTopicBtn" style="display: none;">
+                <i class="fas fa-edit"></i> Edit Lesson
+            </a>
+            {% endif %}
+        </div>
+        
+        <div class="main-box" id="topicContent">
+            <!-- Content from database will be loaded here -->
+            <div style="padding: 100px; text-align: center; color: #94a3b8;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 32px; margin-bottom: 20px;"></i>
+                <p>Loading lesson content...</p>
+            </div>
+        </div>
+
+        <!-- Compiler Integrated as Interactive Playground -->
+        <div class="playground-container" style="margin-top: 40px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+            <div class="playground-title-bar">
+                <div class="title-left">
+                    <i class="fas fa-terminal" style="margin-right: 10px; color: #a78bfa; font-size: 14px;"></i>
+                    <span>INTERACTIVE PLAYGROUND</span>
+                </div>
+                <div class="traffic-lights">
+                    <span class="light red"></span>
+                    <span class="light yellow"></span>
+                    <span class="light green"></span>
+                </div>
+            </div>
+
+            <div class="playground-tab-bar">
+                <div class="tab-item active">
+                    <span class="file-name">main.c</span>
+                    <div class="active-indicator"></div>
+                </div>
+                <div class="playground-controls">
+                    <div class="lang-selector">
+                        <select id="lang">
+                            <option value="71">Python</option>
+                            <option value="62">Java</option>
+                            <option value="50" selected>C</option>
+                            <option value="54">C++</option>
+                            <option value="63">JavaScript</option>
+                        </select>
+                    </div>
+                    <button id="clearBtn" class="btn-playground-clear">Clear</button>
+                    <button id="runBtn" class="btn-playground-run"><i class="fas fa-play" style="font-size: 10px; margin-right: 6px;"></i> Run Code</button>
+                </div>
+            </div>
+
+            <div class="editor-section-new">
+                <div id="editor">#include &lt;stdio.h&gt;
+
+int main() {
+    printf("Hello, C Scholar!\n");
+    return 0;
+}</div>
+            </div>
+
+            <div class="playground-console">
+                <div class="console-label">CONSOLE OUTPUT</div>
+                <pre id="output">Press Run to execute.</pre>
+            </div>
+        </div>
+
+        <!-- Next Lesson -->
+        <div class="next-lesson-section" id="nextLessonBar">
+            <div class="next-lesson-meta">
+                <span>Coming up next</span>
+                <h3>Variables & Data Types</h3>
+            </div>
+            <button class="next-lesson-btn" id="nextLessonBtn">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+<script>
+    // Initialize Ace Editor
+    const editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/c_cpp");
+    editor.setOptions({
+        fontSize: "16px",
+        showPrintMargin: false,
+        tabSize: 4,
+        useWorker: false
+    });
+
+    // DOM
+    const langSelect = document.getElementById("lang");
+    const runBtn = document.getElementById("runBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const outputEl = document.getElementById("output");
+
+    // change mode on language select
+    langSelect.addEventListener("change", () => {
+        const lang = langSelect.value;
+        if (lang == "71") editor.session.setMode("ace/mode/python");
+        else if (lang == "62") editor.session.setMode("ace/mode/java");
+        else if (lang == "50") editor.session.setMode("ace/mode/c_cpp");
+        else if (lang == "54") editor.session.setMode("ace/mode/c_cpp");
+        else if (lang == "63") editor.session.setMode("ace/mode/javascript");
+    });
+
+    // Run handler
+    runBtn.addEventListener("click", runCode);
+    clearBtn.addEventListener("click", () => {
+        outputEl.innerText = "";
+    });
+
+    // runCode: sends code to /run and shows output
+    async function runCode() {
+        try {
+            runBtn.disabled = true;
+            runBtn.innerText = "Running...";
+            outputEl.innerText = "Running...";
+
+            const code = editor.getValue();
+            const language_id = langSelect.value;
+
+            const response = await fetch("/run", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code, language_id })
+            });
+
+            const text = await response.text();
+            let data;
+
+            try {
+                data = JSON.parse(text);
+            } catch (err) {
+                outputEl.innerText = `Invalid response from server:\n${text}`;
+                return;
+            }
+
+            outputEl.innerText = data.output || "No output";
+        } catch (err) {
+            outputEl.innerText = `Error: ${err.message}`;
+        } finally {
+            runBtn.disabled = false;
+            runBtn.innerHTML = '<i class="fas fa-play" style="font-size: 10px; margin-right: 6px;"></i> Run Code';
+        }
+    }
+
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById("menuToggle");
+    const menuToggleMain = document.getElementById("menuToggleMain");
+    const sidebar = document.querySelector(".tutorial-sidebar");
+
+    function toggleSidebar() {
+        sidebar.classList.toggle("active");
+        const isOpened = sidebar.classList.contains("active");
+        const icon = isOpened ? "fa-times" : "fa-bars";
+        
+        if (menuToggle) menuToggle.querySelector('i').className = `fas ${icon}`;
+        if (menuToggleMain) menuToggleMain.querySelector('i').className = `fas ${icon}`;
+        
+        if (typeof editor !== 'undefined') {
+            setTimeout(() => editor.resize(), 300);
+        }
+    }
+
+    if (menuToggle) menuToggle.onclick = toggleSidebar;
+    if (menuToggleMain) menuToggleMain.onclick = toggleSidebar;
+
+    // Close sidebar when clicking outside
+    document.addEventListener('click', (e) => {
+        if (sidebar && sidebar.classList.contains('active')) {
+            const isClickInsideSidebar = sidebar.contains(e.target);
+            const isClickOnToggle = menuToggle && menuToggle.contains(e.target);
+            const isClickOnToggleMain = menuToggleMain && menuToggleMain.contains(e.target);
+
+            if (!isClickInsideSidebar && !isClickOnToggle && !isClickOnToggleMain) {
+                sidebar.classList.remove('active');
+                if (menuToggle) menuToggle.querySelector('i').className = 'fas fa-bars';
+                if (menuToggleMain) menuToggleMain.querySelector('i').className = 'fas fa-bars';
+                if (typeof editor !== 'undefined') {
+                    setTimeout(() => editor.resize(), 300);
+                }
+            }
+        }
+    });
+
+    // Close sidebar when clicking a topic on mobile
+    sidebarTopics.addEventListener("click", (e) => {
+        if (e.target.classList.contains('topic') && window.innerWidth <= 1024) {
+            sidebar.classList.remove("active");
+            if (menuToggle) menuToggle.querySelector('i').className = 'fas fa-bars';
+            if (menuToggleMain) menuToggleMain.querySelector('i').className = 'fas fa-bars';
+        }
+    });
+
+    // Dynamic Content Loading
+    const sidebarTopics = document.getElementById('sidebarTopics');
+    const contentBox = document.getElementById('topicContent');
+    const titleBox = document.getElementById('pageTitle');
+    const currentLang = 'c';
+
+    async function loadTopics() {
+        try {
+            const res = await fetch(`/api/content/${currentLang}`);
+            const topics = await res.json();
+            
+            if (topics.length > 0) {
+                sidebarTopics.innerHTML = '';
+                topics.forEach((topic, index) => {
+                    const li = document.createElement('li');
+                    li.className = `topic ${index === 0 ? 'active' : ''}`;
+                    li.dataset.topic = topic.topic_slug;
+                    li.textContent = topic.topic_title;
+                    li.onclick = () => loadSpecificTopic(topic.topic_slug, li);
+                    sidebarTopics.appendChild(li);
+                });
+                loadSpecificTopic(topics[0].topic_slug, sidebarTopics.firstChild);
+            }
+        } catch (err) { console.error(err); }
+    }
+
+    async function loadSpecificTopic(slug, el) {
+        try {
+            document.querySelectorAll('.topic').forEach(t => t.classList.remove('active'));
+            if(el) el.classList.add('active');
+            
+            const res = await fetch(`/api/content/${currentLang}/${slug}`);
+            const data = await res.json();
+                if(data.content_html) {
+                    contentBox.innerHTML = data.content_html;
+                    
+                    // Display Edit button for Admins
+                    const editBtn = document.getElementById('editTopicBtn');
+                    if(editBtn) {
+                        editBtn.style.display = 'inline-flex';
+                        editBtn.onclick = (e) => {
+                            e.preventDefault();
+                            window.location.href = `/admin/dashboard?tab=tutorials&edit=${data.id || data._id || slug}`;
+                        };
+                    }
+                }
+
+            // Update Next Lesson Bar
+            const nextEl = el.nextElementSibling;
+            const nextBar = document.getElementById('nextLessonBar');
+            if(nextEl && nextEl.classList.contains('topic')) {
+                nextBar.style.display = 'flex';
+                nextBar.querySelector('h3').textContent = nextEl.textContent;
+                nextBar.onclick = () => nextEl.click();
+            } else {
+                nextBar.style.display = 'none';
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch(err) { console.error(err); }
+    }
+
+    // Nav buttons
+    document.getElementById('prevBtn').onclick = () => {
+        const active = document.querySelector('.topic.active');
+        if(active && active.previousElementSibling) active.previousElementSibling.click();
+    };
+    document.getElementById('nextBtn').onclick = () => {
+        const active = document.querySelector('.topic.active');
+        if(active && active.nextElementSibling) active.nextElementSibling.click();
+    };
+
+    window.addEventListener('DOMContentLoaded', loadTopics);
+</script>
+
+<script src="/static/c.js"></script>
+</body>
+</html>

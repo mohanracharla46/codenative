@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Roadmap | Code Native</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/roadmap.css">
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/static/theme.js"></script>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo"><a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a></div>
+            <div class="header-actions">
+                {% if session.get('is_admin') %}
+                <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock" style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
+                {% endif %}
+                
+                {% if session.get('user_name') %}
+                <a href="/dashboard" class="btn-signup user-btn"><i class="fas fa-user-circle" style="margin-right: 8px; font-size: 16px;"></i>Dashboard</a>
+                {% else %}
+                <a href="/signin.html" class="btn-signup">Sign in</a>
+                {% endif %}
+
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="roadmap-container">
+        <header class="roadmap-header">
+            <h1>Developer <span class="highlight">Roadmaps</span></h1>
+            <p>Step-by-step guides to master your favorite programming language.</p>
+        </header>
+
+        <div class="roadmap-tabs">
+            <button class="tab-btn active" onclick="showRoadmap('c')">C Programming</button>
+            <button class="tab-btn" onclick="showRoadmap('java')">Java</button>
+            <button class="tab-btn" onclick="showRoadmap('python')">Python</button>
+            <button class="tab-btn" onclick="showRoadmap('htmlcss')">HTML & CSS</button>
+            <button class="tab-btn" onclick="showRoadmap('javascript')">JavaScript</button>
+        </div>
+
+        <!-- C Roadmap -->
+        <div id="c" class="roadmap-content active">
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>1. Basics of C</h3>
+                        <p>Variables, Data Types, Operators, Input/Output</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>2. Control Flow</h3>
+                        <p>If-Else, Switch Case, Loops (For, While, Do-While)</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>3. Functions</h3>
+                        <p>Declaration, Definition, Recursion, Scope</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>4. Arrays & Strings</h3>
+                        <p>1D/2D Arrays, String Handling Functions</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>5. Pointers</h3>
+                        <p>Memory Addresses, Pointer Arithmetic, Pointers with Arrays/Functions</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>6. Structures & Unions</h3>
+                        <p>User-defined Data Types, Memory Allocation</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>7. File Handling</h3>
+                        <p>Reading, Writing, Updating Files</p>
+                    </div>
+                </div>
+            </div>
+            <div class="cta-box">
+                <a href="/c.html" class="cta-btn">Start Learning C</a>
+            </div>
+        </div>
+
+        <!-- Java Roadmap -->
+        <div id="java" class="roadmap-content">
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>1. Java Basics</h3>
+                        <p>JDK/JRE/JVM, Variables, Data Types</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>2. OOPs Concepts</h3>
+                        <p>Class, Object, Inheritance, Polymorphism, Encapsulation, Abstraction</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>3. Exception Handling</h3>
+                        <p>Try-Catch, Throw, Throws, Custom Exceptions</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>4. Collections Framework</h3>
+                        <p>List, Set, Map, ArrayList, HashMap</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>5. Multithreading</h3>
+                        <p>Threads, Synchronization, Life Cycle</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>6. Java 8 Features</h3>
+                        <p>Lambdas, Streams, Functional Interfaces</p>
+                    </div>
+                </div>
+            </div>
+            <div class="cta-box">
+                <a href="/java.html" class="cta-btn">Start Learning Java</a>
+            </div>
+        </div>
+
+        <!-- Python Roadmap -->
+        <div id="python" class="roadmap-content">
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>1. Python Basics</h3>
+                        <p>Syntax, Variables, Data Types, Comments</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>2. Control Structures</h3>
+                        <p>Conditionals, Loops, List Comprehensions</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>3. Data Structures</h3>
+                        <p>Lists, Tuples, Sets, Dictionaries</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>4. Functions & Modules</h3>
+                        <p>Def, Arguments, Lambda, Importing Modules</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>5. OOPs in Python</h3>
+                        <p>Classes, Objects, Inheritance, Methods</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>6. File Handling & APIs</h3>
+                        <p>Reading Files, JSON, Requests</p>
+                    </div>
+                </div>
+            </div>
+            <div class="cta-box">
+                <a href="/python.html" class="cta-btn">Start Learning Python</a>
+            </div>
+        </div>
+
+        <!-- HTML & CSS Roadmap -->
+        <div id="htmlcss" class="roadmap-content">
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>1. HTML Basics</h3>
+                        <p>Tags, Elements, Attributes, Document Structure</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>2. HTML Forms & Media</h3>
+                        <p>Forms, Input Types, Images, Audio, Video</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>3. CSS Basics</h3>
+                        <p>Selectors, Properties, Colors, Fonts, Box Model</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>4. CSS Layout</h3>
+                        <p>Flexbox, Grid, Position, Display, Float</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>5. Responsive Design</h3>
+                        <p>Media Queries, Mobile-First Design, Viewport</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>6. CSS Advanced</h3>
+                        <p>Animations, Transitions, Transforms, Variables</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>7. CSS Frameworks</h3>
+                        <p>Bootstrap, Tailwind CSS, Material-UI</p>
+                    </div>
+                </div>
+            </div>
+            <div class="cta-box">
+                <a href="#" class="cta-btn">Coming Soon</a>
+            </div>
+        </div>
+
+        <!-- JavaScript Roadmap -->
+        <div id="javascript" class="roadmap-content">
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>1. JavaScript Basics</h3>
+                        <p>Variables, Data Types, Operators, Functions</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>2. DOM Manipulation</h3>
+                        <p>Selecting Elements, Event Listeners, DOM Traversal</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>3. ES6+ Features</h3>
+                        <p>Arrow Functions, Promises, Async/Await, Destructuring</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>4. Arrays & Objects</h3>
+                        <p>Map, Filter, Reduce, Object Methods, Spread Operator</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>5. APIs & Fetch</h3>
+                        <p>REST APIs, JSON, Fetch API, Axios</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>6. Error Handling</h3>
+                        <p>Try-Catch, Throw, Custom Errors</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>7. Modern JavaScript</h3>
+                        <p>Modules, Webpack, NPM, Package Management</p>
+                    </div>
+                </div>
+            </div>
+            <div class="cta-box">
+                <a href="#" class="cta-btn">Coming Soon</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showRoadmap(lang) {
+            // Hide all lists
+            document.querySelectorAll('.roadmap-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Show selected
+            document.getElementById(lang).classList.add('active');
+
+            // Highlight button
+            const buttons = document.querySelectorAll('.tab-btn');
+            if (lang === 'c') buttons[0].classList.add('active');
+            if (lang === 'java') buttons[1].classList.add('active');
+            if (lang === 'python') buttons[2].classList.add('active');
+            if (lang === 'htmlcss') buttons[3].classList.add('active');
+            if (lang === 'javascript') buttons[4].classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions | Code Native</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/static/theme.js"></script>
+
+    <style>
+        .legal-container {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 40px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .legal-container h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .legal-container p,
+        .legal-container li {
+            color: var(--text-dim);
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .legal-container h2 {
+            font-size: 24px;
+            color: var(--text-light);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .legal-container ul {
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+
+        .last-updated {
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-bottom: 30px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo"><a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a></div>
+            <div class="header-actions">
+                {% if session.get('is_admin') %}
+                <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock" style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
+                {% endif %}
+                
+                {% if session.get('user_name') %}
+                <a href="/dashboard" class="btn-signup user-btn"><i class="fas fa-user-circle" style="margin-right: 8px; font-size: 16px;"></i>Dashboard</a>
+                {% else %}
+                <a href="/signin.html" class="btn-signup">Sign in</a>
+                {% endif %}
+
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="legal-container">
+        <h1>Terms & Conditions</h1>
+        <span class="last-updated">Last Updated: January 3, 2026</span>
+
+        <p>Welcome to Code Native. By accessing or using our website, you agree to be bound by these Terms & Conditions.
+            Please read them carefully.</p>
+
+        <h2>1. Use of Services</h2>
+        <p>You agree to use our platform solely for educational and personal purposes. You must not misuse our services,
+            interfere with our operations, or attempt to access restricted areas without authorization.</p>
+
+        <h2>2. User Accounts</h2>
+        <p>To access certain features, you may need to create an account. You are responsible for maintaining the
+            confidentiality of your credentials and for all activities that occur under your account.</p>
+
+        <h2>3. Content Ownership</h2>
+        <p>All tutorials, images, and other content on Code Native are the property of Code Native or its licensors. You
+            may not reproduce, distribute, or create derivative works without our express permission.</p>
+
+        <h2>4. User-Generated Content</h2>
+        <p>By submitting code or comments, you grant us a non-exclusive license to use, display, and distribute such
+            content in connection with our services. You represent that you have the right to share such content.</p>
+
+        <h2>5. Disclaimer of Warranties</h2>
+        <p>Our services are provided "as is" and "as available" without any warranties of any kind. We do not guarantee
+            that our platform will be error-free or uninterrupted.</p>
+
+        <h2>6. Limitation of Liability</h2>
+        <p>Code Native shall not be liable for any indirect, incidental, or consequential damages arising out of your
+            use of our services.</p>
+
+        <h2>7. Changes to Terms</h2>
+        <p>We reserve the right to modify these terms at any time. Continued use of the website after changes
+            constitutes your acceptance of the new terms.</p>
+
+        <h2>8. Contact Us</h2>
+        <p>If you have any questions about these Terms, please contact us at support@codenative.in.</p>
+    </div>
+
+</body>
+
+</html>
