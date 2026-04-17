@@ -248,35 +248,6 @@ body {
     line-height: 1.7;
 }
 
-/* Content Header */
-.content-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-}
-
-.btn-edit-content {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(99, 102, 241, 0.05);
-    color: #6366f1;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 700;
-    border: 1px solid rgba(99, 102, 241, 0.1);
-    transition: 0.2s;
-    cursor: pointer;
-}
-
-.btn-edit-content:hover {
-    background: #6366f1;
-    color: white;
-}
-
 #topicContent {
     font-size: 16px;
     color: #334155;

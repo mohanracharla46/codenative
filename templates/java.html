@@ -107,14 +107,7 @@
     </header>
 
     <div class="tutorial-content">
-        <div class="content-header">
-            <div class="breadcrumb-label">Module 01 • Java Fundamentals</div>
-            {% if session.get('is_admin') %}
-            <a href="#" class="btn-edit-content" id="editTopicBtn" style="display: none;">
-                <i class="fas fa-edit"></i> Edit Lesson
-            </a>
-            {% endif %}
-        </div>
+        <div class="breadcrumb-label">Module 01 • Java Fundamentals</div>
         
         <div class="main-box" id="topicContent">
             <!-- Content from database will be loaded here -->
@@ -293,16 +286,6 @@
                 const data = await res.json();
                 if(data.content_html) {
                     contentBox.innerHTML = data.content_html;
-                    
-                    // Display Edit button for Admins
-                    const editBtn = document.getElementById('editTopicBtn');
-                    if(editBtn) {
-                        editBtn.style.display = 'inline-flex';
-                        editBtn.onclick = (e) => {
-                            e.preventDefault();
-                            window.location.href = `/admin/dashboard?tab=tutorials&edit=${data.id || data._id || slug}`;
-                        };
-                    }
                 }
 
                 // Update Next Lesson Bar
