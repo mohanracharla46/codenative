@@ -462,8 +462,37 @@ body {
     background: var(--primary-hover);
 }
 
+/* Sidebar Close Button (Mobile Only) */
+.sidebar-close {
+    display: none;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 36px;
+    height: 36px;
+    background: #f1f5f9;
+    color: #64748b;
+    border: none;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.2s;
+}
+
+.sidebar-close:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
 /* Responsive Styles */
 @media (max-width: 1024px) {
+    .sidebar-close {
+        display: flex;
+    }
+    
     .tutorial-sidebar {
         transform: translateX(-100%);
         width: 280px;

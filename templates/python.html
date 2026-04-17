@@ -61,6 +61,9 @@
 
     <!-- Sidebar -->
     <div class="tutorial-sidebar">
+        <button class="sidebar-close" id="sidebarClose" aria-label="Close Menu">
+            <i class="fas fa-times"></i>
+        </button>
         <div class="sidebar-course-card">
             <i class="fab fa-python"></i>
             <div class="sidebar-course-info">
@@ -343,21 +346,40 @@
     <script>
         // Sidebar Toggle for Mobile
         const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
         const sidebar = document.querySelector('.tutorial-sidebar');
+        const menuIcon = sidebarToggle ? sidebarToggle.querySelector('i') : null;
+
+        function toggleSidebar(e) {
+            if(e) e.stopPropagation();
+            sidebar.classList.toggle('active');
+            if (menuIcon) {
+                if(sidebar.classList.contains('active')) {
+                    menuIcon.classList.replace('fa-bars', 'fa-times');
+                } else {
+                    menuIcon.classList.replace('fa-times', 'fa-bars');
+                }
+            }
+        }
 
         if (sidebarToggle && sidebar) {
-            sidebarToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                sidebar.classList.toggle('active');
-            });
+            sidebarToggle.addEventListener('click', toggleSidebar);
+        }
 
-            // Close sidebar when clicking outside
-            document.addEventListener('click', (e) => {
-                if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== sidebarToggle) {
-                    sidebar.classList.remove('active');
-                }
+        if (sidebarClose && sidebar) {
+            sidebarClose.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
             });
         }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            if (sidebar && sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== sidebarToggle) {
+                sidebar.classList.remove('active');
+                if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
+            }
+        });
     </script>
 </body>
 
