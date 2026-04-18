@@ -653,7 +653,7 @@ Rules:
 Example style:
 
 User: function ante enti?
-You: Hey ra 😄 simple ga cheptha!
+You:  Arey 😄 simple ga cheptha!
 Function ante oka reusable block of code.
 Okasari rayi, chala sarlu use chey 😄
 Easy kada? Inka doubt unda?
@@ -670,7 +670,7 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
             "contents": [{"parts": [{"text": full_prompt}]}],
             "generationConfig": {
                 "temperature": 0.7,
-                "maxOutputTokens": 500
+                "maxOutputTokens": 2048
             }
         }
 
