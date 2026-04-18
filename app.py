@@ -630,7 +630,8 @@ Guidelines:
         full_prompt = f"{system_prompt}\n\nStudent question: {user_message}"
 
         # Call Gemini REST API directly (no extra SDK needed)
-        gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_api_key}"
+        # Use flash-lite for higher free-tier rate limits; fallback gracefully
+        gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={gemini_api_key}"
         payload = {
             "contents": [{"parts": [{"text": full_prompt}]}],
             "generationConfig": {
@@ -640,6 +641,15 @@ Guidelines:
         }
 
         resp = requests.post(gemini_url, json=payload, timeout=20)
+        
+        # If flash-lite is rate-limited, try flash
+        if resp.status_code == 429:
+            gemini_url2 = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_api_key}"
+            resp = requests.post(gemini_url2, json=payload, timeout=20)
+        
+        if resp.status_code == 429:
+            return jsonify({'reply': '⏳ Too many requests — the AI is a bit busy right now! Please wait a few seconds and try again.'}), 429
+        
         resp.raise_for_status()
         result = resp.json()
 
