@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv() # Load variables from .env
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-app.secret_key = os.urandom(24)  # Secret key for session management
+app.secret_key = os.environ.get('SECRET_KEY', 'codenative_fallback_secret_key_secure_12345')  # Use static key for serverless continuity
 
 # Database configuration
 DATABASE = 'users.db'
