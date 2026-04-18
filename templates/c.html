@@ -274,16 +274,18 @@ int main() {
     });
 
     // Close sidebar when clicking a topic on mobile
-    sidebarTopics.addEventListener("click", (e) => {
-        if (e.target.classList.contains('topic') && window.innerWidth <= 1024) {
-            sidebar.classList.remove("active");
-            if (menuToggle) menuToggle.querySelector('i').className = 'fas fa-bars';
-            if (menuToggleMain) menuToggleMain.querySelector('i').className = 'fas fa-bars';
-        }
-    });
+    const sidebarTopics = document.getElementById('sidebarTopics');
+    if (sidebarTopics) {
+        sidebarTopics.addEventListener("click", (e) => {
+            if (e.target.classList.contains('topic') && window.innerWidth <= 1024) {
+                sidebar.classList.remove("active");
+                if (menuToggle) menuToggle.querySelector('i').className = 'fas fa-bars';
+                if (menuToggleMain) menuToggleMain.querySelector('i').className = 'fas fa-bars';
+            }
+        });
+    }
 
     // Dynamic Content Loading
-    const sidebarTopics = document.getElementById('sidebarTopics');
     const contentBox = document.getElementById('topicContent');
     const titleBox = document.getElementById('pageTitle');
     const currentLang = 'c';
@@ -335,19 +337,23 @@ int main() {
     }
 
     // Nav buttons
-    document.getElementById('prevBtn').onclick = () => {
-        const active = document.querySelector('.topic.active');
-        if(active && active.previousElementSibling) active.previousElementSibling.click();
-    };
-    document.getElementById('nextBtn').onclick = () => {
-        const active = document.querySelector('.topic.active');
-        if(active && active.nextElementSibling) active.nextElementSibling.click();
-    };
+    const prevBtn = document.getElementById('prevTopic');
+    const nextBtn = document.getElementById('nextTopic');
+    if (prevBtn) {
+        prevBtn.onclick = () => {
+            const active = document.querySelector('.topic.active');
+            if(active && active.previousElementSibling) active.previousElementSibling.click();
+        };
+    }
+    if (nextBtn) {
+        nextBtn.onclick = () => {
+            const active = document.querySelector('.topic.active');
+            if(active && active.nextElementSibling) active.nextElementSibling.click();
+        };
+    }
 
     window.addEventListener('DOMContentLoaded', loadTopics);
 </script>
-
-<script src="/static/c.js"></script>
     <script>
         // Sidebar Toggle for Mobile
         const sidebarToggle = document.getElementById('sidebarToggle');

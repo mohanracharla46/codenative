@@ -291,14 +291,20 @@
         }
 
         // Nav buttons
-        document.getElementById('prevBtn').onclick = () => {
-            const active = document.querySelector('.topic.active');
-            if(active && active.previousElementSibling) active.previousElementSibling.click();
-        };
-        document.getElementById('nextBtn').onclick = () => {
-            const active = document.querySelector('.topic.active');
-            if(active && active.nextElementSibling) active.nextElementSibling.click();
-        };
+        const prevBtn = document.getElementById('prevTopic');
+        const nextBtn = document.getElementById('nextTopic');
+        if (prevBtn) {
+            prevBtn.onclick = () => {
+                const active = document.querySelector('.topic.active');
+                if(active && active.previousElementSibling) active.previousElementSibling.click();
+            };
+        }
+        if (nextBtn) {
+            nextBtn.onclick = () => {
+                const active = document.querySelector('.topic.active');
+                if(active && active.nextElementSibling) active.nextElementSibling.click();
+            };
+        }
 
         // Mobile Menu Toggle
         const menuToggle = document.getElementById('menuToggle');
@@ -328,7 +334,6 @@
 
         window.addEventListener('DOMContentLoaded', loadTopics);
     </script>
-    <script src="/static/java.js"></script>
     <script>
         // Sidebar Toggle for Mobile
         const sidebarToggle = document.getElementById('sidebarToggle');
