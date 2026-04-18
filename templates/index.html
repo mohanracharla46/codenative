@@ -39,6 +39,45 @@
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <style>
+        @keyframes cursorBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        @keyframes floatContainer {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .code-showcase {
+            min-width: 380px;
+            text-align: left;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0 auto;
+        }
+        .code-showcase:hover {
+            transform: scale(1.05) translateY(-5px) !important;
+            box-shadow: 0 35px 60px -15px rgba(99, 102, 241, 0.5) !important;
+        }
+        .terminal-header {
+            background: #2d2d2d; 
+            padding: 12px 18px; 
+            display: flex; 
+            align-items: center;
+            gap: 8px; 
+            border-bottom: 1px solid #3f3f46;
+        }
+        .terminal-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+        }
+        .terminal-content {
+            padding: 24px; 
+            font-family: 'JetBrains Mono', Consolas, monospace; 
+            font-size: 15px; 
+            line-height: 1.7; 
+            color: #d4d4d4;
+            background: #1e1e1e;
+        }
+    </style>
 </head>
 
 <body>
@@ -124,9 +163,23 @@
             </div>
 
             <div class="c-right-section reveal-right">
-                <video class="myVideo" width="400" height="360" muted loop>
-                    <source src="{{ url_for('static', filename='videos/C snippet.mp4') }}" type="video/mp4">
-                </video>
+                <div class="code-showcase" style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 89, 156, 0.3); border: 1px solid #333; position: relative; animation: floatContainer 5s ease-in-out infinite;">
+                    <div class="terminal-header">
+                        <span class="terminal-dot" style="background:#ff5f56;"></span>
+                        <span class="terminal-dot" style="background:#ffbd2e;"></span>
+                        <span class="terminal-dot" style="background:#27c93f;"></span>
+                        <span style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">main.c</span>
+                    </div>
+                    <div class="terminal-content">
+                        <span style="color: #c586c0;">#include</span> <span style="color: #ce9178;">&lt;stdio.h&gt;</span><br><br>
+                        <span style="color: #569cd6;">int</span> <span style="color: #dcdcaa;">main</span>() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #569cd6;">char</span>* ptr = <span style="color: #ce9178;">"Excellence"</span>;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #dcdcaa;">printf</span>(<span style="color: #ce9178;">"%s begins here.\n"</span>, ptr);<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #c586c0;">return</span> <span style="color: #b5cea8;">0</span>;<br>
+                        }<br>
+                        <div style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle; margin-top: 5px;"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -142,9 +195,22 @@
             </div>
 
             <div class="c-right-section reveal-left">
-                <video class="myVideo" width="400" height="300" muted loop>
-                    <source src="{{ url_for('static', filename='videos/java snippet.mp4') }}" type="video/mp4">
-                </video>
+                <div class="code-showcase" style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(237, 139, 0, 0.3); border: 1px solid #333; position: relative; animation: floatContainer 6.5s ease-in-out infinite;">
+                    <div class="terminal-header">
+                        <span class="terminal-dot" style="background:#ff5f56;"></span>
+                        <span class="terminal-dot" style="background:#ffbd2e;"></span>
+                        <span class="terminal-dot" style="background:#27c93f;"></span>
+                        <span style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">App.java</span>
+                    </div>
+                    <div class="terminal-content">
+                        <span style="color: #c586c0;">public class</span> <span style="color: #4ec9b0;">App</span> {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #c586c0;">public static void</span> <span style="color: #dcdcaa;">main</span>(String[] args) {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.out.<span style="color: #dcdcaa;">println</span>(<span style="color: #ce9178;">"Hello, Enterprise!"</span>);<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                        }<br>
+                        <div style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle; margin-top: 10px;"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -160,9 +226,23 @@
             </div>
 
             <div class="c-right-section reveal-right">
-                <video class="myVideo" width="400" height="300" muted loop>
-                    <source src="{{ url_for('static', filename='videos/python snippet.mp4') }}" type="video/mp4">
-                </video>
+                <div class="code-showcase" style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(55, 118, 171, 0.3); border: 1px solid #333; position: relative; animation: floatContainer 6s ease-in-out infinite;">
+                    <div class="terminal-header">
+                        <span class="terminal-dot" style="background:#ff5f56;"></span>
+                        <span class="terminal-dot" style="background:#ffbd2e;"></span>
+                        <span class="terminal-dot" style="background:#27c93f;"></span>
+                        <span style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">main.py</span>
+                    </div>
+                    <div class="terminal-content">
+                        <span style="color: #c586c0;">def</span> <span style="color: #dcdcaa;">unleash_potential</span>():<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;vision = <span style="color: #ce9178;">"Build the future"</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #c586c0;">while</span> <span style="color: #569cd6;">True</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #dcdcaa;">learn</span>(), <span style="color: #dcdcaa;">code</span>(), <span style="color: #dcdcaa;">deploy</span>()<br>
+                        <span style="color: #6a9955;"># Powered by CodeNative</span><br>
+                        <br>
+                        <div style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle;"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -178,9 +258,23 @@
             </div>
 
             <div class="c-right-section reveal-left">
-                <video class="myVideo" width="400" height="300" muted loop>
-                    <source src="{{ url_for('static', filename='videos/html snippet.mp4') }}" type="video/mp4">
-                </video>
+                <div class="code-showcase" style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(240, 101, 41, 0.3); border: 1px solid #333; position: relative; animation: floatContainer 5.5s ease-in-out infinite;">
+                    <div class="terminal-header">
+                        <span class="terminal-dot" style="background:#ff5f56;"></span>
+                        <span class="terminal-dot" style="background:#ffbd2e;"></span>
+                        <span class="terminal-dot" style="background:#27c93f;"></span>
+                        <span style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">index.html</span>
+                    </div>
+                    <div class="terminal-content">
+                        <span style="color: #808080;">&lt;!DOCTYPE html&gt;</span><br>
+                        <span style="color: #569cd6;">&lt;html&gt;</span><br>
+                        &nbsp;&nbsp;<span style="color: #569cd6;">&lt;body <span style="color: #9cdcfe;">class</span>=<span style="color: #ce9178;">"beautiful"</span>&gt;</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #569cd6;">&lt;h1&gt;</span>Pixels come to life<span style="color: #569cd6;">&lt;/h1&gt;</span><br>
+                        &nbsp;&nbsp;<span style="color: #569cd6;">&lt;/body&gt;</span><br>
+                        <span style="color: #569cd6;">&lt;/html&gt;</span><br>
+                        <div style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle; margin-top: 2px;"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -196,9 +290,22 @@
             </div>
 
             <div class="c-right-section reveal-right">
-                <video class="myVideo" width="400" height="300" muted loop>
-                    <source src="{{ url_for('static', filename='videos/js snippet.mp4') }}" type="video/mp4">
-                </video>
+                <div class="code-showcase" style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(247, 223, 30, 0.3); border: 1px solid #333; position: relative; animation: floatContainer 5s ease-in-out infinite;">
+                    <div class="terminal-header">
+                        <span class="terminal-dot" style="background:#ff5f56;"></span>
+                        <span class="terminal-dot" style="background:#ffbd2e;"></span>
+                        <span class="terminal-dot" style="background:#27c93f;"></span>
+                        <span style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">script.js</span>
+                    </div>
+                    <div class="terminal-content">
+                        <span style="color: #569cd6;">const</span> createMagic = () <span style="color: #569cd6;">=&gt;</span> {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #569cd6;">let</span> view = <span style="color: #ce9178;">"Dynamic"</span>;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #c586c0;">return</span> <span style="color: #dcdcaa;">fetch</span>(<span style="color: #ce9178;">'/future'</span>);<br>
+                        };<br>
+                        <span style="color: #dcdcaa;">createMagic</span>().<span style="color: #dcdcaa;">then</span>(go <span style="color: #569cd6;">=&gt;</span> go());<br>
+                        <div style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle; margin-top: 10px;"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -319,34 +426,7 @@
             }
         });
 
-        const videos = document.querySelectorAll(".myVideo");
 
-        videos.forEach(video => {
-            video.playbackRate = 3.0; // Speed up each video
-        });
-
-        let options = {
-            threshold: 0.5
-        };
-
-        // Video Intersection Observer
-        let observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const vid = entry.target;
-                if (entry.isIntersecting) {
-                    const playPromise = vid.play();
-                    if (playPromise !== undefined) {
-                        playPromise.catch(error => {
-                            // Auto-play was prevented or interrupted.
-                        });
-                    }
-                } else {
-                    vid.pause();
-                }
-            });
-        }, options);
-
-        videos.forEach(video => observer.observe(video));
 
         // Scroll Reveal Animation
         const revealElements = document.querySelectorAll('.reveal-left, .reveal-right, .reveal-up');
