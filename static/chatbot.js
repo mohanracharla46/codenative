@@ -160,10 +160,10 @@
 
     // ── Quick question chips per language ─────────────────────────────
     const CHIPS = {
-        python:      ['What is a list?', 'Explain def keyword', 'What is indentation?'],
-        java:        ['What is a class?', 'Explain static keyword', 'What are exceptions?'],
-        c:           ['What is a pointer?', 'Explain malloc()', 'What is a struct?'],
-        programming: ['How to start coding?', 'What is an algorithm?', 'Explain variables']
+        python:      ['List ela work chestundi?', 'Function ela reyali?', 'Loop example ivvu'],
+        java:        ['Class ante enti ra?', 'Static keyword explain cheyyi', 'Exception handle ela?'],
+        c:           ['Pointer ante enti ra?', 'malloc() ela use cheyali?', 'Struct explain cheyyi'],
+        programming: ['Coding ela start cheyali?', 'Variable ante enti?', 'Algorithm explain cheyyi']
     };
 
     // ── Build HTML ────────────────────────────────────────────────────
@@ -188,7 +188,8 @@
                 <div class="cn-avatar"><i class="${meta.icon}"></i></div>
                 <div>
                     <div class="cn-bubble">
-                        👋 Hi! I'm your <strong>${meta.label}</strong> AI Tutor. Ask me anything about ${meta.label} — I'm here to help you learn! 🚀
+                        Hey ra! 👋 Nenu <strong>CodeNative AI</strong> — meeru best friend la coding nerpistaanu! 😄<br><br>
+                        ${meta.label} lo doubt unte adugu ra, kalisi solve cheddaam 💪🔥
                         <div class="cn-chips">
                             ${(CHIPS[LANG] || CHIPS.programming).map(q => `<span class="cn-welcome-chip">${q}</span>`).join('')}
                         </div>
@@ -198,7 +199,7 @@
         </div>
 
         <div class="cn-input-area">
-            <textarea id="cn-input" rows="1" placeholder="Ask your ${meta.label} doubt..."></textarea>
+            <textarea id="cn-input" rows="1" placeholder="Doubt adugu ra... 😄"></textarea>
             <button id="cn-send"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
