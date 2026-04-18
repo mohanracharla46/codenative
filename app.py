@@ -659,8 +659,8 @@ You: Oye 😅 tension padaku, code ivvu ra… manam kalisi fix cheddam 💻🔥"
         full_prompt = f"{system_prompt}\n\nUser question: {user_message}"
 
         # Call Gemini REST API directly (no extra SDK needed)
-        # Use flash-lite for higher free-tier rate limits; fallback gracefully
-        gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={gemini_api_key}"
+        # gemini-2.5-flash: best quality on free tier
+        gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
         payload = {
             "contents": [{"parts": [{"text": full_prompt}]}],
             "generationConfig": {
@@ -669,12 +669,12 @@ You: Oye 😅 tension padaku, code ivvu ra… manam kalisi fix cheddam 💻🔥"
             }
         }
 
-        resp = requests.post(gemini_url, json=payload, timeout=20)
+        resp = requests.post(gemini_url, json=payload, timeout=25)
         
-        # If flash-lite is rate-limited, try flash
+        # If rate-limited, try flash as fallback
         if resp.status_code == 429:
-            gemini_url2 = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_api_key}"
-            resp = requests.post(gemini_url2, json=payload, timeout=20)
+            fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_api_key}"
+            resp = requests.post(fallback_url, json=payload, timeout=20)
         
         if resp.status_code == 429:
             return jsonify({'reply': '⏳ Too many requests — the AI is a bit busy right now! Please wait a few seconds and try again.'}), 429
@@ -682,8 +682,15 @@ You: Oye 😅 tension padaku, code ivvu ra… manam kalisi fix cheddam 💻🔥"
         resp.raise_for_status()
         result = resp.json()
 
-        reply = result['candidates'][0]['content']['parts'][0]['text']
+        # Extract text safely
+        candidates = result.get('candidates', [])
+        if candidates and candidates[0].get('content', {}).get('parts'):
+            reply = candidates[0]['content']['parts'][0]['text']
+        else:
+            reply = "Hmm ra, AI response empty vachindi. Malli try cheyyi! 😅"
+        
         return jsonify({'reply': reply})
+
 
     except requests.exceptions.Timeout:
         return jsonify({'reply': '⏳ The AI is thinking too long. Please try again!'}), 504
