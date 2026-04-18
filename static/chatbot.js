@@ -160,10 +160,10 @@
 
     // ── Quick question chips per language ─────────────────────────────
     const CHIPS = {
-        python:      ['Loop ela cheyali ra?', 'Function explain cheyyi', 'Error fix cheyyi'],
-        java:        ['Class ante enti ra?', 'Exception handle ela?', 'Code fix cheyyi'],
-        c:           ['Pointer ante enti ra?', 'Code error istundi', 'Explain cheyyi'],
-        programming: ['Bore ga undi 😅', 'Emi cheyyadam ra?', 'Naku help kavaali']
+        python:      ['Function ante enti ra?', 'Loop ela use cheyali?', 'Error fix cheyyi 🔥'],
+        java:        ['Class ante enti ra?', 'Exception handle ela?', 'Code error fix cheyyi'],
+        c:           ['Pointer ante enti ra?', 'malloc() ela use cheyali?', 'Error fix cheyyi'],
+        programming: ['Coding ela start cheyali?', 'Variable ante enti?', 'Error vastundi help!']
     };
 
     // ── Build HTML ────────────────────────────────────────────────────
@@ -177,8 +177,8 @@
         <div class="cn-header">
             <div class="cn-header-icon"><i class="${meta.icon}"></i></div>
             <div class="cn-header-text">
-                <h3>CodeNative AI ✨</h3>
-                <p>Meeru best friend — ela unnav? 💛</p>
+                <h3>CodeNative AI 🤖</h3>
+                <p>${meta.label} Coding Friend · Ela unnav? 😄</p>
             </div>
             <button class="cn-close-btn" id="cn-close"><i class="fas fa-times"></i></button>
         </div>
@@ -188,8 +188,8 @@
                 <div class="cn-avatar"><i class="${meta.icon}"></i></div>
                 <div>
                     <div class="cn-bubble">
-                        Hey ra! 👋 Nenu nee best friend — CodeNative AI 😄<br><br>
-                        Emi feel avutunnav? Cheppu ra... nenu unna! 💛
+                        Hey ra! 👋 Nenu nee <strong>${meta.label} coding friend</strong> — CodeNative AI 😄<br><br>
+                        ${meta.label} lo doubt unte adugu ra, kalisi solve cheddaam 💻🔥
                         <div class="cn-chips">
                             ${(CHIPS[LANG] || CHIPS.programming).map(q => `<span class="cn-welcome-chip">${q}</span>`).join('')}
                         </div>
@@ -199,7 +199,7 @@
         </div>
 
         <div class="cn-input-area">
-            <textarea id="cn-input" rows="1" placeholder="Emi cheppali ra... 💬"></textarea>
+            <textarea id="cn-input" rows="1" placeholder="Coding doubt adugu ra... 👋"></textarea>
             <button id="cn-send"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
