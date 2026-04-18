@@ -6,375 +6,174 @@
     <title>Admin Dashboard | Code Native</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        /* Native Rich Text Editor Styles */
-        .editor-container {
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            overflow: hidden;
-            background: var(--bg-body);
-        }
-
-        .editor-toolbar {
-            padding: 10px;
-            background: #f1f5f9;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .editor-toolbar button {
-            background: white;
-            border: 1px solid #cbd5e1;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            color: #475569;
-            transition: 0.2s;
-        }
-
-        .editor-toolbar button:hover {
-            background: #f8fafc;
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .editor-content {
-            min-height: 400px;
-            padding: 20px;
-            background: white;
-            color: #1e293b;
-            outline: none;
-            line-height: 1.6;
-        }
-
-        .editor-content:focus {
-            background: #fff;
-        }
-    </style>
-    <style>
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            display: flex;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .admin-sidebar {
-            width: 250px;
-            height: 100vh;
-            background: var(--bg-body);
-            padding: 2rem 1rem;
-            position: sticky;
-            top: 0;
-            border-right: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
-        }
-
-        .admin-sidebar h2 {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            color: var(--primary-color);
-            text-align: center;
-        }
-
-        .admin-sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .admin-sidebar li {
-            padding: 1rem;
-            margin: 0.5rem 0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .admin-sidebar li:hover, .admin-sidebar li.active {
-            background: var(--subtitle-bg);
-            color: var(--primary-color);
-        }
-
-        /* Tab Content Styles */
-        .tab-pane {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-pane.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            padding: 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-        }
-
-        .stat-card i {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        .stat-card div {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .content-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--bg-card);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: var(--glass-shadow);
-            border: 1px solid var(--glass-border);
-        }
-
-        .content-table th, .content-table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .content-table th {
-            color: var(--text-dim);
-            font-weight: 600;
-        }
-
-        .btn-action {
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .btn-add { background: var(--primary-color); color: white; margin-bottom: 1rem; }
-        .btn-delete { background: #ef4444; color: white; }
-        .btn-edit { background: #10b981; color: white; margin-right: 8px;}
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            padding: 2rem;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-dim);
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 0.8rem;
-            border-radius: 8px;
-            border: 1px solid var(--glass-border);
-            background: var(--bg-body);
-            color: var(--text-main);
-            font-family: inherit;
-        }
-
-        .form-group textarea {
-            height: 300px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .close-modal {
-            cursor: pointer;
-            font-size: 1.5rem;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/admin.css">
 </head>
-<body>
+<body class="admin-body">
 
-    <div class="admin-sidebar">
-        <h2>Code Native Admin</h2>
+    <div class="admin-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="/static/images/CodeNative.png" alt="Logo" style="height: 32px">
+            <h2>Admin</h2>
+        </div>
         <ul id="sidebar-menu">
-            <li class="active" data-tab="tab-dashboard"><i class="fas fa-chart-line"></i> Dashboard</li>
-            <li data-tab="tab-tutorials"><i class="fas fa-book"></i> Tutorials</li>
-            <li data-tab="tab-users"><i class="fas fa-users"></i> Users</li>
-            <li onclick="location.href='/'"><i class="fas fa-home"></i> View Site</li>
-            <li onclick="location.href='/logout'" style="color: #ef4444; margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 20px;"><i class="fas fa-sign-out-alt"></i> Logout</li>
+            <li class="active" data-tab="tab-dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></li>
+            <li data-tab="tab-tutorials"><i class="fas fa-book"></i><span>Tutorials</span></li>
+            <li data-tab="tab-users"><i class="fas fa-users"></i><span>Users</span></li>
+            <li onclick="location.href='/'"><i class="fas fa-home"></i><span>View Site</span></li>
+            <li onclick="location.href='/logout'" class="logout"><i class="fas fa-sign-out-alt"></i><span>Logout</span></li>
         </ul>
     </div>
 
     <div class="main-content">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h1 id="main-title">Dashboard Overview</h1>
-            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme" style="margin-bottom: 20px;">
-                <i class="fas fa-moon"></i>
-            </button>
+        <div class="dashboard-header">
+            <div>
+                <h1 id="main-title">Dashboard Overview</h1>
+            </div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
         </div>
         
         <!-- DASHBOARD TAB -->
         <div id="tab-dashboard" class="tab-pane active">
             <div class="stats-grid">
-            <div class="stat-card">
-                <i class="fas fa-users"></i>
-                <p>Total Users</p>
-                <div>{{ users_count }}</div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-users"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <p>Total Users</p>
+                        <div>{{ users_count }}</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-lessons"><i class="fas fa-book-open"></i></div>
+                    <div class="stat-info">
+                        <p>Total Lessons</p>
+                        <div>{{ contents|length }}</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-languages"><i class="fas fa-code"></i></div>
+                    <div class="stat-info">
+                        <p>Active Languages</p>
+                        <div>3</div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <i class="fas fa-file-alt"></i>
-                <p>Total Lessons</p>
-                <div>{{ contents|length }}</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-language"></i>
-                <p>Active Languages</p>
-                <div>4</div>
-            </div>
-            </div> <!-- Close stats-grid -->
             
-            <div style="background: var(--bg-card); padding: 2rem; border-radius: 16px; border: 1px solid var(--glass-border); margin-top: 2rem; box-shadow: var(--glass-shadow);">
-                <h2 style="margin-bottom: 1rem; margin-top: 0; color: var(--text-main);">Quick Actions</h2>
-                <div style="display: flex; gap: 1rem;">
-                    <button class="btn-action btn-add" style="margin: 0; padding: 12px 24px; font-weight: bold;" onclick="switchTab('tab-tutorials')"><i class="fas fa-book" style="margin-right: 8px;"></i>Manage Tutorials</button>
-                    <button class="btn-action" style="margin: 0; padding: 12px 24px; font-weight: bold; background: var(--bg-body); color: var(--text-main); border: 1px solid var(--glass-border);" onclick="switchTab('tab-users')"><i class="fas fa-users" style="margin-right: 8px;"></i>View User Base</button>
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>Quick Actions</h2>
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn-action btn-primary" onclick="switchTab('tab-tutorials')">
+                        <i class="fas fa-book"></i> Manage Tutorials
+                    </button>
+                    <button class="btn-action btn-secondary" onclick="switchTab('tab-users')">
+                        <i class="fas fa-users"></i> View User Base
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- TUTORIALS TAB -->
         <div id="tab-tutorials" class="tab-pane">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2>Tutorials Management</h2>
-                <button class="btn-action btn-add" id="openAddModal">Add New Content</button>
-            </div>
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>Tutorials Management</h2>
+                    <button class="btn-action btn-primary" id="openAddModal">
+                        <i class="fas fa-plus"></i> Add New Content
+                    </button>
+                </div>
 
-            <table class="content-table">
-                <thead>
-                    <tr>
-                        <th>Language</th>
-                        <th>Topic</th>
-                        <th>Order</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in contents %}
-                    <tr>
-                        <td>{{ item.language|upper }}</td>
-                        <td>{{ item.topic_title }}</td>
-                        <td>{{ item.order_index }}</td>
-                        <td>
-                            <button class="btn-action btn-edit" onclick='editContent({{ item.id }}, "{{ item.language }}", "{{ item.topic_slug }}")'>Edit</button>
-                            <button class="btn-action btn-delete" onclick="deleteContent({{ item.id }})">Delete</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    {% if not contents %}
-                    <tr>
-                        <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-dim);">No content found. Add your first tutorial!</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
+                <div class="table-container">
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th>Language</th>
+                                <th>Topic</th>
+                                <th>Order</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in contents %}
+                            <tr>
+                                <td><span class="badge badge-lang">{{ item.language|upper }}</span></td>
+                                <td>
+                                    <div style="font-weight: 600;">{{ item.topic_title }}</div>
+                                    <div style="font-size: 0.8rem; color: var(--admin-text-dim);">{{ item.topic_slug }}</div>
+                                </td>
+                                <td>{{ item.order_index }}</td>
+                                <td>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <button class="btn-action btn-sm btn-edit" onclick='editContent({{ item.id }}, "{{ item.language }}", "{{ item.topic_slug }}")'><i class="fas fa-pen"></i></button>
+                                        <button class="btn-action btn-sm btn-delete" onclick="deleteContent({{ item.id }})"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not contents %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 2rem; color: var(--admin-text-dim);">No content found. Add your first tutorial!</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <!-- USERS TAB -->
         <div id="tab-users" class="tab-pane">
-            <div style="margin-bottom: 1rem;">
-                <h2>Registered Users</h2>
-            </div>
-            
-            <table class="content-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Joined</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in all_users %}
-                    <tr>
-                        <td>#{{ u.id }}</td>
-                        <td>{{ u.name }}</td>
-                        <td>{{ u.email }}</td>
-                        <td>
-                            {% if u.is_admin %}
-                            <span style="background: var(--primary-color); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">Admin</span>
-                            {% else %}
-                            <span style="background: var(--bg-body); color: var(--text-dim); padding: 2px 8px; border-radius: 12px; font-size: 12px; border: 1px solid var(--glass-border);">User</span>
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>Registered Users</h2>
+                </div>
+                
+                <div class="table-container">
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in all_users %}
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <img src="https://ui-avatars.com/api/?name={{ u.name }}&background=6366f1&color=fff&size=40" style="border-radius: 50%;" alt="">
+                                        <div>
+                                            <div style="font-weight: 600;">{{ u.name }}</div>
+                                            <div style="font-size: 0.8rem; color: var(--admin-text-dim);">ID: #{{ u.id }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ u.email }}</td>
+                                <td>
+                                    {% if u.is_admin %}
+                                    <span class="badge badge-admin">Admin</span>
+                                    {% else %}
+                                    <span class="badge badge-user">User</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ u.created_at }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% if not all_users %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 2rem; color: var(--admin-text-dim);">No users found.</td>
+                            </tr>
                             {% endif %}
-                        </td>
-                        <td>{{ u.created_at }}</td>
-                    </tr>
-                    {% endfor %}
-                    {% if not all_users %}
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-dim);">No users found.</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -384,50 +183,52 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle">Add New Content</h2>
-                <span class="close-modal" id="closeModal">&times;</span>
+                <span class="close-modal" id="closeModal"><i class="fas fa-times"></i></span>
             </div>
-            <form id="contentForm">
-                <div class="form-group">
-                    <label>Language</label>
-                    <select id="language" required>
-                        <option value="python">Python</option>
-                        <option value="java">Java</option>
-                        <option value="c">C</option>
-                        <option value="roadmap">Roadmap</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Topic Title</label>
-                    <input type="text" id="topic_title" placeholder="e.g. Python Variables" required>
-                </div>
-                <div class="form-group">
-                    <label>Topic Slug (URL-friendly)</label>
-                    <input type="text" id="topic_slug" placeholder="e.g. python-variables" required>
-                </div>
-                <div class="form-group">
-                    <label>Order Index</label>
-                    <input type="number" id="order_index" value="0" required>
-                </div>
-                <div class="form-group">
-                    <label>Content (Full Rich Text Support)</label>
-                    <div class="editor-container">
-                        <div class="editor-toolbar">
-                            <button type="button" onclick="execCmd('bold')" title="Bold"><i class="fas fa-bold"></i></button>
-                            <button type="button" onclick="execCmd('italic')" title="Italic"><i class="fas fa-italic"></i></button>
-                            <button type="button" onclick="execCmd('underline')" title="Underline"><i class="fas fa-underline"></i></button>
-                            <button type="button" onclick="execCmd('insertUnorderedList')" title="Bullet List"><i class="fas fa-list-ul"></i></button>
-                            <button type="button" onclick="execCmd('insertOrderedList')" title="Numbered List"><i class="fas fa-list-ol"></i></button>
-                            <button type="button" onclick="execCmd('formatBlock', 'H2')" title="Header">H2</button>
-                            <button type="button" onclick="execCmd('formatBlock', 'P')" title="Paragraph">P</button>
-                            <button type="button" onclick="insertCodeSnippet()" title="Code Snippet"><i class="fas fa-code"></i> Code</button>
-                            <button type="button" onclick="execCmd('createLink', prompt('Enter URL:', 'https://'))" title="Link"><i class="fas fa-link"></i></button>
-                            <button type="button" onclick="execCmd('removeFormat')" title="Clear Styling"><i class="fas fa-eraser"></i></button>
-                        </div>
-                        <div id="editor-actual" class="editor-content" contenteditable="true" onmouseup="saveSelection()" onkeyup="saveSelection()" onfocus="saveSelection()"></div>
+            <div class="modal-body">
+                <form id="contentForm">
+                    <div class="form-group">
+                        <label>Language</label>
+                        <select id="language" class="form-control" required>
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="c">C</option>
+                            <option value="roadmap">Roadmap</option>
+                        </select>
                     </div>
-                </div>
-                <button type="submit" class="btn-action btn-add" style="width: 100%;">Save Content</button>
-            </form>
+                    <div class="form-group">
+                        <label>Topic Title</label>
+                        <input type="text" id="topic_title" class="form-control" placeholder="e.g. Python Variables" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Topic Slug (URL-friendly)</label>
+                        <input type="text" id="topic_slug" class="form-control" placeholder="e.g. python-variables" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Order Index</label>
+                        <input type="number" id="order_index" class="form-control" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Content (Full Rich Text Support)</label>
+                        <div class="editor-container">
+                            <div class="editor-toolbar">
+                                <button type="button" onclick="execCmd('bold')" title="Bold"><i class="fas fa-bold"></i></button>
+                                <button type="button" onclick="execCmd('italic')" title="Italic"><i class="fas fa-italic"></i></button>
+                                <button type="button" onclick="execCmd('underline')" title="Underline"><i class="fas fa-underline"></i></button>
+                                <button type="button" onclick="execCmd('insertUnorderedList')" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                                <button type="button" onclick="execCmd('insertOrderedList')" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                                <button type="button" onclick="execCmd('formatBlock', 'H2')" title="Header">H2</button>
+                                <button type="button" onclick="execCmd('formatBlock', 'P')" title="Paragraph">P</button>
+                                <button type="button" onclick="insertCodeSnippet()" title="Code Snippet"><i class="fas fa-code"></i> Code</button>
+                                <button type="button" onclick="execCmd('createLink', prompt('Enter URL:', 'https://'))" title="Link"><i class="fas fa-link"></i></button>
+                                <button type="button" onclick="execCmd('removeFormat')" title="Clear Styling"><i class="fas fa-eraser"></i></button>
+                            </div>
+                            <div id="editor-actual" class="editor-content" contenteditable="true" onmouseup="saveSelection()" onkeyup="saveSelection()" onfocus="saveSelection()"></div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-action btn-primary" style="width: 100%; justify-content: center;"><i class="fas fa-save"></i> Save Content</button>
+                </form>
+            </div>
         </div>
     </div>
     
@@ -436,13 +237,15 @@
         <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
                 <h2>Insert Code Snippet</h2>
-                <span class="close-modal" onclick="document.getElementById('codeModal').style.display='none'">&times;</span>
+                <span class="close-modal" onclick="closeCodeModal()"><i class="fas fa-times"></i></span>
             </div>
-            <div class="form-group">
-                <label>Paste Source Code</label>
-                <textarea id="snippet-textarea" style="height: 300px; font-family: monospace; background: #0f172a; color: #f8fafc; padding: 15px; border-radius: 8px;" placeholder="Paste your code here..."></textarea>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Paste Source Code</label>
+                    <textarea id="snippet-textarea" class="form-control" style="height: 300px; font-family: monospace; background: #1e293b; color: #f8fafc;" placeholder="Paste your code here..."></textarea>
+                </div>
+                <button type="button" class="btn-action btn-primary" style="width: 100%; justify-content: center;" onclick="confirmCodeSnippet()"><i class="fas fa-code"></i> Insert into Lesson</button>
             </div>
-            <button type="button" class="btn-action btn-add" style="width: 100%;" onclick="confirmCodeSnippet()">Insert into Lesson</button>
         </div>
     </div>
 
@@ -484,9 +287,19 @@
             document.getElementById('modalTitle').innerText = 'Add New Content';
             form.reset();
             modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
         };
 
-        closeModalBtn.onclick = () => modal.style.display = 'none';
+        closeModalBtn.onclick = () => {
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        };
+
+        function closeCodeModal() {
+            const codeModal = document.getElementById('codeModal');
+            codeModal.classList.remove('show');
+            setTimeout(() => codeModal.style.display = 'none', 300);
+        }
 
         form.onsubmit = async (e) => {
             e.preventDefault();
@@ -534,6 +347,7 @@
             document.getElementById('editor-actual').innerHTML = item.content_html || '';
             
             modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
         }
 
         // Selection management
@@ -563,7 +377,9 @@
 
         function insertCodeSnippet() {
             saveSelection();
-            document.getElementById('codeModal').style.display = 'flex';
+            const codeModal = document.getElementById('codeModal');
+            codeModal.style.display = 'flex';
+            setTimeout(() => codeModal.classList.add('show'), 10);
         }
 
         function confirmCodeSnippet() {
@@ -573,14 +389,18 @@
                 const html = `<pre style="background: #1e293b; color: #f8fafc; padding: 20px; border-radius: 12px; font-family: 'Courier New', monospace; font-size: 14px; margin: 20px 0; border: 1px solid #334155; overflow-x: auto;"><code>${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre><p><br></p>`;
                 document.execCommand('insertHTML', false, html);
                 document.getElementById('snippet-textarea').value = '';
-                document.getElementById('codeModal').style.display = 'none';
+                closeCodeModal();
             }
         }
 
         // Close modal when clicking outside
         window.onclick = (event) => {
             if (event.target == modal) {
-                modal.style.display = "none";
+                closeModalBtn.onclick();
+            }
+            const codeModal = document.getElementById('codeModal');
+            if (event.target == codeModal) {
+                closeCodeModal();
             }
         }
     </script>
