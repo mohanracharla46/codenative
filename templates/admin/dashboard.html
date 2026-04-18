@@ -75,50 +75,179 @@
 
         <!-- TUTORIALS TAB -->
         <div id="tab-tutorials" class="tab-pane">
-            <div class="section-card">
-                <div class="section-header">
-                    <h2>Tutorials Management</h2>
-                    <button class="btn-action btn-primary" id="openAddModal">
-                        <i class="fas fa-plus"></i> Add New Content
-                    </button>
-                </div>
 
-                <div class="table-container">
-                    <table class="content-table">
-                        <thead>
-                            <tr>
-                                <th>Language</th>
-                                <th>Topic</th>
-                                <th>Order</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in contents %}
-                            <tr>
-                                <td><span class="badge badge-lang">{{ item.language|upper }}</span></td>
-                                <td>
-                                    <div style="font-weight: 600;">{{ item.topic_title }}</div>
-                                    <div style="font-size: 0.8rem; color: var(--admin-text-dim);">{{ item.topic_slug }}</div>
-                                </td>
-                                <td>{{ item.order_index }}</td>
-                                <td>
-                                    <div style="display: flex; gap: 0.5rem;">
-                                        <button class="btn-action btn-sm btn-edit" onclick='editContent({{ item.id }}, "{{ item.language }}", "{{ item.topic_slug }}")'><i class="fas fa-pen"></i></button>
-                                        <button class="btn-action btn-sm btn-delete" onclick="deleteContent({{ item.id }})"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            {% if not contents %}
-                            <tr>
-                                <td colspan="4" style="text-align: center; padding: 2rem; color: var(--admin-text-dim);">No content found. Add your first tutorial!</td>
-                            </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
+            <!-- Language Sub-Tabs -->
+            <div class="lang-tab-bar">
+                <button class="lang-tab-btn active" data-lang="c" onclick="switchLangTab('c')">
+                    <span class="lang-tab-icon lang-icon-c">C</span>
+                    C Language
+                    <span class="lang-tab-count" id="count-c">0</span>
+                </button>
+                <button class="lang-tab-btn" data-lang="python" onclick="switchLangTab('python')">
+                    <span class="lang-tab-icon lang-icon-python">Py</span>
+                    Python
+                    <span class="lang-tab-count" id="count-python">0</span>
+                </button>
+                <button class="lang-tab-btn" data-lang="java" onclick="switchLangTab('java')">
+                    <span class="lang-tab-icon lang-icon-java">J</span>
+                    Java
+                    <span class="lang-tab-count" id="count-java">0</span>
+                </button>
+            </div>
+
+            <!-- C Tutorials Panel -->
+            <div class="lang-panel active" id="panel-c">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="lang-badge-header lang-icon-c">C</div>
+                            <div>
+                                <h2 style="margin:0;">C Language Tutorials</h2>
+                                <p style="margin:0;font-size:0.8rem;color:var(--admin-text-dim);">Manage all C programming lessons</p>
+                            </div>
+                        </div>
+                        <button class="btn-action btn-primary" onclick="openAddModalForLang('c')">
+                            <i class="fas fa-plus"></i> Add C Tutorial
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="content-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Topic</th>
+                                    <th>Slug</th>
+                                    <th>Order</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-c">
+                                {% set c_items = contents | selectattr("language", "equalto", "c") | list %}
+                                {% for item in c_items %}
+                                <tr>
+                                    <td style="color:var(--admin-text-dim);font-size:0.85rem;">{{ loop.index }}</td>
+                                    <td><div style="font-weight:600;">{{ item.topic_title }}</div></td>
+                                    <td><code style="font-size:0.8rem;background:rgba(99,102,241,0.08);padding:2px 8px;border-radius:6px;color:var(--admin-primary);">{{ item.topic_slug }}</code></td>
+                                    <td><span class="order-badge">{{ item.order_index }}</span></td>
+                                    <td>
+                                        <div style="display:flex;gap:0.5rem;">
+                                            <button class="btn-action btn-sm btn-edit" onclick='editContent({{ item.id }}, "{{ item.language }}", "{{ item.topic_slug }}")' title="Edit"><i class="fas fa-pen"></i></button>
+                                            <button class="btn-action btn-sm btn-delete" onclick="deleteContent({{ item.id }})" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not c_items %}
+                                <tr><td colspan="5" class="empty-row"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:0.5rem;opacity:0.3;display:block;"></i>No C tutorials yet. Click "Add C Tutorial" to get started!</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+
+            <!-- Python Tutorials Panel -->
+            <div class="lang-panel" id="panel-python">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="lang-badge-header lang-icon-python">Py</div>
+                            <div>
+                                <h2 style="margin:0;">Python Tutorials</h2>
+                                <p style="margin:0;font-size:0.8rem;color:var(--admin-text-dim);">Manage all Python programming lessons</p>
+                            </div>
+                        </div>
+                        <button class="btn-action btn-primary" onclick="openAddModalForLang('python')">
+                            <i class="fas fa-plus"></i> Add Python Tutorial
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="content-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Topic</th>
+                                    <th>Slug</th>
+                                    <th>Order</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-python">
+                                {% set py_items = contents | selectattr("language", "equalto", "python") | list %}
+                                {% for item in py_items %}
+                                <tr>
+                                    <td style="color:var(--admin-text-dim);font-size:0.85rem;">{{ loop.index }}</td>
+                                    <td><div style="font-weight:600;">{{ item.topic_title }}</div></td>
+                                    <td><code style="font-size:0.8rem;background:rgba(16,185,129,0.08);padding:2px 8px;border-radius:6px;color:#10b981;">{{ item.topic_slug }}</code></td>
+                                    <td><span class="order-badge">{{ item.order_index }}</span></td>
+                                    <td>
+                                        <div style="display:flex;gap:0.5rem;">
+                                            <button class="btn-action btn-sm btn-edit" onclick='editContent({{ item.id }}, "{{ item.language }}", "{{ item.topic_slug }}")' title="Edit"><i class="fas fa-pen"></i></button>
+                                            <button class="btn-action btn-sm btn-delete" onclick="deleteContent({{ item.id }})" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not py_items %}
+                                <tr><td colspan="5" class="empty-row"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:0.5rem;opacity:0.3;display:block;"></i>No Python tutorials yet. Click "Add Python Tutorial" to get started!</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Java Tutorials Panel -->
+            <div class="lang-panel" id="panel-java">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="lang-badge-header lang-icon-java">J</div>
+                            <div>
+                                <h2 style="margin:0;">Java Tutorials</h2>
+                                <p style="margin:0;font-size:0.8rem;color:var(--admin-text-dim);">Manage all Java programming lessons</p>
+                            </div>
+                        </div>
+                        <button class="btn-action btn-primary" onclick="openAddModalForLang('java')">
+                            <i class="fas fa-plus"></i> Add Java Tutorial
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="content-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Topic</th>
+                                    <th>Slug</th>
+                                    <th>Order</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-java">
+                                {% set java_items = contents | selectattr("language", "equalto", "java") | list %}
+                                {% for item in java_items %}
+                                <tr>
+                                    <td style="color:var(--admin-text-dim);font-size:0.85rem;">{{ loop.index }}</td>
+                                    <td><div style="font-weight:600;">{{ item.topic_title }}</div></td>
+                                    <td><code style="font-size:0.8rem;background:rgba(245,158,11,0.08);padding:2px 8px;border-radius:6px;color:#f59e0b;">{{ item.topic_slug }}</code></td>
+                                    <td><span class="order-badge">{{ item.order_index }}</span></td>
+                                    <td>
+                                        <div style="display:flex;gap:0.5rem;">
+                                            <button class="btn-action btn-sm btn-edit" onclick='editContent({{ item.id }}, "{{ item.language }}", "{{ item.topic_slug }}")' title="Edit"><i class="fas fa-pen"></i></button>
+                                            <button class="btn-action btn-sm btn-delete" onclick="deleteContent({{ item.id }})" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not java_items %}
+                                <tr><td colspan="5" class="empty-row"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:0.5rem;opacity:0.3;display:block;"></i>No Java tutorials yet. Click "Add Java Tutorial" to get started!</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- USERS TAB -->
@@ -256,46 +385,30 @@
                 btn.classList.remove('active');
                 if (btn.getAttribute('data-tab') === tabId) {
                     btn.classList.add('active');
-                    mainTitle.innerText = btn.innerText + (tabId === 'tab-dashboard' ? ' Overview' : ' Management');
+                    mainTitle.innerText = btn.querySelector('span') ? btn.querySelector('span').innerText : btn.innerText.trim();
+                    if (tabId === 'tab-dashboard') mainTitle.innerText += ' Overview';
+                    else if (tabId === 'tab-tutorials') mainTitle.innerText = 'Tutorial Management';
+                    else mainTitle.innerText = 'Users Management';
                 }
             });
-
             tabs.forEach(tab => {
                 tab.classList.remove('active');
-                if (tab.id === tabId) {
-                    tab.classList.add('active');
-                }
+                if (tab.id === tabId) tab.classList.add('active');
             });
         }
 
         tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                switchTab(btn.getAttribute('data-tab'));
-            });
+            btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
         });
 
         const modal = document.getElementById('contentModal');
-        const openModalBtn = document.getElementById('openAddModal');
         const closeModalBtn = document.getElementById('closeModal');
         const form = document.getElementById('contentForm');
-
-        openModalBtn.onclick = () => {
-            document.getElementById('modalTitle').innerText = 'Add New Content';
-            form.reset();
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('show'), 10);
-        };
 
         closeModalBtn.onclick = () => {
             modal.classList.remove('show');
             setTimeout(() => modal.style.display = 'none', 300);
         };
-
-        function closeCodeModal() {
-            const codeModal = document.getElementById('codeModal');
-            codeModal.classList.remove('show');
-            setTimeout(() => codeModal.style.display = 'none', 300);
-        }
 
         form.onsubmit = async (e) => {
             e.preventDefault();
@@ -306,15 +419,13 @@
                 order_index: parseInt(document.getElementById('order_index').value),
                 content_html: document.getElementById('editor-actual').innerHTML
             };
-
             const response = await fetch('/admin/add_content', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-
             if (response.ok) {
-                alert('Success!');
+                alert('✅ Saved successfully!');
                 location.reload();
             } else {
                 const err = await response.json();
@@ -323,10 +434,8 @@
         };
 
         async function deleteContent(id) {
-            if (confirm('Are you sure you want to delete this content?')) {
-                const response = await fetch(`/admin/delete_content/${id}`, {
-                    method: 'POST'
-                });
+            if (confirm('Are you sure you want to delete this tutorial?')) {
+                const response = await fetch(`/admin/delete_content/${id}`, { method: 'POST' });
                 if (response.ok) location.reload();
             }
         }
@@ -334,39 +443,29 @@
         async function editContent(id, lang, slug) {
             const res = await fetch(`/api/content/${lang}/${slug}`);
             const item = await res.json();
-            
-            document.getElementById('modalTitle').innerText = 'Edit Content';
+            document.getElementById('modalTitle').innerText = 'Edit Tutorial';
             document.getElementById('language').value = item.language;
             document.getElementById('topic_title').value = item.topic_title;
             document.getElementById('topic_slug').value = item.topic_slug;
             document.getElementById('order_index').value = item.order_index;
             document.getElementById('editor-actual').innerHTML = item.content_html || '';
-            
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
         }
 
         // Selection management
         let savedRange = null;
-
         function saveSelection() {
             const sel = window.getSelection();
-            if (sel.getRangeAt && sel.rangeCount) {
-                savedRange = sel.getRangeAt(0);
-            }
+            if (sel.getRangeAt && sel.rangeCount) savedRange = sel.getRangeAt(0);
         }
-
         function restoreSelection() {
             const sel = window.getSelection();
-            if (savedRange) {
-                sel.removeAllRanges();
-                sel.addRange(savedRange);
-            }
+            if (savedRange) { sel.removeAllRanges(); sel.addRange(savedRange); }
         }
 
-        // Native Editor Logic
         function execCmd(command, val = null) {
-            restoreSelection(); // Always try to restore before command
+            restoreSelection();
             document.execCommand(command, false, val);
             document.getElementById('editor-actual').focus();
         }
@@ -389,16 +488,49 @@
             }
         }
 
-        // Close modal when clicking outside
-        window.onclick = (event) => {
-            if (event.target == modal) {
-                closeModalBtn.onclick();
-            }
+        function closeCodeModal() {
             const codeModal = document.getElementById('codeModal');
-            if (event.target == codeModal) {
-                closeCodeModal();
-            }
+            codeModal.classList.remove('show');
+            setTimeout(() => codeModal.style.display = 'none', 300);
         }
+
+        window.onclick = (event) => {
+            if (event.target == modal) closeModalBtn.onclick();
+            const codeModal = document.getElementById('codeModal');
+            if (event.target == codeModal) closeCodeModal();
+        };
+
+        // ── Language Sub-Tab Logic ─────────────────────────────
+        function switchLangTab(lang) {
+            document.querySelectorAll('.lang-tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+            document.querySelectorAll('.lang-panel').forEach(panel => {
+                panel.classList.toggle('active', panel.id === 'panel-' + lang);
+            });
+        }
+
+        // Open modal pre-set to the correct language
+        function openAddModalForLang(lang) {
+            const labels = { c: 'C Language', python: 'Python', java: 'Java' };
+            document.getElementById('modalTitle').innerText = 'Add ' + (labels[lang] || lang) + ' Tutorial';
+            document.getElementById('contentForm').reset();
+            document.getElementById('editor-actual').innerHTML = '';
+            document.getElementById('language').value = lang;
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        // Count rows per language and update badges
+        (function updateCounts() {
+            ['c', 'python', 'java'].forEach(lang => {
+                const tbody = document.getElementById('tbody-' + lang);
+                const badge = document.getElementById('count-' + lang);
+                if (!tbody || !badge) return;
+                const count = tbody.querySelectorAll('tr:not(:has([colspan]))').length;
+                badge.textContent = count;
+            });
+        })();
     </script>
     <script src="/static/theme.js"></script>
 </body>
