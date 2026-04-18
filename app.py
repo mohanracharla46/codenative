@@ -598,6 +598,61 @@ def run():
         return jsonify({"output": f"Server error: {str(e)}"}), 500
 
 
+# ──────────────────────────────────────────────────────────────
+#  AI CHATBOT ENDPOINT  (Gemini 2.0 Flash)
+# ──────────────────────────────────────────────────────────────
+@app.route('/api/chat', methods=['POST'])
+def ai_chat():
+    """AI chatbot powered by Gemini. Context-aware for the current language."""
+    try:
+        data = request.get_json()
+        user_message = data.get('message', '').strip()
+        language = data.get('language', 'programming')  # e.g. 'python', 'java', 'c'
+
+        if not user_message:
+            return jsonify({'reply': 'Please type a question first!'}), 400
+
+        gemini_api_key = os.environ.get('GEMINI_API_KEY', '')
+        if not gemini_api_key:
+            return jsonify({'reply': '⚠️ AI service not configured. Please set GEMINI_API_KEY in environment variables.'}), 503
+
+        # Build a context-aware system prompt
+        system_prompt = f"""You are CodeNative AI, a friendly coding tutor specializing in teaching {language.upper()} programming to Telugu-speaking learners on the CodeNative platform. 
+
+Guidelines:
+- Answer concisely and clearly. Use simple English (and Telugu transliterations where helpful).
+- For code questions, always show a short code snippet in a markdown code block.
+- Be encouraging and supportive.
+- Focus only on {language} concepts unless asked otherwise.
+- Max 3-4 sentences for explanations, keep it practical.
+- If asked something unrelated to coding, politely redirect back to {language} topics."""
+
+        full_prompt = f"{system_prompt}\n\nStudent question: {user_message}"
+
+        # Call Gemini REST API directly (no extra SDK needed)
+        gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_api_key}"
+        payload = {
+            "contents": [{"parts": [{"text": full_prompt}]}],
+            "generationConfig": {
+                "temperature": 0.7,
+                "maxOutputTokens": 500
+            }
+        }
+
+        resp = requests.post(gemini_url, json=payload, timeout=20)
+        resp.raise_for_status()
+        result = resp.json()
+
+        reply = result['candidates'][0]['content']['parts'][0]['text']
+        return jsonify({'reply': reply})
+
+    except requests.exceptions.Timeout:
+        return jsonify({'reply': '⏳ The AI is thinking too long. Please try again!'}), 504
+    except Exception as e:
+        print(f"Chat error: {e}")
+        return jsonify({'reply': f'❌ Something went wrong. Please try again later.'}), 500
+
+
 if __name__ == "__main__":
     # In SQLite mode we can init local db, for Supabase you did it manually
     if not os.environ.get('DATABASE_URL'):
