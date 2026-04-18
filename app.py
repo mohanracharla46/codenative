@@ -133,10 +133,34 @@ def init_db():
         )
     '''
 
+    # SQL for User Stats
+    stats_sql = '''
+        CREATE TABLE IF NOT EXISTS user_stats (
+            user_id INTEGER PRIMARY KEY,
+            study_minutes INTEGER DEFAULT 0,
+            certificates INTEGER DEFAULT 0,
+            current_streak INTEGER DEFAULT 0,
+            max_streak INTEGER DEFAULT 0,
+            last_active_date DATE
+        )
+    '''
+
+    # SQL for User Activity
+    activity_sql = '''
+        CREATE TABLE IF NOT EXISTS user_activity (
+            user_id INTEGER,
+            activity_date DATE,
+            practice_count INTEGER DEFAULT 0,
+            PRIMARY KEY (user_id, activity_date)
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         cursor.execute(users_sql)
         cursor.execute(content_sql)
+        cursor.execute(stats_sql)
+        cursor.execute(activity_sql)
         
         # Check if is_admin column exists (Postgres migration)
         cursor.execute("""
@@ -152,6 +176,8 @@ def init_db():
         # SQLite
         conn.execute(users_sql)
         conn.execute(content_sql)
+        conn.execute(stats_sql)
+        conn.execute(activity_sql)
         
         # Check if is_admin column exists (SQLite migration)
         cursor = conn.execute("PRAGMA table_info(users)")
@@ -283,7 +309,92 @@ def logout():
 @login_required
 def dashboard():
     """Render the user dashboard"""
-    return render_template("dashboard.html")
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    stats = execute_query(conn, "SELECT * FROM user_stats WHERE user_id = ?", (user_id,)).fetchone()
+    
+    if stats:
+        stats = dict(stats)
+        stats['study_hours'] = round(stats['study_minutes'] / 60, 1)
+    else:
+        stats = {
+            'study_hours': 0.0,
+            'study_minutes': 0,
+            'certificates': 0,
+            'current_streak': 0,
+            'max_streak': 0
+        }
+    
+    # Calculate consistency & total practices
+    activities = execute_query(conn, "SELECT activity_date, practice_count FROM user_activity WHERE user_id = ? ORDER BY activity_date ASC", (user_id,)).fetchall()
+    conn.close()
+    
+    total_practices = sum([a['practice_count'] for a in activities])
+    total_days_active = len(activities)
+    
+    # Quick simple consistency calc assuming 30 days frame
+    consistency = int((total_days_active / 30.0) * 100) if total_days_active <= 30 else 100
+    
+    activity_data = [dict(a) for a in activities]
+    
+    return render_template("dashboard.html", stats=stats, total_practices=total_practices, consistency=consistency, activity_data=activity_data)
+
+def update_user_activity(user_id, is_practice=False):
+    conn = get_db_connection()
+    today_str = datetime.today().strftime('%Y-%m-%d')
+    try:
+        act = execute_query(conn, "SELECT practice_count FROM user_activity WHERE user_id = ? AND activity_date = ?", (user_id, today_str)).fetchone()
+        practice_inc = 1 if is_practice else 0
+        if act:
+            execute_query(conn, "UPDATE user_activity SET practice_count = practice_count + ? WHERE user_id = ? AND activity_date = ?", (practice_inc, user_id, today_str))
+        else:
+            execute_query(conn, "INSERT INTO user_activity (user_id, activity_date, practice_count) VALUES (?, ?, ?)", (user_id, today_str, practice_inc))
+            
+        stats = execute_query(conn, "SELECT * FROM user_stats WHERE user_id = ?", (user_id,)).fetchone()
+        study_inc = 1 if not is_practice else 0
+        
+        if not stats:
+            execute_query(conn, "INSERT INTO user_stats (user_id, study_minutes, certificates, current_streak, max_streak, last_active_date) VALUES (?, ?, 0, 1, 1, ?)", (user_id, study_inc, today_str))
+        else:
+            last_date = stats['last_active_date']
+            # safely parse last_date
+            if isinstance(last_date, str):
+                try:
+                    last_date = datetime.strptime(last_date.split(' ')[0], '%Y-%m-%d').date()
+                except:
+                    last_date = None
+            elif hasattr(last_date, 'date'):
+                last_date = last_date.date()
+            elif isinstance(last_date, datetime):
+                last_date = last_date.date()
+                
+            today_date = datetime.today().date()
+            delta = (today_date - last_date).days if last_date else 0
+            
+            new_streak = stats['current_streak']
+            if delta == 1:
+                new_streak += 1
+            elif delta > 1:
+                new_streak = 1
+                
+            new_max = max(stats['max_streak'], new_streak)
+            if delta == 0:
+                new_streak = stats['current_streak']
+                
+            execute_query(conn, "UPDATE user_stats SET study_minutes = study_minutes + ?, current_streak = ?, max_streak = ?, last_active_date = ? WHERE user_id = ?", 
+                          (study_inc, new_streak, new_max, today_str, user_id))
+        conn.commit()
+    except Exception as e:
+        print("Error tracking activity:", e)
+    finally:
+        conn.close()
+
+@app.route("/api/log_study", methods=["POST"])
+def log_study():
+    if 'user_id' in session:
+        update_user_activity(session['user_id'], is_practice=False)
+        return jsonify({"status": "ok"})
+    return jsonify({"status": "unauthorized"}), 401
 
 @app.route("/")
 def index():
@@ -477,6 +588,10 @@ def run():
             except Exception as e:
                 output_result = f"Docker execution error: {str(e)}"
         
+        # Track practice execution
+        if 'user_id' in session:
+            update_user_activity(session['user_id'], is_practice=True)
+
         return jsonify({"output": output_result or "No output"})
 
     except Exception as e:
