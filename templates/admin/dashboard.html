@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/static/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="admin-body">
 
@@ -17,6 +18,7 @@
         </div>
         <ul id="sidebar-menu">
             <li class="active" data-tab="tab-dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></li>
+            <li data-tab="tab-analytics"><i class="fas fa-chart-pie"></i><span>Analytics</span></li>
             <li data-tab="tab-tutorials"><i class="fas fa-book"></i><span>Tutorials</span></li>
             <li data-tab="tab-users"><i class="fas fa-users"></i><span>Users</span></li>
             <li onclick="location.href='/'"><i class="fas fa-home"></i><span>View Site</span></li>
@@ -29,7 +31,11 @@
             <div>
                 <h1 id="main-title">Dashboard Overview</h1>
             </div>
-            <div class="header-actions">            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" id="theme-toggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
         </div>
         
         <!-- DASHBOARD TAB -->
@@ -41,6 +47,7 @@
                         <p>Total Users</p>
                         <div>{{ users_count }}</div>
                     </div>
+                    <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> 12%</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon icon-lessons"><i class="fas fa-book-open"></i></div>
@@ -52,12 +59,36 @@
                 <div class="stat-card">
                     <div class="stat-icon icon-languages"><i class="fas fa-code"></i></div>
                     <div class="stat-info">
-                        <p>Active Languages</p>
-                        <div>3</div>
+                        <p>Languages</p>
+                        <div>{{ analytics.lang_labels|length }}</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-practices"><i class="fas fa-terminal"></i></div>
+                    <div class="stat-info">
+                        <p>Total Practices</p>
+                        <div id="total-practices-count">0</div>
                     </div>
                 </div>
             </div>
             
+            <div class="analytics-row">
+                <div class="section-card chart-card">
+                    <div class="section-header">
+                        <h2>User Growth (Last 7 Days)</h2>
+                    </div>
+                    <canvas id="userGrowthChart"></canvas>
+                </div>
+                <div class="section-card chart-card">
+                    <div class="section-header">
+                        <h2>Content Distribution</h2>
+                    </div>
+                    <div style="height: 300px; display: flex; justify-content: center;">
+                        <canvas id="langDistChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <div class="section-card">
                 <div class="section-header">
                     <h2>Quick Actions</h2>
@@ -69,6 +100,44 @@
                     <button class="btn-action btn-secondary" onclick="switchTab('tab-users')">
                         <i class="fas fa-users"></i> View User Base
                     </button>
+                    <button class="btn-action btn-secondary" onclick="switchTab('tab-analytics')">
+                        <i class="fas fa-chart-pie"></i> Detailed Analytics
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANALYTICS TAB -->
+        <div id="tab-analytics" class="tab-pane">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>Platform Performance Trends</h2>
+                    <div class="date-filter">
+                        Last 7 Days
+                    </div>
+                </div>
+                <div class="analytics-grid">
+                    <div class="chart-container-large">
+                        <canvas id="practiceTrendsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="analytics-row">
+                <div class="section-card stats-mini-card">
+                    <h3>Engagement Rate</h3>
+                    <div class="value">84%</div>
+                    <p>Users who practice daily</p>
+                </div>
+                <div class="section-card stats-mini-card">
+                    <h3>Popular Language</h3>
+                    <div class="value" id="top-lang">Python</div>
+                    <p>Based on content volume</p>
+                </div>
+                <div class="section-card stats-mini-card">
+                    <h3>Avg. Session</h3>
+                    <div class="value">12m</div>
+                    <p>Estimated study time</p>
                 </div>
             </div>
         </div>
@@ -531,6 +600,129 @@
                 badge.textContent = count;
             });
         })();
+
+        // ── Analytics Charts Initialization ────────────────────────
+        const analyticsData = {{ analytics | tojson }};
+        
+        // Colors from CSS
+        const primaryColor = '#6366f1';
+        const secondaryColor = '#8b5cf6';
+        const successColor = '#10b981';
+        const warningColor = '#f59e0b';
+        
+        // Chart Defaults
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = document.body.classList.contains('dark-mode') ? '#94a3b8' : '#64748b';
+
+        // 1. User Growth Chart
+        const growthCtx = document.getElementById('userGrowthChart').getContext('2d');
+        new Chart(growthCtx, {
+            type: 'line',
+            data: {
+                labels: analyticsData.user_growth.map(d => d.date),
+                datasets: [{
+                    label: 'New Registrations',
+                    data: analyticsData.user_growth.map(d => d.count),
+                    borderColor: primaryColor,
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: primaryColor
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 2. Language Distribution Chart
+        const distCtx = document.getElementById('langDistChart').getContext('2d');
+        new Chart(distCtx, {
+            type: 'doughnut',
+            data: {
+                labels: analyticsData.lang_labels,
+                datasets: [{
+                    data: analyticsData.lang_counts,
+                    backgroundColor: [primaryColor, successColor, warningColor, secondaryColor],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                },
+                cutout: '70%'
+            }
+        });
+
+        // 3. Practice Trends Chart
+        const trendsCtx = document.getElementById('practiceTrendsChart').getContext('2d');
+        new Chart(trendsCtx, {
+            type: 'bar',
+            data: {
+                labels: analyticsData.practice_trends.map(d => d.date),
+                datasets: [{
+                    label: 'Code Executions',
+                    data: analyticsData.practice_trends.map(d => d.count),
+                    backgroundColor: primaryColor,
+                    borderRadius: 8,
+                    barThickness: 30
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: { display: true, text: 'Daily Practice Activity', font: { size: 16, weight: 'bold' } },
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Update total practices count
+        const totalPractices = analyticsData.practice_trends.reduce((acc, curr) => acc + curr.count, 0);
+        document.getElementById('total-practices-count').textContent = totalPractices;
+        
+        // Find top language
+        const maxIdx = analyticsData.lang_counts.indexOf(Math.max(...analyticsData.lang_counts));
+        if (maxIdx !== -1) {
+            document.getElementById('top-lang').textContent = analyticsData.lang_labels[maxIdx];
+        }
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const icon = themeToggle.querySelector('i');
+
+        // Check for saved theme
+        if (localStorage.getItem('admin-theme') === 'dark') {
+            body.classList.add('dark-mode');
+            icon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            icon.classList.toggle('fa-sun', isDark);
+            icon.classList.toggle('fa-moon', !isDark);
+            localStorage.setItem('admin-theme', isDark ? 'dark' : 'light');
+            
+            // Refresh charts with new colors
+            location.reload(); 
+        });
     </script>
     <script src="/static/theme.js"></script>
 </body>

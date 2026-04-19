@@ -437,12 +437,64 @@ def terms_conditions():
 def admin_dashboard():
     conn = get_db_connection()
     contents = execute_query(conn, 'SELECT * FROM content ORDER BY language, order_index').fetchall()
-    users_count = execute_query(conn, 'SELECT COUNT(*) FROM users').fetchone()
-    users_count = users_count[0] if isinstance(users_count, tuple) else (users_count.get('count') if hasattr(users_count, 'get') else list(users_count.values())[0])
     
+    # Total Users
+    users_count_res = execute_query(conn, 'SELECT COUNT(*) as count FROM users').fetchone()
+    users_count = users_count_res['count'] if hasattr(users_count_res, 'get') else users_count_res[0]
+    
+    # Language Distribution
+    lang_dist = execute_query(conn, 'SELECT language, COUNT(*) as count FROM content GROUP BY language').fetchall()
+    lang_labels = [row['language'].capitalize() for row in lang_dist]
+    lang_counts = [row['count'] for row in lang_dist]
+
+    # Daily User Registrations (Last 7 days)
+    is_pg = hasattr(conn, 'cursor_factory')
+    if is_pg:
+        user_growth = execute_query(conn, """
+            SELECT TO_CHAR(created_at, 'YYYY-MM-DD') as date, COUNT(*) as count 
+            FROM users 
+            WHERE created_at > CURRENT_DATE - INTERVAL '7 days'
+            GROUP BY date ORDER BY date ASC
+        """).fetchall()
+    else:
+        user_growth = execute_query(conn, """
+            SELECT strftime('%Y-%m-%d', created_at) as date, COUNT(*) as count 
+            FROM users 
+            WHERE created_at > date('now', '-7 days')
+            GROUP BY date ORDER BY date ASC
+        """).fetchall()
+
+    # Daily Practices (Last 7 days)
+    if is_pg:
+        practice_trends = execute_query(conn, """
+            SELECT activity_date as date, SUM(practice_count) as count 
+            FROM user_activity 
+            WHERE activity_date > CURRENT_DATE - INTERVAL '7 days'
+            GROUP BY activity_date ORDER BY activity_date ASC
+        """).fetchall()
+    else:
+        practice_trends = execute_query(conn, """
+            SELECT activity_date as date, SUM(practice_count) as count 
+            FROM user_activity 
+            WHERE activity_date > date('now', '-7 days')
+            GROUP BY activity_date ORDER BY activity_date ASC
+        """).fetchall()
+
     all_users = execute_query(conn, 'SELECT id, name, email, is_admin, created_at FROM users ORDER BY id DESC').fetchall()
     conn.close()
-    return render_template("admin/dashboard.html", contents=contents, users_count=users_count, all_users=all_users)
+    
+    analytics = {
+        "lang_labels": lang_labels,
+        "lang_counts": lang_counts,
+        "user_growth": [dict(r) for r in user_growth],
+        "practice_trends": [dict(r) for r in practice_trends]
+    }
+    
+    return render_template("admin/dashboard.html", 
+                           contents=contents, 
+                           users_count=users_count, 
+                           all_users=all_users,
+                           analytics=analytics)
 
 @app.route("/admin/add_content", methods=["POST"])
 @admin_required
