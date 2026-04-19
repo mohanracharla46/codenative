@@ -1,4 +1,18 @@
 /* User Dashboard Styles */
+/* Base styles for new elements */
+.mobile-menu-toggle {
+    display: none;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-overlay {
+    display: none;
+}
+
 .dashboard-container {
     display: flex;
     min-height: calc(100vh - 73px);
@@ -708,16 +722,4 @@ body.dark-mode .level-0 { background-color: #334155; }
     }
 }
 
-/* Base styles for new elements */
-.mobile-menu-toggle {
-    display: none;
-}
 
-.header-left {
-    display: flex;
-    align-items: center;
-}
-
-.sidebar-overlay {
-    display: none;
-}

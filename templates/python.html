@@ -324,36 +324,7 @@
             };
         }
 
-        // Mobile Menu Toggle
-        const menuToggle = document.getElementById('menuToggle');
-        const menuToggleMain = document.getElementById('menuToggleMain');
-        const sidebar = document.querySelector('.tutorial-sidebar');
-
-        function toggleSidebar() {
-            sidebar.classList.toggle('active');
-            const icon = sidebar.classList.contains('active') ? 'fa-times' : 'fa-bars';
-            menuToggle.querySelector('i').className = `fas ${icon}`;
-            menuToggleMain.querySelector('i').className = `fas ${icon}`;
-        }
-
-        if (menuToggle) menuToggle.onclick = toggleSidebar;
-        if (menuToggleMain) menuToggleMain.onclick = toggleSidebar;
-
-        // Close sidebar when clicking outside
-        document.addEventListener('click', (e) => {
-            if (sidebar.classList.contains('active')) {
-                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target) && !menuToggleMain.contains(e.target)) {
-                    sidebar.classList.remove('active');
-                    menuToggle.querySelector('i').className = 'fas fa-bars';
-                    menuToggleMain.querySelector('i').className = 'fas fa-bars';
-                }
-            }
-        });
-
-        window.addEventListener('DOMContentLoaded', loadTopics);
-    </script>
-    <script>
-        // Sidebar Toggle for Mobile
+        // Mobile Sidebar Toggle
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebarClose = document.getElementById('sidebarClose');
         const sidebar = document.querySelector('.tutorial-sidebar');
@@ -371,11 +342,11 @@
             }
         }
 
-        if (sidebarToggle && sidebar) {
+        if (sidebarToggle) {
             sidebarToggle.addEventListener('click', toggleSidebar);
         }
 
-        if (sidebarClose && sidebar) {
+        if (sidebarClose) {
             sidebarClose.addEventListener('click', () => {
                 sidebar.classList.remove('active');
                 if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
@@ -384,11 +355,15 @@
 
         // Close sidebar when clicking outside
         document.addEventListener('click', (e) => {
-            if (sidebar && sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== sidebarToggle) {
-                sidebar.classList.remove('active');
-                if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
+            if (sidebar.classList.contains('active')) {
+                if (!sidebar.contains(e.target) && e.target !== sidebarToggle) {
+                    sidebar.classList.remove('active');
+                    if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
+                }
             }
         });
+
+        window.addEventListener('DOMContentLoaded', loadTopics);
     </script>
     <script src="/static/chatbot.js" defer></script>
 </body>

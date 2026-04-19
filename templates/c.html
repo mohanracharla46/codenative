@@ -253,38 +253,47 @@ int main() {
         }
     }
 
-    // Mobile Menu Toggle
-    const menuToggle = document.getElementById("menuToggle");
-    const menuToggleMain = document.getElementById("menuToggleMain");
-    const sidebar = document.querySelector(".tutorial-sidebar");
+    // Mobile Sidebar Toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarClose = document.getElementById('sidebarClose');
+    const sidebar = document.querySelector('.tutorial-sidebar');
+    const menuIcon = sidebarToggle ? sidebarToggle.querySelector('i') : null;
 
-    function toggleSidebar() {
-        sidebar.classList.toggle("active");
-        const isOpened = sidebar.classList.contains("active");
-        const icon = isOpened ? "fa-times" : "fa-bars";
-        
-        if (menuToggle) menuToggle.querySelector('i').className = `fas ${icon}`;
-        if (menuToggleMain) menuToggleMain.querySelector('i').className = `fas ${icon}`;
-        
+    function toggleSidebar(e) {
+        if(e) e.stopPropagation();
+        sidebar.classList.toggle('active');
+        if (menuIcon) {
+            if(sidebar.classList.contains('active')) {
+                menuIcon.classList.replace('fa-bars', 'fa-times');
+            } else {
+                menuIcon.classList.replace('fa-times', 'fa-bars');
+            }
+        }
         if (typeof editor !== 'undefined') {
             setTimeout(() => editor.resize(), 300);
         }
     }
 
-    if (menuToggle) menuToggle.onclick = toggleSidebar;
-    if (menuToggleMain) menuToggleMain.onclick = toggleSidebar;
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', toggleSidebar);
+    }
+
+    if (sidebarClose) {
+        sidebarClose.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
+            if (typeof editor !== 'undefined') {
+                setTimeout(() => editor.resize(), 300);
+            }
+        });
+    }
 
     // Close sidebar when clicking outside
     document.addEventListener('click', (e) => {
         if (sidebar && sidebar.classList.contains('active')) {
-            const isClickInsideSidebar = sidebar.contains(e.target);
-            const isClickOnToggle = menuToggle && menuToggle.contains(e.target);
-            const isClickOnToggleMain = menuToggleMain && menuToggleMain.contains(e.target);
-
-            if (!isClickInsideSidebar && !isClickOnToggle && !isClickOnToggleMain) {
+            if (!sidebar.contains(e.target) && e.target !== sidebarToggle) {
                 sidebar.classList.remove('active');
-                if (menuToggle) menuToggle.querySelector('i').className = 'fas fa-bars';
-                if (menuToggleMain) menuToggleMain.querySelector('i').className = 'fas fa-bars';
+                if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
                 if (typeof editor !== 'undefined') {
                     setTimeout(() => editor.resize(), 300);
                 }
@@ -293,131 +302,17 @@ int main() {
     });
 
     // Close sidebar when clicking a topic on mobile
-    const sidebarTopics = document.getElementById('sidebarTopics');
     if (sidebarTopics) {
         sidebarTopics.addEventListener("click", (e) => {
             if (e.target.classList.contains('topic') && window.innerWidth <= 1024) {
                 sidebar.classList.remove("active");
-                if (menuToggle) menuToggle.querySelector('i').className = 'fas fa-bars';
-                if (menuToggleMain) menuToggleMain.querySelector('i').className = 'fas fa-bars';
+                if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
             }
         });
-    }
-
-    // Dynamic Content Loading
-    const contentBox = document.getElementById('topicContent');
-    const titleBox = document.getElementById('pageTitle');
-    const currentLang = 'c';
-
-    async function loadTopics() {
-        try {
-            const res = await fetch(`/api/content/${currentLang}`);
-            const topics = await res.json();
-            
-            if (topics.length > 0) {
-                sidebarTopics.innerHTML = '';
-                topics.forEach((topic, index) => {
-                    const li = document.createElement('li');
-                    li.className = `topic ${index === 0 ? 'active' : ''}`;
-                    li.dataset.topic = topic.topic_slug;
-                    li.textContent = topic.topic_title;
-                    li.onclick = () => loadSpecificTopic(topic.topic_slug, li);
-                    sidebarTopics.appendChild(li);
-                });
-                loadSpecificTopic(topics[0].topic_slug, sidebarTopics.firstChild);
-            }
-        } catch (err) { console.error(err); }
-    }
-
-    async function loadSpecificTopic(slug, el) {
-        try {
-            document.querySelectorAll('.topic').forEach(t => t.classList.remove('active'));
-            if(el) el.classList.add('active');
-            
-            contentBox.innerHTML = `
-                <div style="padding: 100px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                    <i class="fas fa-code-branch fa-beat-fade" style="font-size: 54px; color: #00599c; margin-bottom: 20px;"></i>
-                    <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Linking C Lesson...</p>
-                </div>
-            `;
-
-            const res = await fetch(`/api/content/${currentLang}/${slug}`);
-            const data = await res.json();
-                if(data.content_html) {
-                    contentBox.innerHTML = data.content_html;
-                }
-
-            // Update Next Lesson Bar
-            const nextEl = el.nextElementSibling;
-            const nextBar = document.getElementById('nextLessonBar');
-            if(nextEl && nextEl.classList.contains('topic')) {
-                nextBar.style.display = 'flex';
-                nextBar.querySelector('h3').textContent = nextEl.textContent;
-                nextBar.onclick = () => nextEl.click();
-            } else {
-                nextBar.style.display = 'none';
-            }
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        } catch(err) { console.error(err); }
-    }
-
-    // Nav buttons
-    const prevBtn = document.getElementById('prevTopic');
-    const nextBtn = document.getElementById('nextTopic');
-    if (prevBtn) {
-        prevBtn.onclick = () => {
-            const active = document.querySelector('.topic.active');
-            if(active && active.previousElementSibling) active.previousElementSibling.click();
-        };
-    }
-    if (nextBtn) {
-        nextBtn.onclick = () => {
-            const active = document.querySelector('.topic.active');
-            if(active && active.nextElementSibling) active.nextElementSibling.click();
-        };
     }
 
     window.addEventListener('DOMContentLoaded', loadTopics);
 </script>
-    <script>
-        // Sidebar Toggle for Mobile
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebarClose = document.getElementById('sidebarClose');
-        const sidebar = document.querySelector('.tutorial-sidebar');
-        const menuIcon = sidebarToggle ? sidebarToggle.querySelector('i') : null;
-
-        function toggleSidebar(e) {
-            if(e) e.stopPropagation();
-            sidebar.classList.toggle('active');
-            if (menuIcon) {
-                if(sidebar.classList.contains('active')) {
-                    menuIcon.classList.replace('fa-bars', 'fa-times');
-                } else {
-                    menuIcon.classList.replace('fa-times', 'fa-bars');
-                }
-            }
-        }
-
-        if (sidebarToggle && sidebar) {
-            sidebarToggle.addEventListener('click', toggleSidebar);
-        }
-
-        if (sidebarClose && sidebar) {
-            sidebarClose.addEventListener('click', () => {
-                sidebar.classList.remove('active');
-                if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
-            });
-        }
-
-        // Close sidebar when clicking outside
-        document.addEventListener('click', (e) => {
-            if (sidebar && sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== sidebarToggle) {
-                sidebar.classList.remove('active');
-                if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
-            }
-        });
-    </script>
     <script src="/static/chatbot.js" defer></script>
 </body>
 </html>
