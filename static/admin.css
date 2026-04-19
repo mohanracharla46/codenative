@@ -48,14 +48,21 @@ body.admin-body {
     flex-direction: column;
     z-index: 100;
     transition: var(--admin-transition);
-    overflow-y: auto;
+    overflow: hidden;
 }
 
-.admin-sidebar::-webkit-scrollbar {
+#sidebar-menu {
+    flex: 1;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+}
+
+#sidebar-menu::-webkit-scrollbar {
     width: 5px;
 }
 
-.admin-sidebar::-webkit-scrollbar-thumb {
+#sidebar-menu::-webkit-scrollbar-thumb {
     background: rgba(99, 102, 241, 0.2);
     border-radius: 10px;
 }
