@@ -20,20 +20,28 @@
 
     <header class="header">
         <div class="container header-inner">
-            <div class="logo">
-                <a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a>
+            <div class="header-left">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo">
+                    <a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a>
+                </div>
             </div>
             <div class="header-actions">
                 <a href="/dashboard" class="btn-dashboard active">
-                    <i class="fas fa-user-circle"></i> Dashboard
+                    <i class="fas fa-user-circle"></i> <span>Dashboard</span>
                 </a>
             </div>
         </div>
     </header>
 
     <div class="dashboard-container">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
         <!-- Sidebar -->
-        <aside class="dashboard-sidebar">
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
             <div class="sidebar-header">
                 <div class="sidebar-profile">
                     <div class="profile-avatar">
@@ -258,14 +266,14 @@
             </div>
 
             <!-- Quick Access Section -->
-            <div style="margin-top: 40px; background: rgba(99, 102, 241, 0.05); padding: 30px; border-radius: 20px; border: 1px dashed var(--primary-color);">
-                <h3 style="margin-bottom: 15px; color: var(--primary-color); font-weight: 800;">🚀 Practice Makes Perfect</h3>
-                <p style="color: #64748b; margin-bottom: 20px;">Ready to test your knowledge? Head over to the interactive playground and write some code!</p>
-                <div style="display: flex; gap: 15px;">
-                    <a href="/compiler.html" class="btn-signup" style="padding: 12px 24px; background: var(--primary-color); color: white; display: inline-flex; align-items: center; gap: 10px;">
+            <div class="quick-access-section">
+                <h3>🚀 Practice Makes Perfect</h3>
+                <p>Ready to test your knowledge? Head over to the interactive playground and write some code!</p>
+                <div class="quick-access-actions">
+                    <a href="/compiler.html" class="btn-signup primary">
                         <i class="fas fa-terminal"></i> Open Playground
                     </a>
-                    <a href="/roadmap.html" class="btn-signup" style="padding: 12px 24px; background: #fff; border: 1px solid #e2e8f0; color: #64748b; display: inline-flex; align-items: center; gap: 10px;">
+                    <a href="/roadmap.html" class="btn-signup secondary">
                         <i class="fas fa-map"></i> View Roadmap
                     </a>
                 </div>
@@ -316,6 +324,27 @@
             sq.title = `${dateName}, ${dateString}: ${count} practices`;
             
             grid.appendChild(sq);
+        }
+
+        // Mobile Sidebar Toggle
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('dashboardSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
         }
     </script>
 </body>

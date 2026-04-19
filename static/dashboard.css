@@ -478,3 +478,246 @@ body.dark-mode .stat-info p {
     color: #f8fafc;
 }
 body.dark-mode .level-0 { background-color: #334155; }
+
+.quick-access-section {
+    margin-top: 40px;
+    background: rgba(99, 102, 241, 0.05);
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px dashed var(--primary-color);
+}
+
+.quick-access-section h3 {
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    font-weight: 800;
+}
+
+.quick-access-section p {
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+.quick-access-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-signup {
+    padding: 12px 24px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s;
+}
+
+.btn-signup.primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-signup.secondary {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+}
+
+.btn-signup:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Responsive Media Queries */
+@media (max-width: 1024px) {
+    .dashboard-sidebar {
+        width: 280px;
+    }
+}
+
+@media (max-width: 992px) {
+    .dashboard-sidebar {
+        position: fixed;
+        left: -100%;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+        width: 300px;
+        transition: 0.3s ease;
+        box-shadow: 20px 0 50px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-sidebar.active {
+        left: 0;
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+    .mobile-menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #f1f5f9;
+        border: none;
+        color: #1e293b;
+        cursor: pointer;
+        margin-right: 15px;
+    }
+
+    body.dark-mode .mobile-menu-toggle {
+        background: #1e293b;
+        color: #f1f5f9;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+    }
+
+    .dashboard-content {
+        padding: 30px 20px;
+    }
+
+    .welcome-section h1 {
+        font-size: 26px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-inner {
+        padding: 0 15px;
+    }
+
+    .header-actions {
+        display: flex !important;
+        position: static !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        width: auto !important;
+        gap: 10px !important;
+    }
+
+    .btn-dashboard span {
+        display: none;
+    }
+
+    .btn-dashboard {
+        padding: 10px;
+        width: 40px;
+        height: 40px;
+        justify-content: center;
+        border-radius: 10px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .course-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .heatmap-card {
+        padding: 20px;
+    }
+
+    .heatmap-stats {
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .h-stat-num {
+        font-size: 20px;
+    }
+
+    .section-title {
+        font-size: 18px;
+    }
+
+    .course-header {
+        padding: 20px;
+    }
+
+    .course-body {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-section h1 {
+        font-size: 22px;
+    }
+
+    .welcome-section p {
+        font-size: 14px;
+    }
+
+    .stat-card {
+        padding: 20px;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .stat-info p {
+        font-size: 20px;
+    }
+
+    .streak-badge {
+        padding: 4px 12px;
+        font-size: 12px;
+    }
+
+    .quick-access-section {
+        padding: 20px;
+    }
+
+    .quick-access-actions {
+        flex-direction: column;
+    }
+
+    .quick-access-section .btn-signup {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Base styles for new elements */
+.mobile-menu-toggle {
+    display: none;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-overlay {
+    display: none;
+}
