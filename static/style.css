@@ -548,51 +548,78 @@ h1 {
     margin-bottom: 40px;
 }
 
+.action-buttons {
+    display: flex;
+    flex-wrap: nowrap; /* Force one line */
+    gap: 10px;
+    margin-top: 10px;
+}
+
 .c-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 14px 28px;
-    border-radius: 12px;
+    padding: 12px 20px; /* Reduced padding to fit better */
+    border-radius: 14px;
     text-decoration: none;
-    font-weight: 600;
-    margin-right: 16px;
-    margin-bottom: 16px;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
+    font-weight: 700;
+    font-size: 14px; /* Slightly smaller font */
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    white-space: nowrap; /* Prevent text wrapping inside buttons */
+    flex: 1; /* Allow them to grow/shrink equally */
+    max-width: 200px;
+}
+
+.c-button i {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.c-button:hover i {
+    transform: translateX(3px) scale(1.1);
 }
 
 .btn-learn {
-    background: #ecfdf5;
-    color: #10b981;
-    border-color: #10b981;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    color: #16a34a;
+    box-shadow: 0 10px 30px -10px rgba(22, 163, 74, 0.2);
 }
 
 .btn-learn:hover {
-    background: #d1fae5;
-    transform: translateY(-2px);
+    background: #16a34a;
+    color: white;
+    box-shadow: 0 15px 35px -5px rgba(22, 163, 74, 0.4);
+    transform: translateY(-5px);
 }
 
 .btn-video {
-    background: #fffbeb;
-    color: #f59e0b;
-    border-color: #f59e0b;
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    color: #d97706;
+    box-shadow: 0 10px 30px -10px rgba(217, 119, 6, 0.2);
 }
 
 .btn-video:hover {
-    background: #fef3c7;
-    transform: translateY(-2px);
+    background: #d97706;
+    color: white;
+    box-shadow: 0 15px 35px -5px rgba(217, 119, 6, 0.4);
+    transform: translateY(-5px);
 }
 
 .btn-reference {
-    background: #eef2ff;
-    color: #6366f1;
-    border-color: #6366f1;
+    background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    color: #4f46e5;
+    box-shadow: 0 10px 30px -10px rgba(79, 70, 229, 0.2);
 }
 
 .btn-reference:hover {
-    background: #e0e7ff;
-    transform: translateY(-2px);
+    background: #4f46e5;
+    color: white;
+    box-shadow: 0 15px 35px -5px rgba(79, 70, 229, 0.4);
+    transform: translateY(-5px);
 }
 
 .c-right-section video {
@@ -806,10 +833,11 @@ h1 {
     .action-buttons {
         display: flex;
         flex-direction: column;
+        align-items: center; /* Center buttons horizontally in the column */
         gap: 12px;
         width: 100%;
         max-width: 300px;
-        margin: 0 auto;
+        margin: 20px auto 0; /* Centered in parent container */
     }
 
     .c-button {
