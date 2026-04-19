@@ -120,23 +120,41 @@ body {
     }
 }
 
-/* /* Timeline Section - Premium Redesign */
+/* Premium Roadmap Styling */
+.roadmap-container {
+    max-width: 1000px;
+    margin: 80px auto;
+    padding: 0 20px;
+    position: relative;
+}
+
+.roadmap-header {
+    margin-bottom: 80px;
+    text-align: center;
+}
+
+.roadmap-header h1 {
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 1;
+    margin-bottom: 20px;
+}
+
+/* Timeline Redesign */
 .timeline {
     position: relative;
-    max-width: 850px;
-    margin: 40px auto;
     padding: 40px 0;
 }
 
-/* Vertical Line with Gradient */
 .timeline::before {
     content: '';
     position: absolute;
     top: 0;
     bottom: 0;
     left: 25px;
-    width: 4px;
-    background: linear-gradient(to bottom, transparent, var(--primary-color), var(--accent-blue), transparent);
+    width: 6px;
+    background: rgba(99, 102, 241, 0.05);
     border-radius: 10px;
 }
 
@@ -148,121 +166,126 @@ body {
 }
 
 .timeline-item {
-    position: relative;
-    margin-bottom: 60px;
-    width: 100%;
-    z-index: 1;
+    margin-bottom: 100px;
 }
 
-/* Modern Dots */
+/* Enhanced Dots */
 .timeline-dot {
-    position: absolute;
-    left: 17px;
-    top: 0;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+    width: 24px;
+    height: 24px;
     background: white;
-    border: 4px solid var(--primary-color);
-    z-index: 5;
-    transition: all 0.4s ease;
-    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    border: 6px solid var(--primary-color);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    z-index: 10;
 }
 
-.timeline-item:hover .timeline-dot {
-    background: var(--primary-color);
-    transform: scale(1.3);
-    box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
-}
-
-@media (min-width: 768px) {
-    .timeline-dot {
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    .timeline-item:hover .timeline-dot {
-        transform: scale(1.3) translateX(-38%); /* Maintain center alignment while scaling */
-    }
-}
-
-/* Premium Cards */
+/* Advanced Cards */
 .timeline-content {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    padding: 30px;
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    margin-left: 60px;
-    text-align: left;
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 32px;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
-    overflow: hidden;
 }
 
-/* Adding a Step Badge to the card */
-.timeline-content::before {
-    content: "STEP";
+/* Background Step Number */
+.step-number {
     position: absolute;
-    top: 15px;
+    top: -20px;
     right: 20px;
-    font-size: 10px;
-    font-weight: 800;
+    font-size: 100px;
+    font-weight: 900;
     color: var(--primary-color);
-    opacity: 0.3;
-    letter-spacing: 2px;
+    opacity: 0.04;
+    user-select: none;
+    pointer-events: none;
 }
 
-.timeline-content:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.3);
-    background: white;
+.card-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--subtitle-bg);
+    color: var(--primary-color);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.timeline-item:hover .timeline-content {
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 40px 80px rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+.timeline-item:hover .card-icon {
+    background: var(--primary-color);
+    color: white;
+    transform: rotate(-10deg) scale(1.1);
 }
 
 .timeline-content h3 {
-    color: var(--text-main);
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 800;
-    margin-bottom: 10px;
-    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+    color: #0f172a;
 }
 
 .timeline-content p {
-    color: var(--text-dim);
-    font-size: 16px;
-    line-height: 1.7;
-    margin: 0;
+    font-size: 17px;
+    color: #64748b;
+    line-height: 1.6;
 }
 
-/* Desktop Alternating Layout Improvements */
+/* Desktop Layout Refinements */
 @media (min-width: 768px) {
-    .timeline-item {
-        width: 45%; /* Slightly narrower for more breathing room */
-    }
-
-    .timeline-item:nth-child(odd) {
-        margin-left: 0;
-        margin-right: auto;
-        padding-right: 0;
-    }
-
-    .timeline-item:nth-child(even) {
-        margin-left: auto;
-        padding-left: 0;
-    }
-
     .timeline-item:nth-child(odd) .timeline-content {
-        margin-left: 0;
-        margin-right: 40px;
+        margin-right: 60px;
         text-align: right;
+    }
+    
+    .timeline-item:nth-child(odd) .card-icon {
+        margin-left: auto;
+    }
+    
+    .timeline-item:nth-child(odd) .step-number {
+        right: auto;
+        left: 20px;
     }
 
     .timeline-item:nth-child(even) .timeline-content {
-        margin-left: 40px;
-        text-align: left;
+        margin-left: 60px;
     }
+}
+
+/* Background Decorations */
+.roadmap-container::before {
+    content: '{ }';
+    position: fixed;
+    top: 20%;
+    left: 5%;
+    font-size: 120px;
+    font-weight: 900;
+    color: var(--primary-color);
+    opacity: 0.03;
+    z-index: -1;
+}
+
+.roadmap-container::after {
+    content: '</>';
+    position: fixed;
+    bottom: 20%;
+    right: 5%;
+    font-size: 120px;
+    font-weight: 900;
+    color: var(--primary-color);
+    opacity: 0.03;
+    z-index: -1;
 }
 
 /* CTA & Animations */
