@@ -10,10 +10,10 @@
     const LANG = ['python', 'java', 'c'].includes(pathLang) ? pathLang : 'programming';
 
     const LANG_META = {
-        python:      { label: 'Python',      color: '#3776ab', icon: 'fab fa-python',      glow: 'rgba(55,118,171,0.45)' },
-        java:        { label: 'Java',         color: '#ed8b00', icon: 'fab fa-java',        glow: 'rgba(237,139,0,0.45)'  },
-        c:           { label: 'C Language',   color: '#00599c', icon: 'fas fa-code-branch', glow: 'rgba(0,89,156,0.45)'   },
-        programming: { label: 'Programming',  color: '#6366f1', icon: 'fas fa-robot',       glow: 'rgba(99,102,241,0.45)' }
+        python: { label: 'Python', color: '#3776ab', icon: 'fab fa-python', glow: 'rgba(55,118,171,0.45)' },
+        java: { label: 'Java', color: '#ed8b00', icon: 'fab fa-java', glow: 'rgba(237,139,0,0.45)' },
+        c: { label: 'C Language', color: '#00599c', icon: 'fas fa-code-branch', glow: 'rgba(0,89,156,0.45)' },
+        programming: { label: 'Programming', color: '#6366f1', icon: 'fas fa-robot', glow: 'rgba(99,102,241,0.45)' }
     };
     const meta = LANG_META[LANG];
 
@@ -176,15 +176,15 @@
 
     // ── Quick question chips per language ─────────────────────────────
     const CHIPS = {
-        python:      ['Function ante enti ra?', 'Loop ela use cheyali?', 'Error fix cheyyi 🔥'],
-        java:        ['Class ante enti ra?', 'Exception handle ela?', 'Code error fix cheyyi'],
-        c:           ['Pointer ante enti ra?', 'malloc() ela use cheyali?', 'Error fix cheyyi'],
+        python: ['Function ante enti ra?', 'Loop ela use cheyali?', 'Error fix cheyyi 🔥'],
+        java: ['Class ante enti ra?', 'Exception handle ela?', 'Code error fix cheyyi'],
+        c: ['Pointer ante enti ra?', 'malloc() ela use cheyali?', 'Error fix cheyyi'],
         programming: ['Coding ela start cheyali?', 'Variable ante enti?', 'Error vastundi help!']
     };
 
     // ── Build HTML ────────────────────────────────────────────────────
     document.body.insertAdjacentHTML('beforeend', `
-    <div id="cn-chat-hint">తెలుగులో అడగండి</div>
+    <div id="cn-chat-hint">Ask in telugu</div>
     <button id="cn-chat-fab" title="Ask AI Doubt">
         <i class="${meta.icon}"></i>
         <span class="cn-badge">AI</span>
@@ -223,12 +223,12 @@
     `);
 
     // ── References ────────────────────────────────────────────────────
-    const fab      = document.getElementById('cn-chat-fab');
-    const hint     = document.getElementById('cn-chat-hint');
-    const window_  = document.getElementById('cn-chat-window');
+    const fab = document.getElementById('cn-chat-fab');
+    const hint = document.getElementById('cn-chat-hint');
+    const window_ = document.getElementById('cn-chat-window');
     const closeBtn = document.getElementById('cn-close');
-    const input    = document.getElementById('cn-input');
-    const sendBtn  = document.getElementById('cn-send');
+    const input = document.getElementById('cn-input');
+    const sendBtn = document.getElementById('cn-send');
     const messages = document.getElementById('cn-messages');
 
     let isOpen = false;
@@ -304,7 +304,7 @@
     // Render markdown-ish code blocks: ```lang\ncode\n```
     function renderMarkdown(text) {
         // Escape HTML first
-        let safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        let safe = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         // Code blocks ```...```
         safe = safe.replace(/```[\w]*\n?([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
         // Inline code `...`
