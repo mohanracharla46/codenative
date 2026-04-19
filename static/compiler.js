@@ -67,16 +67,16 @@ function showNotice() {
         notice.innerHTML = `
             <div class="notice-icon"><i class="fas fa-tools"></i></div>
             <div class="notice-content">
-                <b>Working on it! 😄</b>
-                <p>Memu deenipai work chestunnamu ra. Twaralo full features vastayi! 😄</p>
+                <b>We are working on it!</b>
+                <p>Please cooperate! 😊</p>        
             </div>
         `;
         document.body.appendChild(notice);
     }
-    
+
     // Show it
     setTimeout(() => notice.classList.add('active'), 100);
-    
+
     // Hide it after 4 seconds
     setTimeout(() => {
         notice.classList.remove('active');
@@ -87,7 +87,7 @@ function showNotice() {
 langSelect.addEventListener("change", () => {
     const lang = langSelect.value;
     const tabFileName = document.querySelector(".file-name");
-    
+
     if (lang == "71") {
         editor.session.setMode("ace/mode/python");
         tabFileName.innerText = "main.py";
@@ -130,7 +130,7 @@ async function runCode() {
 
         const response = await fetch("/run", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ code, language_id })
         });
 
