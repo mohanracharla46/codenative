@@ -339,3 +339,59 @@ body {
 .roadmap-content.active .timeline-dot {
     animation: pulse 2s infinite;
 }
+
+/* Scroll Rocket */
+.scroll-rocket {
+    position: absolute;
+    left: 25px; /* Same as timeline line */
+    width: 44px;
+    height: 44px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    z-index: 100;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+}
+
+@media (min-width: 768px) {
+    .scroll-rocket {
+        left: 50%;
+    }
+}
+
+.scroll-rocket.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-rocket i {
+    transform: rotate(-45deg);
+}
+
+.rocket-flame {
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 18px;
+    background: linear-gradient(to bottom, #fbbf24, #ef4444);
+    border-radius: 50% 50% 20% 20%;
+    filter: blur(2px);
+    animation: flamePulse 0.15s infinite alternate;
+    opacity: 0.9;
+}
+
+@keyframes flamePulse {
+    from { height: 14px; opacity: 0.7; transform: translateX(-50%) scaleX(0.8); }
+    to { height: 22px; opacity: 1; transform: translateX(-50%) scaleX(1.2); }
+}

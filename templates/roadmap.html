@@ -36,6 +36,12 @@
     </header>
 
     <div class="roadmap-container">
+        <!-- Rocket element (Will be moved by JS) -->
+        <div class="scroll-rocket" id="scrollRocket">
+            <i class="fas fa-rocket"></i>
+            <div class="rocket-flame"></div>
+        </div>
+
         <header class="roadmap-header">
             <h1>Developer <span class="highlight">Roadmaps</span></h1>
             <p>Step-by-step guides to master your favorite programming language.</p>
@@ -372,7 +378,44 @@
             if (lang === 'python') buttons[2].classList.add('active');
             if (lang === 'htmlcss') buttons[3].classList.add('active');
             if (lang === 'javascript') buttons[4].classList.add('active');
+            
+            // Reset rocket position on tab switch
+            updateRocket();
         }
+
+        // Rocket Scroll Logic
+        function updateRocket() {
+            const rocket = document.getElementById('scrollRocket');
+            const activeTimeline = document.querySelector('.roadmap-content.active .timeline');
+            const container = document.querySelector('.roadmap-container');
+            
+            if (!activeTimeline || !container || !rocket) return;
+
+            const timelineRect = activeTimeline.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            const startOffset = timelineRect.top - containerRect.top;
+            const triggerPoint = window.innerHeight / 1.8; // Slightly below middle
+            const relativeTrigger = triggerPoint - timelineRect.top;
+            
+            let progress = relativeTrigger / timelineRect.height;
+            
+            // Show/Hide rocket based on whether we are in the roadmap section
+            if (timelineRect.top < window.innerHeight && timelineRect.bottom > 0) {
+                rocket.classList.add('visible');
+            } else {
+                rocket.classList.remove('visible');
+            }
+            
+            progress = Math.max(0, Math.min(1, progress));
+            const targetTop = startOffset + (progress * timelineRect.height);
+            rocket.style.top = `${targetTop}px`;
+        }
+
+        window.addEventListener('scroll', updateRocket);
+        window.addEventListener('resize', updateRocket);
+        // Initial call
+        setTimeout(updateRocket, 500);
     </script>
 </body>
 
