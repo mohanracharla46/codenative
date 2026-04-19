@@ -184,21 +184,23 @@ body.admin-body {
 /* Stats Grid */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.75rem;
+    margin-bottom: 3rem;
 }
 
 .stat-card {
     background: var(--admin-card-bg);
-    padding: 1.5rem;
-    border-radius: 20px;
+    padding: 1.75rem;
+    border-radius: 24px;
     display: flex;
-    align-items: flex-start;
-    gap: 1rem;
+    align-items: center;
+    gap: 1.25rem;
     border: 1px solid var(--admin-border);
     box-shadow: var(--admin-shadow);
     transition: var(--admin-transition);
+    position: relative;
+    overflow: hidden;
 }
 
 .stat-card:hover {
@@ -207,23 +209,45 @@ body.admin-body {
 }
 
 .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
     flex-shrink: 0;
+    transition: var(--admin-transition);
+}
+
+.stat-card:hover .stat-icon {
+    transform: scale(1.1);
 }
 
 .icon-users { background: rgba(99, 102, 241, 0.1); color: var(--admin-primary); }
 .icon-lessons { background: rgba(16, 185, 129, 0.1); color: #10b981; }
 .icon-languages { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
 
-.stat-info { display: flex; flex-direction: column; }
-.stat-info p { color: var(--admin-text-dim); font-size: 0.875rem; font-weight: 500; margin: 0 0 0.25rem 0; text-transform: uppercase; letter-spacing: 0.05em; }
-.stat-info div { font-size: 1.75rem; font-weight: 800; color: var(--admin-text-main); line-height: 1.2; }
+.stat-info { 
+    display: flex; 
+    flex-direction: column; 
+    flex: 1;
+}
+.stat-info p { 
+    color: var(--admin-text-dim); 
+    font-size: 0.75rem; 
+    font-weight: 700; 
+    margin: 0 0 0.25rem 0; 
+    text-transform: uppercase; 
+    letter-spacing: 0.08em; 
+}
+.stat-info div { 
+    font-size: 2rem; 
+    font-weight: 800; 
+    color: var(--admin-text-main); 
+    line-height: 1; 
+    letter-spacing: -1px;
+}
 
 /* Content Section/Cards */
 .section-card {
@@ -679,10 +703,16 @@ body.dark-mode .editor-toolbar { background: rgba(15, 23, 42, 0.5); }
 
 .stat-trend {
     font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
-    margin-left: auto;
+    font-weight: 700;
+    padding: 0.4rem 0.6rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-trend i {
+    font-size: 0.7rem;
 }
 
 .trend-up { background: rgba(16, 185, 129, 0.1); color: #10b981; }
