@@ -6,7 +6,7 @@ import hashlib
 import os
 import subprocess
 import tempfile
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import wraps
 import psycopg2
 import psycopg2.extras
@@ -15,7 +15,8 @@ from dotenv import load_dotenv
 load_dotenv() # Load variables from .env
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-app.secret_key = os.environ.get('SECRET_KEY', 'codenative_fallback_secret_key_secure_12345')  # Use static key for serverless continuity
+app.secret_key = os.environ.get('SECRET_KEY', 'codenative_fallback_secret_key_secure_12345')
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
 
 # Database configuration
 DATABASE = 'users.db'
@@ -276,6 +277,7 @@ def signin():
                 user['is_admin'] = 1
 
             # Store user info in session
+            session.permanent = True
             session['user_id'] = user['id']
             session['user_name'] = user['name']
             session['user_email'] = user['email']
