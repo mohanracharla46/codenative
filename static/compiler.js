@@ -68,7 +68,7 @@ function showNotice() {
             <div class="notice-icon"><i class="fas fa-tools"></i></div>
             <div class="notice-content">
                 <b>Working on it! 😄</b>
-                <p>మేము దీనిపై పని చేస్తున్నాము. త్వరలో మరిన్ని ఫీచర్స్ వస్తాయి!</p>
+                <p>Memu deenipai work chestunnamu ra. Twaralo full features vastayi! 😄</p>
             </div>
         `;
         document.body.appendChild(notice);
