@@ -45,6 +45,22 @@
             border:2px solid #fff; animation:cn-bounce 2s infinite;
         }
 
+        #cn-chat-hint {
+            position:fixed; bottom:98px; right:28px; z-index:9999;
+            background:#fff; color:#1e293b; padding:5px 10px; border-radius:10px;
+            font-size:10.5px; font-weight:800; font-family:'Inter',sans-serif;
+            box-shadow:0 4px 15px rgba(0,0,0,0.1);
+            animation:cn-bounce 3s infinite;
+            pointer-events:none; border:1px solid rgba(0,0,0,0.05);
+            transition:all .3s ease;
+        }
+        #cn-chat-hint.cn-hidden { opacity:0; transform:translateY(10px); }
+        #cn-chat-hint::after {
+            content:''; position:absolute; bottom:-6px; right:22px;
+            border-left:6px solid transparent; border-right:6px solid transparent;
+            border-top:6px solid #fff;
+        }
+
         #cn-chat-window {
             position:fixed; bottom:100px; right:28px; z-index:9998;
             width:380px; max-height:560px;
@@ -168,6 +184,7 @@
 
     // ── Build HTML ────────────────────────────────────────────────────
     document.body.insertAdjacentHTML('beforeend', `
+    <div id="cn-chat-hint">తెలుగులో అడగండి</div>
     <button id="cn-chat-fab" title="Ask AI Doubt">
         <i class="${meta.icon}"></i>
         <span class="cn-badge">AI</span>
@@ -207,6 +224,7 @@
 
     // ── References ────────────────────────────────────────────────────
     const fab      = document.getElementById('cn-chat-fab');
+    const hint     = document.getElementById('cn-chat-hint');
     const window_  = document.getElementById('cn-chat-window');
     const closeBtn = document.getElementById('cn-close');
     const input    = document.getElementById('cn-input');
@@ -218,6 +236,7 @@
     function toggleChat() {
         isOpen = !isOpen;
         window_.classList.toggle('cn-hidden', !isOpen);
+        hint.classList.toggle('cn-hidden', isOpen);
         if (isOpen) { input.focus(); scrollToBottom(); }
     }
 
