@@ -53,11 +53,22 @@
             perspective: 1000px;
         }
         .code-showcase {
-            min-width: 380px;
+            width: 100%;
+            max-width: 500px;
+            min-width: unset;
             text-align: left;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             margin: 0 auto;
             transform-style: preserve-3d;
+        }
+        @media (max-width: 480px) {
+            .code-showcase {
+                min-width: unset;
+            }
+            .terminal-content {
+                padding: 15px;
+                font-size: 13px;
+            }
         }
         .code-showcase:hover {
             transform: scale(1.04) translateY(-10px) rotateX(2deg);
