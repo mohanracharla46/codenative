@@ -35,15 +35,28 @@ body {
 
 /* Roadmap Tabs (Redesigned as Cards) */
 .roadmap-tabs {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 15px;
-    margin-bottom: 60px;
+    display: flex;
+    overflow-x: auto;
+    padding: 10px 5px 25px; /* Extra bottom padding for the shadow when scrolling */
+    gap: 12px;
+    margin-bottom: 40px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
+}
+
+.roadmap-tabs::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari */
 }
 
 @media (min-width: 768px) {
     .roadmap-tabs {
+        display: grid;
         grid-template-columns: repeat(5, 1fr);
+        padding: 0;
+        overflow-x: visible;
+        margin-bottom: 60px;
     }
 }
 
@@ -51,17 +64,29 @@ body {
     background: var(--bg-card);
     border: 1px solid var(--glass-border);
     color: var(--text-main);
-    padding: 20px 15px;
-    border-radius: 20px;
-    font-size: 14px;
+    padding: 16px 12px;
+    border-radius: 18px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    flex: 0 0 130px; /* Fixed width for sliding on mobile */
+    scroll-snap-align: center;
+}
+
+@media (min-width: 768px) {
+    .tab-btn {
+        padding: 20px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        gap: 10px;
+        flex: 1;
+    }
 }
 
 .tab-btn i {
