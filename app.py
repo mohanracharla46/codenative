@@ -832,13 +832,24 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
         try:
             resp = requests.post(gemini_url, json=payload, headers=headers, timeout=30)
             
-            # If rate-limited or model not found, try 1.5 flash as fallback
+            # Multi-stage fallback for maximum availability
+            # 1. Try 2.0 Flash Lite if 2.0 Flash is busy
+            if resp.status_code in [429, 404]:
+                fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={gemini_api_key}"
+                resp = requests.post(fallback_url, json=payload, headers=headers, timeout=25)
+            
+            # 2. Try Flash Latest (usually 1.5 Flash) if others are busy
+            if resp.status_code in [429, 404]:
+                fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={gemini_api_key}"
+                resp = requests.post(fallback_url, json=payload, headers=headers, timeout=25)
+
+            # 3. Try 1.5 Flash directly as last resort
             if resp.status_code in [429, 404]:
                 fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
                 resp = requests.post(fallback_url, json=payload, headers=headers, timeout=25)
             
             if resp.status_code == 429:
-                return jsonify({'reply': '⏳ Too many requests — the AI is a bit busy right now! Please wait a few seconds and try again.'}), 429
+                return jsonify({'reply': '⏳ Too many requests — current free limit reach ayindi ra! Please wait a few seconds and try again.'}), 429
             
             resp.raise_for_status()
             result = resp.json()
