@@ -361,8 +361,28 @@
 
                 const res = await fetch(`/api/content/${currentLang}/${slug}`);
                 const data = await res.json();
+                
+                // Clear previous custom styles and scripts
+                document.querySelectorAll('.custom-lesson-asset').forEach(el => el.remove());
+
                 if(data.content_html) {
                     contentBox.innerHTML = data.content_html;
+                }
+
+                // Inject Custom CSS
+                if(data.custom_css) {
+                    const styleTag = document.createElement('style');
+                    styleTag.className = 'custom-lesson-asset';
+                    styleTag.textContent = data.custom_css;
+                    document.head.appendChild(styleTag);
+                }
+
+                // Inject Custom JS
+                if(data.custom_js) {
+                    const scriptTag = document.createElement('script');
+                    scriptTag.className = 'custom-lesson-asset';
+                    scriptTag.textContent = `(function() { ${data.custom_js} })();`;
+                    document.body.appendChild(scriptTag);
                 }
 
                 // Update Next Lesson Bar

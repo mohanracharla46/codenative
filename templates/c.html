@@ -318,6 +318,100 @@ int main() {
         }
     }
 
+    // Dynamic Content Loading
+    const sidebarTopics = document.getElementById('sidebarTopics');
+    const contentBox = document.getElementById('topicContent');
+    const currentLang = 'c';
+
+    async function loadTopics() {
+        try {
+            const res = await fetch(`/api/content/${currentLang}`);
+            const topics = await res.json();
+            
+            if (topics.length > 0) {
+                sidebarTopics.innerHTML = '';
+                topics.forEach((topic, index) => {
+                    const li = document.createElement('li');
+                    li.className = `topic ${index === 0 ? 'active' : ''}`;
+                    li.dataset.topic = topic.topic_slug;
+                    li.textContent = topic.topic_title;
+                    li.onclick = () => loadSpecificTopic(topic.topic_slug, li);
+                    sidebarTopics.appendChild(li);
+                });
+                loadSpecificTopic(topics[0].topic_slug, sidebarTopics.firstChild);
+            }
+        } catch (err) { console.error(err); }
+    }
+
+    async function loadSpecificTopic(slug, el) {
+        try {
+            document.querySelectorAll('.topic').forEach(t => t.classList.remove('active'));
+            if(el) el.classList.add('active');
+            
+            contentBox.innerHTML = `
+                <div style="padding: 100px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <i class="fas fa-code-branch fa-beat-fade" style="font-size: 54px; color: #00599c; margin-bottom: 20px;"></i>
+                    <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Linking C Lesson...</p>
+                </div>
+            `;
+
+            const res = await fetch(`/api/content/${currentLang}/${slug}`);
+            const data = await res.json();
+
+            // Clear previous custom styles and scripts
+            document.querySelectorAll('.custom-lesson-asset').forEach(el => el.remove());
+
+            if(data.content_html) {
+                contentBox.innerHTML = data.content_html;
+            }
+
+            // Inject Custom CSS
+            if(data.custom_css) {
+                const styleTag = document.createElement('style');
+                styleTag.className = 'custom-lesson-asset';
+                styleTag.textContent = data.custom_css;
+                document.head.appendChild(styleTag);
+            }
+
+            // Inject Custom JS
+            if(data.custom_js) {
+                const scriptTag = document.createElement('script');
+                scriptTag.className = 'custom-lesson-asset';
+                scriptTag.textContent = `(function() { ${data.custom_js} })();`;
+                document.body.appendChild(scriptTag);
+            }
+
+            // Update Next Lesson Bar
+            const nextEl = el.nextElementSibling;
+            const nextBar = document.getElementById('nextLessonBar');
+            if(nextEl && nextEl.classList.contains('topic')) {
+                nextBar.style.display = 'flex';
+                nextBar.querySelector('h3').textContent = nextEl.textContent;
+                nextBar.onclick = () => nextEl.click();
+            } else {
+                nextBar.style.display = 'none';
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch(err) { console.error(err); }
+    }
+
+    // Nav buttons
+    const prevBtn = document.getElementById('prevTopic');
+    const nextBtn = document.getElementById('nextTopic');
+    if (prevBtn) {
+        prevBtn.onclick = () => {
+            const active = document.querySelector('.topic.active');
+            if(active && active.previousElementSibling) active.previousElementSibling.click();
+        };
+    }
+    if (nextBtn) {
+        nextBtn.onclick = () => {
+            const active = document.querySelector('.topic.active');
+            if(active && active.nextElementSibling) active.nextElementSibling.click();
+        };
+    }
+
     // Mobile Sidebar Toggle
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebarClose = document.getElementById('sidebarClose');

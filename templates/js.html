@@ -6,29 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Python Programming Tutorial | Code Native</title>
-    <meta name="title" content="Python Programming Tutorial | Code Native">
+    <title>JavaScript Tutorial | Code Native</title>
+    <meta name="title" content="JavaScript Tutorial | Code Native">
     <meta name="description"
-        content="Start your Python journey with Code Native. Easy to understand Python tutorials in Telugu with an interactive compiler to practice code.">
+        content="Master JavaScript in Telugu. Learn variables, functions, DOM, and ES6+ features with our interactive JS tutorial.">
     <meta name="keywords"
-        content="learn Python, Python tutorial Telugu, Python programming, Python syntax, online Python compiler, Code Native">
+        content="learn JavaScript, JS tutorial Telugu, JavaScript programming, ES6, DOM manipulation, Code Native">
     <meta name="robots" content="index, follow">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="https://codenative.in/python.html">
-    <meta property="og:title" content="Python Programming Tutorial | Code Native">
-    <meta property="og:description"
-        content="Start your Python journey with Code Native. Easy to understand Python tutorials in Telugu with an interactive compiler to practice code.">
-    <meta property="og:image" content="/static/images/LMS image.jpg">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://codenative.in/python.html">
-    <meta property="twitter:title" content="Python Programming Tutorial | Code Native">
-    <meta property="twitter:description"
-        content="Start your Python journey with Code Native. Easy to understand Python tutorials in Telugu with an interactive compiler to practice code.">
-    <meta property="twitter:image" content="/static/images/LMS image.jpg">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -76,9 +60,9 @@
         </button>
 
         <div class="sidebar-header" style="padding: 24px 20px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
-            <i class="fab fa-python" style="font-size: 36px; color: #3776ab;"></i>
+            <i class="fab fa-js" style="font-size: 36px; color: #f7df1e; background: #000; border-radius: 4px;"></i>
             <div>
-                <h2 style="font-size: 18px; font-weight: 800; margin: 0; color: var(--text-primary);">Python</h2>
+                <h2 style="font-size: 18px; font-weight: 800; margin: 0; color: var(--text-primary);">JavaScript</h2>
                 <p style="font-size: 11px; margin: 0; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Fundamentals</p>
             </div>
         </div>
@@ -97,13 +81,13 @@
 
     <!-- Content -->
     <div class="tutorial-content">
-        <div class="breadcrumb-label">Module 01 • Python Fundamentals</div>
+        <div class="breadcrumb-label">Module 01 • JavaScript Basics</div>
         
         <div class="main-box" id="topicContent">
             <!-- Content from database will be loaded here -->
             <div style="padding: 100px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <i class="fab fa-python fa-beat-fade" style="font-size: 54px; color: #3776ab; margin-bottom: 20px;"></i>
-                <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Preparing Python Lesson...</p>
+                <i class="fab fa-js fa-beat-fade" style="font-size: 54px; color: #f7df1e; margin-bottom: 20px;"></i>
+                <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Preparing JavaScript Lesson...</p>
             </div>
         </div>
 
@@ -123,7 +107,7 @@
             <div class="playground-title-bar">
                 <div class="title-left">
                     <i class="fas fa-terminal" style="margin-right: 10px; color: #a78bfa; font-size: 14px;"></i>
-                    <span>INTERACTIVE PLAYGROUND</span>
+                    <span>JAVASCRIPT PLAYGROUND</span>
                 </div>
                 <div class="traffic-lights">
                     <span class="light red"></span>
@@ -134,26 +118,20 @@
 
             <div class="playground-tab-bar">
                 <div class="tab-item active">
-                    <span class="file-name">main.py</span>
+                    <span class="file-name">script.js</span>
                     <div class="active-indicator"></div>
                 </div>
                 <div class="playground-controls">
-                    <div class="lang-selector">
-                        <select id="lang">
-                            <option value="71" selected>Python</option>
-                            <option value="62">Java</option>
-                            <option value="50">C</option>
-                            <option value="54">C++</option>
-                            <option value="63">JavaScript</option>
-                        </select>
-                    </div>
                     <button id="clearBtn" class="btn-playground-clear">Clear</button>
                     <button id="runBtn" class="btn-playground-run"><i class="fas fa-play" style="font-size: 10px; margin-right: 6px;"></i> Run Code</button>
                 </div>
             </div>
 
             <div class="editor-section-new">
-                <div id="editor">print("Hello, Python Scholar!")</div>
+                <div id="editor">console.log("Hello, JavaScript Scholar!");
+
+let name = "CodeNative";
+console.log("Welcome to " + name);</div>
             </div>
 
             <div class="playground-console">
@@ -166,7 +144,7 @@
         <div class="next-lesson-section" id="nextLessonBar">
             <div class="next-lesson-meta">
                 <span>Coming up next</span>
-                <h3>Variables & State</h3>
+                <h3>Variables & Constants</h3>
             </div>
             <button class="next-lesson-btn" id="nextLessonBtn">
                 <i class="fas fa-arrow-right"></i>
@@ -178,145 +156,50 @@
         // Initialize Ace Editor
         const editor = ace.edit("editor");
         editor.setTheme("ace/theme/monokai");
-        editor.session.setMode("ace/mode/python");
+        editor.session.setMode("ace/mode/javascript");
         editor.setOptions({
             fontSize: "14px",
             showPrintMargin: false,
-            tabSize: 4,
+            tabSize: 2,
             useWorker: false
         });
 
         // DOM
-        const langSelect = document.getElementById("lang");
         const runBtn = document.getElementById("runBtn");
         const clearBtn = document.getElementById("clearBtn");
         const outputEl = document.getElementById("output");
 
-        // Add notification styles dynamically
-        const style = document.createElement('style');
-        style.textContent = `
-            .compiler-notice {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #1e293b;
-                color: #fff;
-                padding: 16px 24px;
-                border-radius: 16px;
-                box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-                z-index: 10000;
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                border: 1px solid rgba(255,255,255,0.1);
-                transform: translateY(-100px);
-                opacity: 0;
-                transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-                max-width: 320px;
-            }
-            .compiler-notice.active {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            .notice-icon {
-                width: 40px;
-                height: 40px;
-                background: rgba(99, 102, 241, 0.2);
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #818cf8;
-                font-size: 18px;
-                flex-shrink: 0;
-            }
-            .notice-content b { display: block; font-size: 14px; margin-bottom: 2px; }
-            .notice-content p { margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.4; }
-        `;
-        document.head.appendChild(style);
+        function runJS() {
+            outputEl.innerText = "";
+            const code = editor.getValue();
+            
+            // Capture console.log
+            const originalLog = console.log;
+            console.log = (...args) => {
+                outputEl.innerText += args.join(" ") + "\n";
+            };
 
-        function showNotice() {
-            let notice = document.getElementById('compiler-notice');
-            if (!notice) {
-                notice = document.createElement('div');
-                notice.id = 'compiler-notice';
-                notice.className = 'compiler-notice';
-                notice.innerHTML = `
-                    <div class="notice-icon"><i class="fas fa-tools"></i></div>
-                    <div class="notice-content">
-                        <b>We are working on it!</b>
-                        <p>Please cooperate! 😊</p>        
-                    </div>
-                `;
-                document.body.appendChild(notice);
+            try {
+                eval(code);
+            } catch (err) {
+                outputEl.innerText += "Error: " + err.message + "\n";
             }
-            setTimeout(() => notice.classList.add('active'), 100);
-            setTimeout(() => {
-                notice.classList.remove('active');
-            }, 4000);
+
+            console.log = originalLog;
+            if (!outputEl.innerText) outputEl.innerText = "No output produced.";
         }
 
-        // change mode on language select
-        langSelect.addEventListener("change", () => {
-            const lang = langSelect.value;
-            if (lang == "71") editor.session.setMode("ace/mode/python");
-            else if (lang == "62") editor.session.setMode("ace/mode/java");
-            else if (lang == "50") editor.session.setMode("ace/mode/c_cpp");
-            else if (lang == "54") editor.session.setMode("ace/mode/c_cpp");
-            else if (lang == "63") editor.session.setMode("ace/mode/javascript");
-        });
-
-        // Run handler
-        runBtn.addEventListener("click", runCode);
+        runBtn.addEventListener("click", runJS);
         clearBtn.addEventListener("click", () => {
             outputEl.innerText = "";
         });
-
-        // runCode: sends code to /run and shows output
-        async function runCode() {
-            showNotice();
-            try {
-                runBtn.disabled = true;
-                runBtn.innerText = "Running...";
-                outputEl.innerText = "Running...";
-
-                const code = editor.getValue();
-                const language_id = langSelect.value;
-
-                const response = await fetch("/run", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ code, language_id })
-                });
-
-                const text = await response.text();
-                let data;
-
-                try {
-                    data = JSON.parse(text);
-                } catch (err) {
-                    outputEl.innerText = `Invalid response from server:\n${text}`;
-                    return;
-                }
-
-                outputEl.innerText = data.output || "No output";
-            } catch (err) {
-                outputEl.innerText = `Error: ${err.message}`;
-            } finally {
-                runBtn.disabled = false;
-                runBtn.innerHTML = '<i class="fas fa-play" style="font-size: 10px; margin-right: 6px;"></i> Run Code';
-            }
-        }
     </script>
-    </div>
 
     <script>
         // Dynamic Content Loading
         const sidebarTopics = document.getElementById('sidebarTopics');
-        const topicContentList = document.getElementById('sidebarTopics'); // reuse
         const contentBox = document.getElementById('topicContent');
-        const titleBox = document.getElementById('pageTitle');
-        const currentLang = 'python';
+        const currentLang = 'js';
 
         async function loadTopics() {
             try {
@@ -345,8 +228,8 @@
                 
                 contentBox.innerHTML = `
                     <div style="padding: 100px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <i class="fab fa-python fa-beat-fade" style="font-size: 54px; color: #3776ab; margin-bottom: 20px;"></i>
-                        <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Preparing Python Lesson...</p>
+                        <i class="fab fa-js fa-beat-fade" style="font-size: 54px; color: #f7df1e; margin-bottom: 20px;"></i>
+                        <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Preparing JavaScript Lesson...</p>
                     </div>
                 `;
 
@@ -440,7 +323,7 @@
 
         // Close sidebar when clicking outside
         document.addEventListener('click', (e) => {
-            if (sidebar.classList.contains('active')) {
+            if (sidebar && sidebar.classList.contains('active')) {
                 if (!sidebar.contains(e.target) && e.target !== sidebarToggle) {
                     sidebar.classList.remove('active');
                     if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');

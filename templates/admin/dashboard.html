@@ -163,6 +163,16 @@
                     Java
                     <span class="lang-tab-count" id="count-java">0</span>
                 </button>
+                <button class="lang-tab-btn" data-lang="web" onclick="switchLangTab('web')">
+                    <span class="lang-tab-icon lang-icon-web"><i class="fab fa-html5"></i></span>
+                    Web Dev
+                    <span class="lang-tab-count" id="count-web">0</span>
+                </button>
+                <button class="lang-tab-btn" data-lang="js" onclick="switchLangTab('js')">
+                    <span class="lang-tab-icon lang-icon-js"><i class="fab fa-js"></i></span>
+                    JavaScript
+                    <span class="lang-tab-count" id="count-js">0</span>
+                </button>
             </div>
 
             <!-- C Tutorials Panel -->
@@ -310,7 +320,109 @@
                                 </tr>
                                 {% endfor %}
                                 {% if not java_items %}
-                                <tr><td colspan="5" class="empty-row"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:0.5rem;opacity:0.3;display:block;"></i>No Java tutorials yet. Click "Add Java Tutorial" to get started!</td></tr>
+                                <tr><td colspan="5" class="empty-row"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:0.5rem;opacity:0.3;display:block;"></i>No Java tutorials yet.</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Web Tutorials Panel -->
+            <div class="lang-panel" id="panel-web">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="lang-badge-header lang-icon-web"><i class="fab fa-html5"></i></div>
+                            <div>
+                                <h2 style="margin:0;">Web Development Tutorials</h2>
+                                <p style="margin:0;font-size:0.8rem;color:var(--admin-text-dim);">Manage HTML & CSS lessons</p>
+                            </div>
+                        </div>
+                        <button class="btn-action btn-primary" onclick="openAddModalForLang('web')">
+                            <i class="fas fa-plus"></i> Add Web Tutorial
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="content-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Topic</th>
+                                    <th>Slug</th>
+                                    <th>Order</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-web">
+                                {% set web_items = contents | selectattr("language", "equalto", "web") | list %}
+                                {% for item in web_items %}
+                                <tr>
+                                    <td style="color:var(--admin-text-dim);font-size:0.85rem;">{{ loop.index }}</td>
+                                    <td><div style="font-weight:600;">{{ item.topic_title }}</div></td>
+                                    <td><code style="font-size:0.8rem;background:rgba(227,79,38,0.08);padding:2px 8px;border-radius:6px;color:#e34f26;">{{ item.topic_slug }}</code></td>
+                                    <td><span class="order-badge">{{ item.order_index }}</span></td>
+                                    <td>
+                                        <div style="display:flex;gap:0.5rem;">
+                                            <button class="btn-action btn-sm btn-edit" onclick='editContent({{ item.id }}, "{{ item.language }}", "{{ item.topic_slug }}")' title="Edit"><i class="fas fa-pen"></i></button>
+                                            <button class="btn-action btn-sm btn-delete" onclick="deleteContent({{ item.id }})" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not web_items %}
+                                <tr><td colspan="5" class="empty-row"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:0.5rem;opacity:0.3;display:block;"></i>No Web tutorials yet.</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JS Tutorials Panel -->
+            <div class="lang-panel" id="panel-js">
+                <div class="section-card">
+                    <div class="section-header">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="lang-badge-header lang-icon-js"><i class="fab fa-js"></i></div>
+                            <div>
+                                <h2 style="margin:0;">JavaScript Tutorials</h2>
+                                <p style="margin:0;font-size:0.8rem;color:var(--admin-text-dim);">Manage JavaScript lessons</p>
+                            </div>
+                        </div>
+                        <button class="btn-action btn-primary" onclick="openAddModalForLang('js')">
+                            <i class="fas fa-plus"></i> Add JS Tutorial
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="content-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Topic</th>
+                                    <th>Slug</th>
+                                    <th>Order</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-js">
+                                {% set js_items = contents | selectattr("language", "equalto", "js") | list %}
+                                {% for item in js_items %}
+                                <tr>
+                                    <td style="color:var(--admin-text-dim);font-size:0.85rem;">{{ loop.index }}</td>
+                                    <td><div style="font-weight:600;">{{ item.topic_title }}</div></td>
+                                    <td><code style="font-size:0.8rem;background:rgba(247,223,30,0.1);padding:2px 8px;border-radius:6px;color:#d4b106;">{{ item.topic_slug }}</code></td>
+                                    <td><span class="order-badge">{{ item.order_index }}</span></td>
+                                    <td>
+                                        <div style="display:flex;gap:0.5rem;">
+                                            <button class="btn-action btn-sm btn-edit" onclick='editContent({{ item.id }}, "{{ item.language }}", "{{ item.topic_slug }}")' title="Edit"><i class="fas fa-pen"></i></button>
+                                            <button class="btn-action btn-sm btn-delete" onclick="deleteContent({{ item.id }})" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not js_items %}
+                                <tr><td colspan="5" class="empty-row"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:0.5rem;opacity:0.3;display:block;"></i>No JavaScript tutorials yet.</td></tr>
                                 {% endif %}
                             </tbody>
                         </table>
@@ -388,6 +500,8 @@
                             <option value="python">Python</option>
                             <option value="java">Java</option>
                             <option value="c">C</option>
+                            <option value="web">Web Dev</option>
+                            <option value="js">JavaScript</option>
                             <option value="roadmap">Roadmap</option>
                         </select>
                     </div>
@@ -404,8 +518,14 @@
                         <input type="number" id="order_index" class="form-control" value="0" required>
                     </div>
                     <div class="form-group">
-                        <label>Content (Full Rich Text Support)</label>
-                        <div class="editor-container">
+                        <label>Tutorial Content</label>
+                        <div class="editor-tabs" style="display: flex; gap: 10px; margin-bottom: 8px;">
+                            <button type="button" class="btn-sm-tab active" id="btn-rich-text" onclick="setEditorMode('rich')">Rich Text</button>
+                            <button type="button" class="btn-sm-tab" id="btn-raw-html" onclick="setEditorMode('raw')">Raw HTML</button>
+                        </div>
+                        
+                        <!-- Rich Text Editor -->
+                        <div id="rich-editor-container" class="editor-container">
                             <div class="editor-toolbar">
                                 <button type="button" onclick="execCmd('bold')" title="Bold"><i class="fas fa-bold"></i></button>
                                 <button type="button" onclick="execCmd('italic')" title="Italic"><i class="fas fa-italic"></i></button>
@@ -419,6 +539,20 @@
                                 <button type="button" onclick="execCmd('removeFormat')" title="Clear Styling"><i class="fas fa-eraser"></i></button>
                             </div>
                             <div id="editor-actual" class="editor-content" contenteditable="true" onmouseup="saveSelection()" onkeyup="saveSelection()" onfocus="saveSelection()"></div>
+                        </div>
+
+                        <!-- Raw HTML Editor -->
+                        <textarea id="raw-html-editor" class="form-control" style="display: none; height: 300px; font-family: monospace; background: #1e293b; color: #f8fafc;" placeholder="<div>Enter custom HTML here...</div>"></textarea>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Custom CSS (Optional)</label>
+                            <textarea id="custom_css" class="form-control" style="height: 150px; font-family: monospace;" placeholder="/* Custom styles */"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Custom JavaScript (Optional)</label>
+                            <textarea id="custom_js" class="form-control" style="height: 150px; font-family: monospace;" placeholder="// Custom logic"></textarea>
                         </div>
                     </div>
                     <button type="submit" class="btn-action btn-primary" style="width: 100%; justify-content: center;"><i class="fas fa-save"></i> Save Content</button>
@@ -443,6 +577,36 @@
             </div>
         </div>
     </div>
+
+    </script>
+
+    <script>
+        // Editor Mode Switching
+        let currentEditorMode = 'rich';
+        function setEditorMode(mode) {
+            currentEditorMode = mode;
+            const richContainer = document.getElementById('rich-editor-container');
+            const rawEditor = document.getElementById('raw-html-editor');
+            const btnRich = document.getElementById('btn-rich-text');
+            const btnRaw = document.getElementById('btn-raw-html');
+
+            if (mode === 'rich') {
+                rawEditor.style.display = 'none';
+                richContainer.style.display = 'block';
+                btnRich.classList.add('active');
+                btnRaw.classList.remove('active');
+                // Sync content from raw to rich
+                document.getElementById('editor-actual').innerHTML = rawEditor.value;
+            } else {
+                richContainer.style.display = 'none';
+                rawEditor.style.display = 'block';
+                btnRaw.classList.add('active');
+                btnRich.classList.remove('active');
+                // Sync content from rich to raw
+                rawEditor.value = document.getElementById('editor-actual').innerHTML;
+            }
+        }
+    </script>
 
     <script>
         // Tab Switching Logic
@@ -487,7 +651,11 @@
                 topic_title: document.getElementById('topic_title').value,
                 topic_slug: document.getElementById('topic_slug').value,
                 order_index: parseInt(document.getElementById('order_index').value),
-                content_html: document.getElementById('editor-actual').innerHTML
+                content_html: currentEditorMode === 'rich' ? 
+                              document.getElementById('editor-actual').innerHTML : 
+                              document.getElementById('raw-html-editor').value,
+                custom_css: document.getElementById('custom_css').value,
+                custom_js: document.getElementById('custom_js').value
             };
             const response = await fetch('/admin/add_content', {
                 method: 'POST',
@@ -513,12 +681,18 @@
         async function editContent(id, lang, slug) {
             const res = await fetch(`/api/content/${lang}/${slug}`);
             const item = await res.json();
-            document.getElementById('modalTitle').innerText = 'Edit Tutorial';
             document.getElementById('language').value = item.language;
             document.getElementById('topic_title').value = item.topic_title;
             document.getElementById('topic_slug').value = item.topic_slug;
             document.getElementById('order_index').value = item.order_index;
-            document.getElementById('editor-actual').innerHTML = item.content_html || '';
+            
+            const content = item.content_html || '';
+            document.getElementById('editor-actual').innerHTML = content;
+            document.getElementById('raw-html-editor').value = content;
+            
+            document.getElementById('custom_css').value = item.custom_css || '';
+            document.getElementById('custom_js').value = item.custom_js || '';
+            setEditorMode('rich');
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
         }
@@ -582,10 +756,14 @@
 
         // Open modal pre-set to the correct language
         function openAddModalForLang(lang) {
-            const labels = { c: 'C Language', python: 'Python', java: 'Java' };
+            const labels = { c: 'C Language', python: 'Python', java: 'Java', web: 'Web Development', js: 'JavaScript' };
             document.getElementById('modalTitle').innerText = 'Add ' + (labels[lang] || lang) + ' Tutorial';
             document.getElementById('contentForm').reset();
             document.getElementById('editor-actual').innerHTML = '';
+            document.getElementById('raw-html-editor').value = '';
+            setEditorMode('rich');
+            document.getElementById('custom_css').value = '';
+            document.getElementById('custom_js').value = '';
             document.getElementById('language').value = lang;
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
@@ -593,7 +771,7 @@
 
         // Count rows per language and update badges
         (function updateCounts() {
-            ['c', 'python', 'java'].forEach(lang => {
+            ['c', 'python', 'java', 'web', 'js'].forEach(lang => {
                 const tbody = document.getElementById('tbody-' + lang);
                 const badge = document.getElementById('count-' + lang);
                 if (!tbody || !badge) return;

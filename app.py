@@ -73,7 +73,7 @@ def execute_query(conn, query, params=None):
         if 'INSERT OR REPLACE' in query:
             # We specifically handle the content table case
             query = query.replace('INSERT OR REPLACE INTO content', 'INSERT INTO content')
-            query += ' ON CONFLICT (language, topic_slug) DO UPDATE SET topic_title = EXCLUDED.topic_title, content_html = EXCLUDED.content_html, order_index = EXCLUDED.order_index'
+            query += ' ON CONFLICT (language, topic_slug) DO UPDATE SET topic_title = EXCLUDED.topic_title, content_html = EXCLUDED.content_html, custom_css = EXCLUDED.custom_css, custom_js = EXCLUDED.custom_js, order_index = EXCLUDED.order_index'
     
     cursor = conn.cursor()
     cursor.execute(query, params or ())
@@ -117,6 +117,8 @@ def init_db():
             topic_slug TEXT NOT NULL,
             topic_title TEXT NOT NULL,
             content_html TEXT NOT NULL,
+            custom_css TEXT,
+            custom_js TEXT,
             order_index INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(language, topic_slug)
@@ -128,6 +130,8 @@ def init_db():
             topic_slug TEXT NOT NULL,
             topic_title TEXT NOT NULL,
             content_html TEXT NOT NULL,
+            custom_css TEXT,
+            custom_js TEXT,
             order_index INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(language, topic_slug)
@@ -185,6 +189,14 @@ def init_db():
         columns = [col[1] for col in cursor.fetchall()]
         if 'is_admin' not in columns:
             conn.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0")
+        
+        # Check if custom_css/js columns exist (SQLite migration)
+        cursor = conn.execute("PRAGMA table_info(content)")
+        columns = [col[1] for col in cursor.fetchall()]
+        if 'custom_css' not in columns:
+            conn.execute("ALTER TABLE content ADD COLUMN custom_css TEXT")
+        if 'custom_js' not in columns:
+            conn.execute("ALTER TABLE content ADD COLUMN custom_js TEXT")
         
         conn.commit()
     
@@ -433,6 +445,16 @@ def roadmap_page():
 def terms_conditions():
     return render_template("terms-conditions.html")
 
+@app.route("/web.html")
+@login_required
+def web_page():
+    return render_template("web.html")
+
+@app.route("/js.html")
+@login_required
+def js_page():
+    return render_template("js.html")
+
 # Admin Routes
 @app.route("/admin")
 @admin_required
@@ -507,13 +529,15 @@ def add_content():
         topic_slug = data.get('topic_slug')
         topic_title = data.get('topic_title')
         content_html = data.get('content_html')
+        custom_css = data.get('custom_css', '')
+        custom_js = data.get('custom_js', '')
         order_index = data.get('order_index', 0)
 
         conn = get_db_connection()
         execute_query(conn, '''
-            INSERT OR REPLACE INTO content (language, topic_slug, topic_title, content_html, order_index)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (language, topic_slug, topic_title, content_html, order_index))
+            INSERT OR REPLACE INTO content (language, topic_slug, topic_title, content_html, custom_css, custom_js, order_index)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (language, topic_slug, topic_title, content_html, custom_css, custom_js, order_index))
         conn.commit()
         conn.close()
         return jsonify({"message": "Content added/updated successfully"}), 200
