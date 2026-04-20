@@ -73,7 +73,7 @@ def execute_query(conn, query, params=None):
         if 'INSERT OR REPLACE' in query:
             # We specifically handle the content table case
             query = query.replace('INSERT OR REPLACE INTO content', 'INSERT INTO content')
-            query += ' ON CONFLICT (language, topic_slug) DO UPDATE SET topic_title = EXCLUDED.topic_title, content_html = EXCLUDED.content_html, custom_css = EXCLUDED.custom_css, custom_js = EXCLUDED.custom_js, order_index = EXCLUDED.order_index'
+            query += ' ON CONFLICT (language, topic_slug) DO UPDATE SET topic_title = EXCLUDED.topic_title, content_html = EXCLUDED.content_html, order_index = EXCLUDED.order_index'
     
     cursor = conn.cursor()
     cursor.execute(query, params or ())
@@ -117,8 +117,6 @@ def init_db():
             topic_slug TEXT NOT NULL,
             topic_title TEXT NOT NULL,
             content_html TEXT NOT NULL,
-            custom_css TEXT,
-            custom_js TEXT,
             order_index INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(language, topic_slug)
@@ -130,8 +128,6 @@ def init_db():
             topic_slug TEXT NOT NULL,
             topic_title TEXT NOT NULL,
             content_html TEXT NOT NULL,
-            custom_css TEXT,
-            custom_js TEXT,
             order_index INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(language, topic_slug)
@@ -460,7 +456,7 @@ def js_page():
 @admin_required
 def admin_dashboard():
     conn = get_db_connection()
-    contents = execute_query(conn, 'SELECT * FROM content ORDER BY language, order_index').fetchall()
+    contents = execute_query(conn, 'SELECT id, language, topic_slug, topic_title, content_html, order_index, created_at FROM content ORDER BY language, order_index').fetchall()
     
     # Total Users
     users_count_res = execute_query(conn, 'SELECT COUNT(*) as count FROM users').fetchone()
@@ -529,15 +525,13 @@ def add_content():
         topic_slug = data.get('topic_slug')
         topic_title = data.get('topic_title')
         content_html = data.get('content_html')
-        custom_css = data.get('custom_css', '')
-        custom_js = data.get('custom_js', '')
         order_index = data.get('order_index', 0)
 
         conn = get_db_connection()
         execute_query(conn, '''
-            INSERT OR REPLACE INTO content (language, topic_slug, topic_title, content_html, custom_css, custom_js, order_index)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (language, topic_slug, topic_title, content_html, custom_css, custom_js, order_index))
+            INSERT OR REPLACE INTO content (language, topic_slug, topic_title, content_html, order_index)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (language, topic_slug, topic_title, content_html, order_index))
         conn.commit()
         conn.close()
         return jsonify({"message": "Content added/updated successfully"}), 200
@@ -567,7 +561,7 @@ def get_language_content(language):
 @app.route("/api/content/<language>/<topic_slug>")
 def get_topic_content(language, topic_slug):
     conn = get_db_connection()
-    topic = execute_query(conn, 'SELECT * FROM content WHERE language = ? AND topic_slug = ?', (language.lower(), topic_slug)).fetchone()
+    topic = execute_query(conn, 'SELECT id, language, topic_slug, topic_title, content_html, order_index, created_at FROM content WHERE language = ? AND topic_slug = ?', (language.lower(), topic_slug)).fetchone()
     conn.close()
     if topic:
         return jsonify(dict(topic))
