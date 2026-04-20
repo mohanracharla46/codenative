@@ -545,16 +545,6 @@
                         <textarea id="raw-html-editor" class="form-control" style="display: none; height: 300px; font-family: monospace; background: #1e293b; color: #f8fafc;" placeholder="<div>Enter custom HTML here...</div>"></textarea>
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div class="form-group">
-                            <label>Custom CSS (Optional)</label>
-                            <textarea id="custom_css" class="form-control" style="height: 150px; font-family: monospace;" placeholder="/* Custom styles */"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Custom JavaScript (Optional)</label>
-                            <textarea id="custom_js" class="form-control" style="height: 150px; font-family: monospace;" placeholder="// Custom logic"></textarea>
-                        </div>
-                    </div>
                     <button type="submit" class="btn-action btn-primary" style="width: 100%; justify-content: center;"><i class="fas fa-save"></i> Save Content</button>
                 </form>
             </div>
@@ -653,9 +643,7 @@
                 order_index: parseInt(document.getElementById('order_index').value),
                 content_html: currentEditorMode === 'rich' ? 
                               document.getElementById('editor-actual').innerHTML : 
-                              document.getElementById('raw-html-editor').value,
-                custom_css: document.getElementById('custom_css').value,
-                custom_js: document.getElementById('custom_js').value
+                              document.getElementById('raw-html-editor').value
             };
             const response = await fetch('/admin/add_content', {
                 method: 'POST',
@@ -690,8 +678,6 @@
             document.getElementById('editor-actual').innerHTML = content;
             document.getElementById('raw-html-editor').value = content;
             
-            document.getElementById('custom_css').value = item.custom_css || '';
-            document.getElementById('custom_js').value = item.custom_js || '';
             setEditorMode('rich');
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
@@ -762,8 +748,6 @@
             document.getElementById('editor-actual').innerHTML = '';
             document.getElementById('raw-html-editor').value = '';
             setEditorMode('rich');
-            document.getElementById('custom_css').value = '';
-            document.getElementById('custom_js').value = '';
             document.getElementById('language').value = lang;
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
