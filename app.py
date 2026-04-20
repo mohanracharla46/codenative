@@ -813,9 +813,14 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
 
         full_prompt = f"{system_prompt}\n\nUser: {user_message}\nYou:"
 
-        # Call Gemini REST API directly (no extra SDK needed)
-        # gemini-2.5-flash: best quality on free tier
-        gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
+        # Call Gemini REST API directly
+        # Using gemini-2.0-flash for high stability and fast response
+        gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_api_key}"
+        
+        headers = {
+            "Content-Type": "application/json"
+        }
+
         payload = {
             "contents": [{"parts": [{"text": full_prompt}]}],
             "generationConfig": {
@@ -824,29 +829,50 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
             }
         }
 
-        resp = requests.post(gemini_url, json=payload, timeout=25)
-        
-        # If rate-limited, try flash as fallback
-        if resp.status_code == 429:
-            fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_api_key}"
-            resp = requests.post(fallback_url, json=payload, timeout=20)
-        
-        if resp.status_code == 429:
-            return jsonify({'reply': '⏳ Too many requests — the AI is a bit busy right now! Please wait a few seconds and try again.'}), 429
-        
-        resp.raise_for_status()
-        result = resp.json()
+        try:
+            resp = requests.post(gemini_url, json=payload, headers=headers, timeout=30)
+            
+            # If rate-limited or model not found, try 1.5 flash as fallback
+            if resp.status_code in [429, 404]:
+                fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
+                resp = requests.post(fallback_url, json=payload, headers=headers, timeout=25)
+            
+            if resp.status_code == 429:
+                return jsonify({'reply': '⏳ Too many requests — the AI is a bit busy right now! Please wait a few seconds and try again.'}), 429
+            
+            resp.raise_for_status()
+            result = resp.json()
 
-        # Extract text safely
-        candidates = result.get('candidates', [])
-        if candidates and candidates[0].get('content', {}).get('parts'):
-            reply = candidates[0]['content']['parts'][0]['text']
-        else:
-            reply = "Hmm ra, AI response empty vachindi. Malli try cheyyi! 😅"
-        
-        return jsonify({'reply': reply})
+            # Extract text safely
+            if 'candidates' in result and len(result['candidates']) > 0:
+                candidate = result['candidates'][0]
+                if 'content' in candidate and 'parts' in candidate['content'] and len(candidate['content']['parts']) > 0:
+                    reply = candidate['content']['parts'][0].get('text', '')
+                    if not reply:
+                        reply = "Hmm ra, AI response empty vachindi. Malli try cheyyi! 😅"
+                else:
+                    reply = "Hmm, response structure lo chinna issue vachindi. Malli adugu ra! 😅"
+            else:
+                # Check for safety filter or other reasons
+                finish_reason = result.get('candidates', [{}])[0].get('finishReason', 'UNKNOWN')
+                if finish_reason == 'SAFETY':
+                    reply = "Arey, ee question konchem sensitive ga undi ra. General coding doubts adugu, manam kalisi nerchukundam! 😊"
+                else:
+                    reply = "Hmm ra, AI response empty vachindi. Malli try cheyyi! 😅"
+            
+            return jsonify({'reply': reply})
 
-
+        except requests.exceptions.HTTPError as http_err:
+            print(f"Gemini API HTTP error: {http_err}")
+            # Try to extract error message from response if available
+            try:
+                error_data = resp.json()
+                error_msg = error_data.get('error', {}).get('message', 'Unknown API error')
+                print(f"API Error Message: {error_msg}")
+            except:
+                pass
+            return jsonify({'reply': '❌ AI service lo chinna error vachindi. Malli try cheyyi ra!'}), 502
+            
     except requests.exceptions.Timeout:
         return jsonify({'reply': '⏳ The AI is thinking too long. Please try again!'}), 504
     except Exception as e:
