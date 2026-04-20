@@ -156,12 +156,24 @@ def init_db():
         )
     '''
 
+    # SQL for User Progress
+    progress_sql = '''
+        CREATE TABLE IF NOT EXISTS user_progress (
+            user_id INTEGER,
+            language TEXT,
+            topic_slug TEXT,
+            completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (user_id, language, topic_slug)
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         cursor.execute(users_sql)
         cursor.execute(content_sql)
         cursor.execute(stats_sql)
         cursor.execute(activity_sql)
+        cursor.execute(progress_sql)
         
         # Check if is_admin column exists (Postgres migration)
         cursor.execute("""
@@ -179,6 +191,7 @@ def init_db():
         conn.execute(content_sql)
         conn.execute(stats_sql)
         conn.execute(activity_sql)
+        conn.execute(progress_sql)
         
         # Check if is_admin column exists (SQLite migration)
         cursor = conn.execute("PRAGMA table_info(users)")
@@ -337,6 +350,41 @@ def dashboard():
     
     # Calculate consistency & total practices
     activities = execute_query(conn, "SELECT activity_date, practice_count FROM user_activity WHERE user_id = ? ORDER BY activity_date ASC", (user_id,)).fetchall()
+    
+    # Calculate Real Course Progress
+    courses = [
+        {'id': 'python', 'name': 'Python Core', 'icon': 'fab fa-python', 'bg': 'python-bg', 'header_bg': 'linear-gradient(135deg, #3776ab, #ffde57)', 'link': '/python.html'},
+        {'id': 'c', 'name': 'C Architecture', 'icon': 'fas fa-code-branch', 'bg': 'c-bg', 'header_bg': 'linear-gradient(135deg, #00599c, #004482)', 'link': '/c.html'},
+        {'id': 'java', 'name': 'Java Masterclass', 'icon': 'fab fa-java', 'bg': 'java-bg', 'header_bg': 'linear-gradient(135deg, #ed8b00, #f8981d)', 'link': '/java.html'},
+        {'id': 'web', 'name': 'Web Development', 'icon': 'fab fa-html5', 'bg': 'web-bg', 'header_bg': 'linear-gradient(135deg, #e34f26, #f06529)', 'link': '/web.html'},
+        {'id': 'js', 'name': 'JavaScript Expert', 'icon': 'fab fa-js', 'bg': 'js-bg', 'header_bg': 'linear-gradient(135deg, #f7df1e, #f0db4f)', 'link': '/js.html'}
+    ]
+    
+    user_courses = []
+    for course in courses:
+        # Total topics in this language
+        total_topics = execute_query(conn, "SELECT COUNT(*) as count FROM content WHERE language = ?", (course['id'],)).fetchone()
+        total_topics = total_topics['count'] if total_topics else 0
+        
+        if total_topics > 0:
+            # Topics completed by user
+            completed = execute_query(conn, "SELECT COUNT(*) as count FROM user_progress WHERE user_id = ? AND language = ?", (user_id, course['id'])).fetchone()
+            completed_count = completed['count'] if completed else 0
+            
+            # Last completed topic
+            last_topic = execute_query(conn, """
+                SELECT c.topic_title 
+                FROM user_progress p 
+                JOIN content c ON p.topic_slug = c.topic_slug AND p.language = c.language
+                WHERE p.user_id = ? AND p.language = ?
+                ORDER BY p.completed_at DESC LIMIT 1
+            """, (user_id, course['id'])).fetchone()
+            
+            course_data = course.copy()
+            course_data['progress'] = int((completed_count / total_topics) * 100) if total_topics > 0 else 0
+            course_data['last_topic'] = last_topic['topic_title'] if last_topic else "Not started yet"
+            user_courses.append(course_data)
+
     conn.close()
     
     total_practices = sum([a['practice_count'] for a in activities])
@@ -347,7 +395,7 @@ def dashboard():
     
     activity_data = [dict(a) for a in activities]
     
-    return render_template("dashboard.html", stats=stats, total_practices=total_practices, consistency=consistency, activity_data=activity_data)
+    return render_template("dashboard.html", stats=stats, total_practices=total_practices, consistency=consistency, activity_data=activity_data, user_courses=user_courses)
 
 def update_user_activity(user_id, is_practice=False):
     conn = get_db_connection()
@@ -398,6 +446,34 @@ def update_user_activity(user_id, is_practice=False):
         print("Error tracking activity:", e)
     finally:
         conn.close()
+
+@app.route("/api/complete_topic", methods=["POST"])
+@login_required
+def complete_topic():
+    try:
+        data = request.json
+        user_id = session['user_id']
+        language = data.get('language')
+        topic_slug = data.get('topic_slug')
+        
+        if not language or not topic_slug:
+            return jsonify({"message": "Missing language or slug"}), 400
+            
+        conn = get_db_connection()
+        execute_query(conn, """
+            INSERT INTO user_progress (user_id, language, topic_slug)
+            VALUES (?, ?, ?)
+            ON CONFLICT (user_id, language, topic_slug) DO NOTHING
+        """, (user_id, language, topic_slug))
+        conn.commit()
+        conn.close()
+        
+        # Also track this as a study activity
+        update_user_activity(user_id, is_practice=False)
+        
+        return jsonify({"message": "Progress saved"}), 200
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 
 @app.route("/api/log_study", methods=["POST"])
 def log_study():

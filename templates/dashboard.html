@@ -70,33 +70,20 @@
 
                 <div class="menu-group">
                     <span class="menu-title">My Courses</span>
-                    <a href="/python.html" class="course-nav-item">
-                        <div class="course-icon python-bg">
-                            <i class="fab fa-python"></i>
+                    {% for course in user_courses %}
+                    <a href="{{ course.link }}" class="course-nav-item">
+                        <div class="course-icon {{ course.bg }}">
+                            <i class="{{ course.icon }}"></i>
                         </div>
                         <div class="course-details">
-                            <span class="course-name">Python Core</span>
-                            <span class="course-progress">65% Completed</span>
+                            <span class="course-name">{{ course.name }}</span>
+                            <span class="course-progress">{{ course.progress }}% Completed</span>
                         </div>
                     </a>
-                    <a href="/c.html" class="course-nav-item">
-                        <div class="course-icon c-bg">
-                            <i class="fas fa-code"></i>
-                        </div>
-                        <div class="course-details">
-                            <span class="course-name">C Architecture</span>
-                            <span class="course-progress">30% Completed</span>
-                        </div>
-                    </a>
-                    <a href="/java.html" class="course-nav-item">
-                        <div class="course-icon java-bg">
-                            <i class="fab fa-java"></i>
-                        </div>
-                        <div class="course-details">
-                            <span class="course-name">Java Masterclass</span>
-                            <span class="course-progress">10% Completed</span>
-                        </div>
-                    </a>
+                    {% endfor %}
+                    {% if not user_courses %}
+                    <p style="padding: 10px 15px; font-size: 12px; color: var(--text-dim);">No active courses yet.</p>
+                    {% endif %}
                 </div>
             </div>
 
@@ -195,74 +182,36 @@
             <!-- Current Courses -->
             <h2 class="section-title"><i class="fas fa-graduation-cap"></i> My Learning Path</h2>
             <div class="course-grid">
-                <!-- Python Card -->
+                {% for course in user_courses %}
                 <div class="course-card">
-                    <div class="course-header" style="background: linear-gradient(135deg, #3776ab, #ffde57);">
-                        <span style="font-weight: 800; color: #fff;">PYTHON</span>
-                        <i class="fab fa-python" style="font-size: 24px; color: #fff;"></i>
+                    <div class="course-header" style="background: {{ course.header_bg }};">
+                        <span style="font-weight: 800; color: #fff;">{{ course.id | upper }}</span>
+                        <i class="{{ course.icon }}" style="font-size: 24px; color: #fff;"></i>
                     </div>
                     <div class="course-body">
                         <div class="progress-container">
                             <div class="progress-label">
                                 <span>Course Completion</span>
-                                <span>65%</span>
+                                <span>{{ course.progress }}%</span>
                             </div>
                             <div class="progress-bar">
-                                <div class="progress-fill" style="width: 65%;"></div>
+                                <div class="progress-fill" style="width: {{ course.progress }}%; {% if course.id == 'c' %}background: #00599c;{% elif course.id == 'java' %}background: #ed8b00;{% endif %}"></div>
                             </div>
                         </div>
                         <div class="course-footer">
-                            <span style="font-size: 13px; color: #64748b; font-weight: 600;">Last Topic: Dict Methods</span>
-                            <a href="/python.html" class="btn-resume">Resume Course</a>
+                            <span style="font-size: 13px; color: #64748b; font-weight: 600;">Last Topic: {{ course.last_topic }}</span>
+                            <a href="{{ course.link }}" class="btn-resume" style="{% if course.id == 'c' %}background: #00599c;{% elif course.id == 'java' %}background: #ed8b00;{% endif %}">Resume Course</a>
                         </div>
                     </div>
                 </div>
-
-                <!-- C Card -->
-                <div class="course-card">
-                    <div class="course-header" style="background: linear-gradient(135deg, #00599c, #004482);">
-                        <span style="font-weight: 800; color: #fff;">C PROGRAMMING</span>
-                        <i class="fas fa-code-branch" style="font-size: 24px; color: #fff;"></i>
-                    </div>
-                    <div class="course-body">
-                        <div class="progress-container">
-                            <div class="progress-label">
-                                <span>Course Completion</span>
-                                <span>30%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 30%; background: #00599c;"></div>
-                            </div>
-                        </div>
-                        <div class="course-footer">
-                            <span style="font-size: 13px; color: #64748b; font-weight: 600;">Last Topic: Pointers</span>
-                            <a href="/c.html" class="btn-resume" style="background: #00599c;">Resume Course</a>
-                        </div>
-                    </div>
+                {% endfor %}
+                {% if not user_courses %}
+                <div class="course-card" style="grid-column: 1 / -1; padding: 40px; text-align: center;">
+                    <i class="fas fa-book-open" style="font-size: 48px; color: #e2e8f0; margin-bottom: 20px;"></i>
+                    <h3>Start your first course!</h3>
+                    <p>Visit the roadmap to choose a language and begin your journey.</p>
                 </div>
-
-                <!-- Java Card -->
-                <div class="course-card">
-                    <div class="course-header" style="background: linear-gradient(135deg, #ed8b00, #f8981d);">
-                        <span style="font-weight: 800; color: #fff;">JAVA</span>
-                        <i class="fab fa-java" style="font-size: 24px; color: #fff;"></i>
-                    </div>
-                    <div class="course-body">
-                        <div class="progress-container">
-                            <div class="progress-label">
-                                <span>Course Completion</span>
-                                <span>10%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 10%; background: #ed8b00;"></div>
-                            </div>
-                        </div>
-                        <div class="course-footer">
-                            <span style="font-size: 13px; color: #64748b; font-weight: 600;">Last Topic: Classes & Objects</span>
-                            <a href="/java.html" class="btn-resume" style="background: #ed8b00;">Resume Course</a>
-                        </div>
-                    </div>
-                </div>
+                {% endif %}
             </div>
 
             <!-- Quick Access Section -->

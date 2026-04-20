@@ -392,6 +392,13 @@
                 }
 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Record progress
+                fetch('/api/complete_topic', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ language: currentLang, topic_slug: slug })
+                });
             } catch(err) { console.error(err); }
         }
 
