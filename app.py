@@ -223,9 +223,11 @@ def admin_required(f):
     return decorated_function
 
 
-# Initialize database on startup (Only for local SQLite)
-if not os.environ.get('DATABASE_URL'):
+# Initialize database on startup
+try:
     init_db()
+except Exception as e:
+    print(f"Note: Database initialization skipped or failed: {e}")
 
 # Authentication Routes
 @app.route("/signin.html")
