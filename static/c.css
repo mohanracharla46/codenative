@@ -505,3 +505,49 @@ body {
     }
 }
 .sidebar-header { padding: 32px 24px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 16px; margin-bottom: 12px; } .sidebar-header i { font-size: 38px; color: #6366f1; filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.15)); } .sidebar-header h2 { font-size: 19px; font-weight: 800; margin: 0; color: #0f172a; letter-spacing: -0.02em; } .sidebar-header p { font-size: 11px; margin: 0; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
+
+.topic {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.topic-title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+    color: #334155; /* Light black / Dark slate color */
+}
+
+/* Completed Topic Styling - Matching latest feedback */
+.topic.completed:not(.active) .topic-title {
+    color: #334155; /* Keep it light black */
+    font-weight: 500;
+}
+
+.completion-mark {
+    color: #10b981; /* Success green */
+    font-size: 12px;
+    margin-right: 8px;
+}
+
+.topic.active {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);
+    border-left: 4px solid white;
+    transform: translateX(4px);
+}
+
+.topic.active .topic-title {
+    color: #ffffff; /* Pure white text when active */
+    font-weight: 700;
+}
+
+.topic:hover:not(.active):not(.completed) {
+    background: #f8fafc;
+    transform: translateX(4px);
+}

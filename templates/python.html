@@ -327,9 +327,15 @@
                     sidebarTopics.innerHTML = '';
                     topics.forEach((topic, index) => {
                         const li = document.createElement('li');
-                        li.className = `topic ${index === 0 ? 'active' : ''}`;
+                        li.className = `topic ${index === 0 ? 'active' : ''} ${topic.completed ? 'completed' : ''}`;
                         li.dataset.topic = topic.topic_slug;
-                        li.textContent = topic.topic_title;
+                        
+                        // Create content with checkmark if completed
+                        li.innerHTML = `
+                            ${topic.completed ? '<i class="fas fa-check-circle completion-mark"></i>' : ''}
+                            <span class="topic-title">${topic.topic_title}</span>
+                        `;
+                        
                         li.onclick = () => loadSpecificTopic(topic.topic_slug, li);
                         sidebarTopics.appendChild(li);
                     });
@@ -377,11 +383,11 @@
                 }
 
                 // Update Next Lesson Bar
-                const nextEl = el.nextElementSibling;
+                const nextEl = el ? el.nextElementSibling : null;
                 const nextBar = document.getElementById('nextLessonBar');
                 if(nextEl && nextEl.classList.contains('topic')) {
                     nextBar.style.display = 'flex';
-                    nextBar.querySelector('h3').textContent = nextEl.textContent;
+                    nextBar.querySelector('h3').textContent = nextEl.querySelector('.topic-title').textContent;
                     nextBar.onclick = () => nextEl.click();
                 } else {
                     nextBar.style.display = 'none';
@@ -389,12 +395,19 @@
 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 
-                // Record progress
-                fetch('/api/complete_topic', {
+                // Record progress and update UI mark
+                const progressRes = await fetch('/api/complete_topic', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ language: currentLang, topic_slug: slug })
                 });
+
+                if (progressRes.ok && el) {
+                    el.classList.add('completed');
+                    if (!el.querySelector('.completion-mark')) {
+                        el.insertAdjacentHTML('afterbegin', '<i class="fas fa-check-circle completion-mark"></i>');
+                    }
+                }
             } catch(err) { console.error(err); }
         }
 

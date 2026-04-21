@@ -631,8 +631,22 @@ def delete_content(id):
 # Content API for dynamic pages
 @app.route("/api/content/<language>")
 def get_language_content(language):
+    user_id = session.get('user_id')
     conn = get_db_connection()
-    topics = execute_query(conn, 'SELECT topic_slug, topic_title FROM content WHERE language = ? ORDER BY order_index', (language.lower(),)).fetchall()
+    
+    if user_id:
+        query = '''
+            SELECT c.topic_slug, c.topic_title, 
+            CASE WHEN p.user_id IS NOT NULL THEN 1 ELSE 0 END as completed
+            FROM content c
+            LEFT JOIN user_progress p ON c.language = p.language AND c.topic_slug = p.topic_slug AND p.user_id = ?
+            WHERE c.language = ? 
+            ORDER BY c.order_index
+        '''
+        topics = execute_query(conn, query, (user_id, language.lower())).fetchall()
+    else:
+        topics = execute_query(conn, 'SELECT topic_slug, topic_title, 0 as completed FROM content WHERE language = ? ORDER BY order_index', (language.lower(),)).fetchall()
+    
     conn.close()
     return jsonify([dict(t) for t in topics])
 
