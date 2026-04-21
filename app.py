@@ -529,6 +529,11 @@ def web_page():
 def js_page():
     return render_template("js.html")
 
+@app.route("/videos.html")
+@login_required
+def videos_page():
+    return render_template("videos.html")
+
 # Admin Routes
 @app.route("/admin")
 @admin_required
@@ -766,6 +771,7 @@ def run():
 #  AI CHATBOT ENDPOINT  (Gemini 2.0 Flash)
 # ──────────────────────────────────────────────────────────────
 @app.route('/api/chat', methods=['POST'])
+@login_required
 def ai_chat():
     """AI chatbot powered by Gemini. Context-aware for the current language."""
     try:
@@ -828,7 +834,6 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
         full_prompt = f"{system_prompt}\n\nUser: {user_message}\nYou:"
 
         # Call Gemini REST API directly
-        # Using gemini-2.0-flash for high stability and fast response
         gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_api_key}"
         
         headers = {
@@ -843,30 +848,42 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
             }
         }
 
+        # Use a session for better performance
+        session_req = requests.Session()
+        
         try:
-            resp = requests.post(gemini_url, json=payload, headers=headers, timeout=30)
+            # Primary attempt: 2.0 Flash
+            # Reduced timeout to 15s to allow for fallbacks within gateway limits
+            try:
+                resp = session_req.post(gemini_url, json=payload, headers=headers, timeout=15)
+            except requests.exceptions.RequestException:
+                # Force a 429-like state to trigger fallback if request fails
+                class FakeResp: status_code = 429
+                resp = FakeResp()
             
-            # Multi-stage fallback for maximum availability
-            # 1. Try 2.0 Flash Lite if 2.0 Flash is busy
-            if resp.status_code in [429, 404]:
+            # Fallback 1: 2.0 Flash Lite (Fastest fallback)
+            if resp.status_code in [429, 500, 502, 503, 504]:
                 fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={gemini_api_key}"
-                resp = requests.post(fallback_url, json=payload, headers=headers, timeout=25)
+                try:
+                    resp = session_req.post(fallback_url, json=payload, headers=headers, timeout=12)
+                except: pass
             
-            # 2. Try Flash Latest (usually 1.5 Flash) if others are busy
-            if resp.status_code in [429, 404]:
-                fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={gemini_api_key}"
-                resp = requests.post(fallback_url, json=payload, headers=headers, timeout=25)
-
-            # 3. Try 1.5 Flash directly as last resort
-            if resp.status_code in [429, 404]:
+            # Fallback 2: 1.5 Flash (Most reliable fallback)
+            if resp.status_code in [429, 500, 502, 503, 504]:
                 fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
-                resp = requests.post(fallback_url, json=payload, headers=headers, timeout=25)
+                try:
+                    resp = session_req.post(fallback_url, json=payload, headers=headers, timeout=12)
+                except: pass
             
             if resp.status_code == 429:
-                return jsonify({'reply': '⏳ Too many requests — current free limit reach ayindi ra! Please wait a few seconds and try again.'}), 429
+                return jsonify({'reply': '⏳ Free limit reach ayindi ra! Konchem wait chesi malli try cheyyi. 😊'}), 429
+            
+            if not hasattr(resp, 'json'):
+                return jsonify({'reply': '❌ AI service temporary ga busy undi ra. Malli try cheyyi! 😅'}), 503
+
+            result = resp.json()
             
             resp.raise_for_status()
-            result = resp.json()
 
             # Extract text safely
             if 'candidates' in result and len(result['candidates']) > 0:
