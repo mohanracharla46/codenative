@@ -643,27 +643,22 @@ def index():
     return render_template("index.html", logout_message=logout_msg)
 
 @app.route("/c.html")
-@login_required
 def c_page():
     return render_template("c.html")
 
 @app.route("/java.html")
-@login_required
 def java_page():
     return render_template("java.html")
 
 @app.route("/python.html")
-@login_required
 def python_page():
     return render_template("python.html")
 
 @app.route("/compiler.html")
-@login_required
 def compiler_page():
     return render_template("compiler.html")
 
 @app.route("/roadmap.html")
-@login_required
 def roadmap_page():
     return render_template("roadmap.html")
 
@@ -672,12 +667,10 @@ def terms_conditions():
     return render_template("terms-conditions.html")
 
 @app.route("/web.html")
-@login_required
 def web_page():
     return render_template("web.html")
 
 @app.route("/js.html")
-@login_required
 def js_page():
     return render_template("js.html")
 

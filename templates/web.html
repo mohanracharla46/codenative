@@ -213,6 +213,7 @@
         const sidebarTopics = document.getElementById('sidebarTopics');
         const contentBox = document.getElementById('topicContent');
         const currentLang = 'web';
+        const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
 
         async function loadTopics() {
             try {
@@ -225,14 +226,28 @@
                         const li = document.createElement('li');
                         li.className = `topic ${index === 0 ? 'active' : ''} ${topic.completed ? 'completed' : ''}`;
                         li.dataset.topic = topic.topic_slug;
+                        li.dataset.index = index;
                         
+                        // Add lock icon for guests on subsequent lessons
+                        let lockIcon = '';
+                        if (!isLoggedIn && index > 0) {
+                            lockIcon = '<i class="fas fa-lock" style="margin-right: 8px; font-size: 12px; opacity: 0.6;"></i>';
+                        }
+
                         // Create content with checkmark if completed
                         li.innerHTML = `
                             ${topic.completed ? '<i class="fas fa-check-circle completion-mark"></i>' : ''}
+                            ${lockIcon}
                             <span class="topic-title">${topic.topic_title}</span>
                         `;
                         
-                        li.onclick = () => loadSpecificTopic(topic.topic_slug, li);
+                        li.onclick = () => {
+                            if (!isLoggedIn && index > 0) {
+                                window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
+                                return;
+                            }
+                            loadSpecificTopic(topic.topic_slug, li);
+                        };
                         sidebarTopics.appendChild(li);
                     });
                     loadSpecificTopic(topics[0].topic_slug, sidebarTopics.firstChild);
@@ -242,6 +257,14 @@
 
         async function loadSpecificTopic(slug, el) {
             try {
+                const topicIndex = el ? parseInt(el.dataset.index) : 0;
+                
+                // Guest protection for non-first topics
+                if (!isLoggedIn && topicIndex > 0) {
+                    window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
+                    return;
+                }
+
                 document.querySelectorAll('.topic').forEach(t => t.classList.remove('active'));
                 if(el) el.classList.add('active');
                 
@@ -284,24 +307,34 @@
                 if(nextEl && nextEl.classList.contains('topic')) {
                     nextBar.style.display = 'flex';
                     nextBar.querySelector('h3').textContent = nextEl.querySelector('.topic-title').textContent;
-                    nextBar.onclick = () => nextEl.click();
+                    
+                    nextBar.onclick = () => {
+                        const nextIndex = parseInt(nextEl.dataset.index);
+                        if (!isLoggedIn && nextIndex > 0) {
+                            window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
+                            return;
+                        }
+                        nextEl.click();
+                    };
                 } else {
                     nextBar.style.display = 'none';
                 }
 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                // Record progress and update UI mark
-                const progressRes = await fetch('/api/complete_topic', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ language: currentLang, topic_slug: slug })
-                });
+                // Record progress and update UI mark (only if logged in)
+                if (isLoggedIn) {
+                    const progressRes = await fetch('/api/complete_topic', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ language: currentLang, topic_slug: slug })
+                    });
 
-                if (progressRes.ok && el) {
-                    el.classList.add('completed');
-                    if (!el.querySelector('.completion-mark')) {
-                        el.insertAdjacentHTML('afterbegin', '<i class="fas fa-check-circle completion-mark"></i>');
+                    if (progressRes.ok && el) {
+                        el.classList.add('completed');
+                        if (!el.querySelector('.completion-mark')) {
+                            el.insertAdjacentHTML('afterbegin', '<i class="fas fa-check-circle completion-mark"></i>');
+                        }
                     }
                 }
             } catch(err) { console.error(err); }
