@@ -256,8 +256,8 @@
         
         // Map dates to practices
         activityData.forEach(d => {
-            // Depending on serialization it might be string or obj
-            let dateStr = typeof d.activity_date === "string" ? d.activity_date : d.activity_date;
+            // Ensure we only use the YYYY-MM-DD part of the date string
+            let dateStr = String(d.activity_date).split(' ')[0];
             activityMap[dateStr] = d.practice_count;
         });
 

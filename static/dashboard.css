@@ -439,7 +439,7 @@
 
 .heatmap-grid {
     display: grid;
-    grid-template-flow: column;
+    grid-auto-flow: column;
     grid-template-columns: repeat(53, 1fr);
     grid-template-rows: repeat(7, 1fr);
     gap: 4px;
