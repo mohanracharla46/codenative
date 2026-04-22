@@ -11,6 +11,10 @@ from functools import wraps
 import psycopg2
 import psycopg2.extras
 from dotenv import load_dotenv
+import smtplib
+import random
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 load_dotenv() # Load variables from .env
 
@@ -195,6 +199,14 @@ def init_db():
         if not cursor.fetchone():
             cursor.execute("ALTER TABLE users ADD COLUMN mobile TEXT")
         
+        # Check if OTP columns exist (Postgres migration)
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='users' AND column_name='otp_code'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE users ADD COLUMN otp_code TEXT")
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='users' AND column_name='otp_expiry' ")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE users ADD COLUMN otp_expiry TIMESTAMP")
+        
         conn.commit()
     else:
         # SQLite
@@ -212,6 +224,11 @@ def init_db():
         
         if 'mobile' not in columns:
             conn.execute("ALTER TABLE users ADD COLUMN mobile TEXT")
+        
+        if 'otp_code' not in columns:
+            conn.execute("ALTER TABLE users ADD COLUMN otp_code TEXT")
+        if 'otp_expiry' not in columns:
+            conn.execute("ALTER TABLE users ADD COLUMN otp_expiry TIMESTAMP")
         
         # Check if custom_css/js columns exist (SQLite migration)
         cursor = conn.execute("PRAGMA table_info(content)")
@@ -335,6 +352,125 @@ def signin():
 
     except Exception as e:
         return jsonify({"message": f"Server error: {str(e)}"}), 500
+
+# Forgot Password Routes
+def send_email(to_email, subject, body):
+    """Helper function to send email via SMTP"""
+    smtp_server = os.environ.get('SMTP_SERVER', 'smtp.gmail.com')
+    smtp_port = int(os.environ.get('SMTP_PORT', 587))
+    smtp_user = os.environ.get('SMTP_USER')
+    smtp_password = os.environ.get('SMTP_PASSWORD')
+
+    if not smtp_user or not smtp_password:
+        print("ERROR: SMTP credentials not set in .env")
+        return False
+
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = smtp_user
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_user, smtp_password)
+        server.send_message(msg)
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"SMTP Error: {e}")
+        return False
+
+@app.route("/forgot-password", methods=["POST"])
+def forgot_password():
+    data = request.get_json()
+    email = data.get("email")
+    
+    conn = get_db_connection()
+    user = execute_query(conn, "SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+    
+    if not user:
+        conn.close()
+        return jsonify({"message": "Email not found"}), 404
+    
+    # Generate 6-digit OTP
+    otp = str(random.randint(100000, 999999))
+    expiry = datetime.now() + timedelta(minutes=10)
+    
+    execute_query(conn, "UPDATE users SET otp_code = ?, otp_expiry = ? WHERE email = ?", (otp, expiry, email))
+    conn.commit()
+    conn.close()
+    
+    subject = "Your Code Native Password Reset OTP"
+    body = f"Hello,\n\nYour OTP for password reset is: {otp}\n\nThis code will expire in 10 minutes.\n\nIf you did not request this, please ignore this email."
+    
+    if send_email(email, subject, body):
+        return jsonify({"message": "OTP sent successfully to your email."})
+    else:
+        return jsonify({"message": "Failed to send email. Please check SMTP settings."}), 500
+
+@app.route("/verify-otp", methods=["POST"])
+def verify_otp():
+    data = request.get_json()
+    email = data.get("email")
+    otp = data.get("otp")
+    
+    conn = get_db_connection()
+    user = execute_query(conn, "SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+    
+    if not user:
+        conn.close()
+        return jsonify({"message": "User not found"}), 404
+    
+    # Check OTP and Expiry
+    db_otp = user['otp_code']
+    db_expiry = user['otp_expiry']
+    
+    if isinstance(db_expiry, str):
+        try:
+            db_expiry = datetime.strptime(db_expiry.split('.')[0], '%Y-%m-%d %H:%M:%S')
+        except:
+            db_expiry = datetime.strptime(db_expiry, '%Y-%m-%dT%H:%M:%S')
+
+    if db_otp == otp and datetime.now() < db_expiry:
+        conn.close()
+        return jsonify({"message": "OTP verified successfully"})
+    else:
+        conn.close()
+        return jsonify({"message": "Invalid or expired OTP"}), 400
+
+@app.route("/reset-password", methods=["POST"])
+def reset_password():
+    data = request.get_json()
+    email = data.get("email")
+    otp = data.get("otp")
+    new_password = data.get("new_password")
+    
+    conn = get_db_connection()
+    user = execute_query(conn, "SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+    
+    if not user:
+        conn.close()
+        return jsonify({"message": "User not found"}), 404
+        
+    db_otp = user['otp_code']
+    db_expiry = user['otp_expiry']
+    if isinstance(db_expiry, str):
+        try:
+            db_expiry = datetime.strptime(db_expiry.split('.')[0], '%Y-%m-%d %H:%M:%S')
+        except:
+            db_expiry = datetime.strptime(db_expiry, '%Y-%m-%dT%H:%M:%S')
+
+    if db_otp == otp and datetime.now() < db_expiry:
+        hashed_pw = hash_password(new_password)
+        execute_query(conn, "UPDATE users SET password = ?, otp_code = NULL, otp_expiry = NULL WHERE email = ?", (hashed_pw, email))
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Password reset successfully!"})
+    else:
+        conn.close()
+        return jsonify({"message": "Session expired or invalid. Please try again."}), 400
 
 @app.route("/logout")
 def logout():

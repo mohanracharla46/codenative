@@ -280,6 +280,52 @@
             </div>
         </div>
 
+        <!-- Forgot Password Card -->
+        <div class="auth-card glass" id="forgotPasswordCard" style="display: none;">
+            <div class="auth-header">
+                <div class="logo-section">
+                    <img src="{{ url_for('static', filename='/images/CodeNative.png') }}" alt="CodeNative Logo" class="auth-logo">
+                </div>
+                <h1 class="auth-title">Reset Password</h1>
+                <p class="auth-subtitle" id="fpSubtitle">Enter your email to receive an OTP</p>
+            </div>
+
+            <!-- Step 1: Email Input -->
+            <form id="requestOtpForm" class="auth-form">
+                <div class="form-group">
+                    <label for="fp-email" class="form-label">Email Address</label>
+                    <input type="email" id="fp-email" name="email" class="form-input" placeholder="you@example.com" required>
+                </div>
+                <button type="submit" class="btn-submit" id="requestOtpBtn">Send OTP</button>
+            </form>
+
+            <!-- Step 2: OTP Input (Hidden by default) -->
+            <form id="verifyOtpForm" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label for="fp-otp" class="form-label">Enter OTP</label>
+                    <input type="text" id="fp-otp" name="otp" class="form-input" placeholder="6-digit code" maxlength="6" required>
+                </div>
+                <button type="submit" class="btn-submit" id="verifyOtpBtn">Verify OTP</button>
+            </form>
+
+            <!-- Step 3: New Password Input (Hidden by default) -->
+            <form id="resetPasswordForm" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label for="fp-new-password" class="form-label">New Password</label>
+                    <input type="password" id="fp-new-password" name="new_password" class="form-input" placeholder="Min 6 characters" required>
+                </div>
+                <div class="form-group">
+                    <label for="fp-confirm-password" class="form-label">Confirm New Password</label>
+                    <input type="password" id="fp-confirm-password" name="confirm_password" class="form-input" placeholder="Confirm your new password" required>
+                </div>
+                <button type="submit" class="btn-submit" id="resetBtn">Reset Password</button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Remembered your password? <a href="#" id="backToSignin" class="toggle-link">Back to Sign in</a></p>
+            </div>
+        </div>
+
         <!-- Animated Background -->
         <div class="background-animation">
             <div class="circle circle-1"></div>
@@ -328,6 +374,32 @@
                     e.preventDefault();
                     signupCard.style.display = 'none';
                     signinCard.style.display = 'block';
+                });
+            }
+
+            // Forgot Password Transitions
+            const forgotPasswordCard = document.getElementById('forgotPasswordCard');
+            const forgotLink = document.querySelector('.forgot-link');
+            const backToSignin = document.getElementById('backToSignin');
+
+            if (forgotLink) {
+                forgotLink.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    signinCard.style.display = 'none';
+                    forgotPasswordCard.style.display = 'block';
+                });
+            }
+
+            if (backToSignin) {
+                backToSignin.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    forgotPasswordCard.style.display = 'none';
+                    signinCard.style.display = 'block';
+                    // Reset forms
+                    document.getElementById('requestOtpForm').style.display = 'block';
+                    document.getElementById('verifyOtpForm').style.display = 'none';
+                    document.getElementById('resetPasswordForm').style.display = 'none';
+                    document.getElementById('fpSubtitle').textContent = 'Enter your email to receive an OTP';
                 });
             }
 
@@ -419,6 +491,111 @@
                 } catch (error) {
                     showAlert('An error occurred. Please try again.');
                     console.error('Error:', error);
+                }
+            });
+
+            // Handle Forgot Password - Step 1: Request OTP
+            let currentFpEmail = '';
+            document.getElementById('requestOtpForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const email = document.getElementById('fp-email').value;
+                currentFpEmail = email;
+                const btn = document.getElementById('requestOtpBtn');
+                btn.disabled = true;
+                btn.textContent = 'Sending...';
+
+                try {
+                    const response = await fetch('/forgot-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        showAlert('OTP sent to your email! 📧');
+                        document.getElementById('requestOtpForm').style.display = 'none';
+                        document.getElementById('verifyOtpForm').style.display = 'block';
+                        document.getElementById('fpSubtitle').textContent = 'Enter the 6-digit code sent to your email';
+                    } else {
+                        showAlert(result.message);
+                    }
+                } catch (error) {
+                    showAlert('Connection error. Please try again.');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Send OTP';
+                }
+            });
+
+            // Handle Forgot Password - Step 2: Verify OTP
+            let currentFpOtp = '';
+            document.getElementById('verifyOtpForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const otp = document.getElementById('fp-otp').value;
+                currentFpOtp = otp;
+                const btn = document.getElementById('verifyOtpBtn');
+                
+                try {
+                    const response = await fetch('/verify-otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: currentFpEmail, otp })
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        showAlert('OTP Verified! Set your new password. 🔓');
+                        document.getElementById('verifyOtpForm').style.display = 'none';
+                        document.getElementById('resetPasswordForm').style.display = 'block';
+                        document.getElementById('fpSubtitle').textContent = 'Create a secure new password';
+                    } else {
+                        showAlert(result.message);
+                    }
+                } catch (error) {
+                    showAlert('Verification failed.');
+                }
+            });
+
+            // Handle Forgot Password - Step 3: Reset Password
+            document.getElementById('resetPasswordForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const newPassword = document.getElementById('fp-new-password').value;
+                const confirmPassword = document.getElementById('fp-confirm-password').value;
+
+                if (newPassword.length < 6) {
+                    showAlert('Password must be at least 6 characters.');
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    showAlert('Passwords do not match!');
+                    return;
+                }
+
+                const btn = document.getElementById('resetBtn');
+                btn.disabled = true;
+
+                try {
+                    const response = await fetch('/reset-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            email: currentFpEmail, 
+                            otp: currentFpOtp, 
+                            new_password: newPassword 
+                        })
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        showAlert('Password reset successful! Sign in now. 🎉');
+                        setTimeout(() => {
+                            location.reload(); // Returns to sign in state
+                        }, 2000);
+                    } else {
+                        showAlert(result.message);
+                    }
+                } catch (error) {
+                    showAlert('Reset failed.');
+                } finally {
+                    btn.disabled = false;
                 }
             });
         });
