@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Policy | Code Native</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/static/theme.js"></script>
+
+    <style>
+        .legal-container {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 40px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .legal-container h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .legal-container p,
+        .legal-container li {
+            color: var(--text-dim);
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .legal-container h2 {
+            font-size: 24px;
+            color: var(--text-light);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .legal-container ul {
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+
+        .last-updated {
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-bottom: 30px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo"><a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a></div>
+            <div class="header-actions">
+                {% if session.get('is_admin') %}
+                <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock" style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
+                {% endif %}
+                
+                {% if session.get('user_name') %}
+                <a href="/dashboard" class="btn-signup user-btn"><i class="fas fa-user-circle" style="margin-right: 8px; font-size: 16px;"></i>Dashboard</a>
+                {% else %}
+                <a href="/signin.html" class="btn-signup">Sign in</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="legal-container">
+        <h1>Cookie Policy</h1>
+        <span class="last-updated">Last Updated: January 3, 2026</span>
+
+        <p>This Cookie Policy explains how Code Native uses cookies and similar technologies to recognize you when you
+            visit our website. It explains what these technologies are and why we use them.</p>
+
+        <h2>1. What are Cookies?</h2>
+        <p>Cookies are small data files that are placed on your computer or mobile device when you visit a website.
+            Cookies are widely used by website owners in order to make their websites work, or to work more
+            efficiently, as well as to provide reporting information.</p>
+
+        <h2>2. Why We Use Cookies</h2>
+        <p>We use first-party and third-party cookies for several reasons:</p>
+        <ul>
+            <li><strong>Essential Cookies:</strong> These cookies are strictly necessary to provide you with services
+                available through our website and to use some of its features, such as access to secure areas.</li>
+            <li><strong>Performance and Functionality Cookies:</strong> These cookies are used to enhance the
+                performance and functionality of our website but are non-essential to their use.</li>
+            <li><strong>Analytics and Customization Cookies:</strong> These cookies collect information that is used
+                either in aggregate form to help us understand how our website is being used or how effective our
+                marketing campaigns are.</li>
+        </ul>
+
+        <h2>3. How Can I Control Cookies?</h2>
+        <p>You have the right to decide whether to accept or reject cookies. You can set or amend your web browser
+            controls to accept or refuse cookies. If you choose to reject cookies, you may still use our website though
+            your access to some functionality and areas of our website may be restricted.</p>
+
+        <h2>4. Updates to This Policy</h2>
+        <p>We may update this Cookie Policy from time to time in order to reflect, for example, changes to the cookies
+            we use or for other operational, legal, or regulatory reasons.</p>
+
+        <h2>5. Contact Us</h2>
+        <p>If you have any questions about our use of cookies or other technologies, please email us at
+            support@codenative.in.</p>
+    </div>
+
+</body>
+
+</html>

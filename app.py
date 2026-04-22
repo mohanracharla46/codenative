@@ -666,6 +666,14 @@ def roadmap_page():
 def terms_conditions():
     return render_template("terms-conditions.html")
 
+@app.route("/privacy-policy.html")
+def privacy_policy():
+    return render_template("privacy-policy.html")
+
+@app.route("/cookie-policy.html")
+def cookie_policy():
+    return render_template("cookie-policy.html")
+
 @app.route("/web.html")
 def web_page():
     return render_template("web.html")
@@ -675,7 +683,6 @@ def js_page():
     return render_template("js.html")
 
 @app.route("/videos.html")
-@login_required
 def videos_page():
     return render_template("videos.html")
 
