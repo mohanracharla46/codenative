@@ -549,7 +549,7 @@ body.dark-mode .level-0 { background-color: #334155; }
 .btn-signup.secondary {
     background: #fff;
     border: 1px solid #e2e8f0;
-    color: #64748b;
+    color: #64748b !important;
 }
 
 .btn-signup:hover {
