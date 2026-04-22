@@ -94,6 +94,7 @@ def init_db():
             id SERIAL PRIMARY KEY,
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
+            mobile TEXT,
             password TEXT NOT NULL,
             is_admin INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -103,6 +104,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
+            mobile TEXT,
             password TEXT NOT NULL,
             is_admin INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -184,6 +186,15 @@ def init_db():
         if not cursor.fetchone():
             cursor.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0")
         
+        # Check if mobile column exists (Postgres migration)
+        cursor.execute("""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name='users' AND column_name='mobile'
+        """)
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE users ADD COLUMN mobile TEXT")
+        
         conn.commit()
     else:
         # SQLite
@@ -198,6 +209,9 @@ def init_db():
         columns = [col[1] for col in cursor.fetchall()]
         if 'is_admin' not in columns:
             conn.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0")
+        
+        if 'mobile' not in columns:
+            conn.execute("ALTER TABLE users ADD COLUMN mobile TEXT")
         
         # Check if custom_css/js columns exist (SQLite migration)
         cursor = conn.execute("PRAGMA table_info(content)")
@@ -241,6 +255,7 @@ def signup():
         data = request.get_json()
         name = data.get('name')
         email = data.get('email')
+        mobile = data.get('mobile')
         password = data.get('password')
 
         if not name or not email or not password:
@@ -253,8 +268,8 @@ def signup():
         conn = get_db_connection()
         try:
             execute_query(conn,
-                'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-                (name, email, hashed_password)
+                'INSERT INTO users (name, email, mobile, password) VALUES (?, ?, ?, ?)',
+                (name, email, mobile, hashed_password)
             )
             conn.commit()
             conn.close()

@@ -37,6 +37,7 @@ def init_db():
             id SERIAL PRIMARY KEY,
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
+            mobile TEXT,
             password TEXT NOT NULL,
             is_admin INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -46,6 +47,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
+            mobile TEXT,
             password TEXT NOT NULL,
             is_admin INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -91,6 +93,15 @@ def init_db():
         if not cursor.fetchone():
             cursor.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0")
         
+        # Check if mobile column exists
+        cursor.execute("""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name='users' AND column_name='mobile'
+        """)
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE users ADD COLUMN mobile TEXT")
+        
         conn.commit()
     else:
         # SQLite
@@ -101,6 +112,9 @@ def init_db():
         columns = [col[1] for col in cursor.fetchall()]
         if 'is_admin' not in columns:
             conn.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0")
+        
+        if 'mobile' not in columns:
+            conn.execute("ALTER TABLE users ADD COLUMN mobile TEXT")
         
         conn.commit()
     

@@ -445,6 +445,7 @@
                             <tr>
                                 <th>User</th>
                                 <th>Email</th>
+                                <th>Mobile</th>
                                 <th>Role</th>
                                 <th>Joined</th>
                             </tr>
@@ -462,6 +463,7 @@
                                     </div>
                                 </td>
                                 <td>{{ u.email }}</td>
+                                <td>{{ u.mobile or 'N/A' }}</td>
                                 <td>
                                     {% if u.is_admin %}
                                     <span class="badge badge-admin">Admin</span>

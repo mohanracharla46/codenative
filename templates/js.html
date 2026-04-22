@@ -47,9 +47,15 @@
         </div>
 
         <div class="header-right">
-            <a href="/dashboard" class="btn-dashboard-minimal" title="Dashboard">
-                <i class="fas fa-th-large"></i>
-            </a>
+            <div class="user-nav-wrapper">
+                <div class="user-nav-info">
+                    <span class="user-name">{{ session.get('user_name', 'Scholar') }}</span>
+                    <span class="user-role">{{ 'Administrator' if session.get('is_admin') else 'Scholar' }}</span>
+                </div>
+                <a href="/dashboard" class="user-profile-avatar" title="View Dashboard">
+                    <img src="https://ui-avatars.com/api/?name={{ session.get('user_name', 'User') }}&background=6366f1&color=fff" alt="User">
+                </a>
+            </div>
         </div>
     </header>
 
