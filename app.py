@@ -367,7 +367,8 @@ def send_email(to_email, subject, body):
 
     try:
         msg = MIMEMultipart()
-        msg['From'] = smtp_user
+        sender_name = os.environ.get('SENDER_NAME', 'Code Native')
+        msg['From'] = f"{sender_name} <{smtp_user}>"
         msg['To'] = to_email
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
