@@ -149,6 +149,8 @@
 .python-bg { background: linear-gradient(135deg, #3776ab, #818cf8); }
 .c-bg { background: linear-gradient(135deg, #00599c, #38bdf8); }
 .java-bg { background: linear-gradient(135deg, #ed8b00, #fbbf24); }
+.web-bg { background: linear-gradient(135deg, #e34f26, #f06529); }
+.js-bg { background: linear-gradient(135deg, #f7df1e, #f0db4f); }
 
 .course-details {
     display: flex;

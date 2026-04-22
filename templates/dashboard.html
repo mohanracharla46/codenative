@@ -198,12 +198,24 @@
                                 <span>{{ course.progress }}%</span>
                             </div>
                             <div class="progress-bar">
-                                <div class="progress-fill" style="width: {{ course.progress }}%; {% if course.id == 'c' %}background: #00599c;{% elif course.id == 'java' %}background: #ed8b00;{% endif %}"></div>
+                                <div class="progress-fill" style="width: {{ course.progress }}%; 
+                                    {% if course.id == 'c' %}background: #00599c;
+                                    {% elif course.id == 'java' %}background: #ed8b00;
+                                    {% elif course.id == 'python' %}background: #3776ab;
+                                    {% elif course.id == 'web' %}background: #e34f26;
+                                    {% elif course.id == 'js' %}background: #f7df1e;
+                                    {% endif %}"></div>
                             </div>
                         </div>
                         <div class="course-footer">
                             <span style="font-size: 13px; color: #64748b; font-weight: 600;">Last Topic: {{ course.last_topic }}</span>
-                            <a href="{{ course.link }}" class="btn-resume" style="{% if course.id == 'c' %}background: #00599c;{% elif course.id == 'java' %}background: #ed8b00;{% endif %}">Resume Course</a>
+                            <a href="{{ course.link }}" class="btn-resume" style="
+                                {% if course.id == 'c' %}background: #00599c;
+                                {% elif course.id == 'java' %}background: #ed8b00;
+                                {% elif course.id == 'python' %}background: #3776ab;
+                                {% elif course.id == 'web' %}background: #e34f26;
+                                {% elif course.id == 'js' %}background: #f7df1e;
+                                {% endif %}">Resume Course</a>
                         </div>
                     </div>
                 </div>
