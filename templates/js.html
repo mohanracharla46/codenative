@@ -207,6 +207,7 @@ console.log("Welcome to " + name);</div>
         const contentBox = document.getElementById('topicContent');
         const currentLang = 'js';
         const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
+        const lessonCache = {}; // Client-side cache
 
         async function loadTopics() {
             try {
@@ -261,15 +262,25 @@ console.log("Welcome to " + name);</div>
                 document.querySelectorAll('.topic').forEach(t => t.classList.remove('active'));
                 if(el) el.classList.add('active');
                 
-                contentBox.innerHTML = `
-                    <div style="padding: 100px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <i class="fab fa-js fa-beat-fade" style="font-size: 54px; color: #f7df1e; margin-bottom: 20px;"></i>
-                        <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Preparing JavaScript Lesson...</p>
-                    </div>
-                `;
+                // Show loading state only if not in cache
+                if (!lessonCache[slug]) {
+                    contentBox.innerHTML = `
+                        <div style="padding: 100px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <i class="fab fa-js fa-beat-fade" style="font-size: 54px; color: #f7df1e; margin-bottom: 20px;"></i>
+                            <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Preparing JavaScript Lesson...</p>
+                        </div>
+                    `;
+                }
 
-                const res = await fetch(`/api/content/${currentLang}/${slug}`);
-                const data = await res.json();
+                // Fetch from cache or API
+                let data;
+                if (lessonCache[slug]) {
+                    data = lessonCache[slug];
+                } else {
+                    const res = await fetch(`/api/content/${currentLang}/${slug}`);
+                    data = await res.json();
+                    lessonCache[slug] = data; // Save to cache
+                }
 
                 // Clear previous custom styles and scripts
                 document.querySelectorAll('.custom-lesson-asset').forEach(el => el.remove());

@@ -319,9 +319,9 @@
     <script>
         // Dynamic Content Loading
         const sidebarTopics = document.getElementById('sidebarTopics');
-        const contentBox = document.getElementById('topicContent');
         const currentLang = 'python';
         const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
+        const lessonCache = {}; // Client-side cache for instant loading
 
         async function loadTopics() {
             try {
@@ -376,22 +376,32 @@
                 document.querySelectorAll('.topic').forEach(t => t.classList.remove('active'));
                 if(el) el.classList.add('active');
                 
+            // Show loading state only if not in cache
+            if (!lessonCache[slug]) {
                 contentBox.innerHTML = `
                     <div style="padding: 100px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                         <i class="fab fa-python fa-beat-fade" style="font-size: 54px; color: #3776ab; margin-bottom: 20px;"></i>
                         <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Preparing Python Lesson...</p>
                     </div>
                 `;
+            }
 
+            // Fetch from cache or API
+            let data;
+            if (lessonCache[slug]) {
+                data = lessonCache[slug];
+            } else {
                 const res = await fetch(`/api/content/${currentLang}/${slug}`);
-                const data = await res.json();
+                data = await res.json();
+                lessonCache[slug] = data; // Save to cache
+            }
 
-                // Clear previous custom styles and scripts
-                document.querySelectorAll('.custom-lesson-asset').forEach(el => el.remove());
+            // Clear previous custom styles and scripts
+            document.querySelectorAll('.custom-lesson-asset').forEach(el => el.remove());
 
-                if(data.content_html) {
-                    contentBox.innerHTML = data.content_html;
-                }
+            if(data.content_html) {
+                contentBox.innerHTML = data.content_html;
+            }
 
                 // Inject Custom CSS
                 if(data.custom_css) {
