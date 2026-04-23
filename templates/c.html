@@ -266,6 +266,7 @@ int main() {
 
     // Dynamic Content Loading
     const sidebarTopics = document.getElementById('sidebarTopics');
+    const contentBox = document.getElementById('topicContent');
     const currentLang = 'c';
     const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
     const lessonCache = {}; // Client-side cache for instant loading
