@@ -1003,69 +1003,73 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
         # Use a session for better performance
         session_req = requests.Session()
         
-        try:
-            # Primary attempt: 2.0 Flash
-            # Reduced timeout to 15s to allow for fallbacks within gateway limits
+        # Models to try in order of preference
+        # gemini-flash-latest usually points to the best stable/latest flash model
+        models_to_try = [
+            "gemini-flash-latest",
+            "gemini-2.5-flash",
+            "gemini-2.0-flash",
+            "gemini-2.0-flash-lite",
+            "gemini-1.5-flash"
+        ]
+        
+        resp = None
+        last_error = None
+        
+        for model_name in models_to_try:
+            current_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_api_key}"
             try:
-                resp = session_req.post(gemini_url, json=payload, headers=headers, timeout=15)
-            except requests.exceptions.RequestException:
-                # Force a 429-like state to trigger fallback if request fails
-                class FakeResp: status_code = 429
-                resp = FakeResp()
-            
-            # Fallback 1: 2.0 Flash Lite (Fastest fallback)
-            if resp.status_code in [429, 500, 502, 503, 504]:
-                fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={gemini_api_key}"
-                try:
-                    resp = session_req.post(fallback_url, json=payload, headers=headers, timeout=12)
-                except: pass
-            
-            # Fallback 2: 1.5 Flash (Most reliable fallback)
-            if resp.status_code in [429, 500, 502, 503, 504]:
-                fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
-                try:
-                    resp = session_req.post(fallback_url, json=payload, headers=headers, timeout=12)
-                except: pass
-            
-            if resp.status_code == 429:
+                # Reduced timeout to 12s per attempt to keep overall response time reasonable
+                temp_resp = session_req.post(current_url, json=payload, headers=headers, timeout=12)
+                
+                # If we get a successful response or a safety/empty response, we're done
+                if temp_resp.status_code == 200:
+                    resp = temp_resp
+                    break
+                
+                # If it's a 429 (Quota), we might want to try another model, but often quota is per project
+                # However, sometimes different models have different quotas
+                if temp_resp.status_code == 429:
+                    last_error = "QUOTA_EXCEEDED"
+                    continue # Try next model
+                    
+                # For other errors (400, 404, 500, etc.), try the next model
+                continue
+                
+            except Exception as e:
+                print(f"Attempt with {model_name} failed: {e}")
+                continue
+
+        # If all attempts failed or returned errors
+        if resp is None:
+            if last_error == "QUOTA_EXCEEDED":
                 return jsonify({'reply': '⏳ Free limit reach ayindi ra! Konchem wait chesi malli try cheyyi. 😊'}), 429
-            
-            if not hasattr(resp, 'json'):
-                return jsonify({'reply': '❌ AI service temporary ga busy undi ra. Malli try cheyyi! 😅'}), 503
+            return jsonify({'reply': '❌ AI service temporary ga busy undi ra. Malli try cheyyi! 😅'}), 503
 
-            result = resp.json()
-            
-            resp.raise_for_status()
+        result = resp.json()
+        
+        # Check for error in JSON even if status was 200 (rare but possible)
+        if 'error' in result:
+            return jsonify({'reply': '❌ AI service lo chinna error vachindi. Malli try cheyyi ra!'}), 502
 
-            # Extract text safely
-            if 'candidates' in result and len(result['candidates']) > 0:
-                candidate = result['candidates'][0]
-                if 'content' in candidate and 'parts' in candidate['content'] and len(candidate['content']['parts']) > 0:
-                    reply = candidate['content']['parts'][0].get('text', '')
-                    if not reply:
-                        reply = "Hmm ra, AI response empty vachindi. Malli try cheyyi! 😅"
-                else:
-                    reply = "Hmm, response structure lo chinna issue vachindi. Malli adugu ra! 😅"
+        # Extract text safely
+        if 'candidates' in result and len(result['candidates']) > 0:
+            candidate = result['candidates'][0]
+            if 'content' in candidate and 'parts' in candidate['content'] and len(candidate['content']['parts']) > 0:
+                reply = candidate['content']['parts'][0].get('text', '')
+                if not reply:
+                    reply = "Hmm ra, AI response empty vachindi. Malli try cheyyi! 😅"
             else:
                 # Check for safety filter or other reasons
-                finish_reason = result.get('candidates', [{}])[0].get('finishReason', 'UNKNOWN')
+                finish_reason = candidate.get('finishReason', 'UNKNOWN')
                 if finish_reason == 'SAFETY':
                     reply = "Arey, ee question konchem sensitive ga undi ra. General coding doubts adugu, manam kalisi nerchukundam! 😊"
                 else:
-                    reply = "Hmm ra, AI response empty vachindi. Malli try cheyyi! 😅"
-            
-            return jsonify({'reply': reply})
-
-        except requests.exceptions.HTTPError as http_err:
-            print(f"Gemini API HTTP error: {http_err}")
-            # Try to extract error message from response if available
-            try:
-                error_data = resp.json()
-                error_msg = error_data.get('error', {}).get('message', 'Unknown API error')
-                print(f"API Error Message: {error_msg}")
-            except:
-                pass
-            return jsonify({'reply': '❌ AI service lo chinna error vachindi. Malli try cheyyi ra!'}), 502
+                    reply = "Hmm, response structure lo chinna issue vachindi. Malli adugu ra! 😅"
+        else:
+            reply = "Hmm ra, AI response empty vachindi. Malli try cheyyi! 😅"
+        
+        return jsonify({'reply': reply})
             
     except requests.exceptions.Timeout:
         return jsonify({'reply': '⏳ The AI is thinking too long. Please try again!'}), 504
