@@ -829,85 +829,54 @@ def run():
         if not source or not language_id:
             return jsonify({"output": "Missing code or language_id"}), 400
 
-        # Run code locally depending on language using secure Docker Sandboxing
-        output_result = ""
-        
-        with tempfile.TemporaryDirectory() as temp_dir:
-            try:
-                # Resolve temp_dir absolute path for Docker volume mounting
-                mnt_dir = os.path.abspath(temp_dir)
+        # Use Judge0 API for code execution
+        import base64
+        import requests
 
-                if language_id == '71':  # Python
-                    file_path = os.path.join(mnt_dir, 'script.py')
-                    with open(file_path, 'w', encoding='utf-8') as f:
-                        f.write(source)
-                    cmd = ['docker', 'run', '--rm', '--memory=100m', '--cpus=0.5', '--net=none', '-v', f'{mnt_dir}:/code', '-w', '/code', 'python:3.9-slim', 'python', 'script.py']
-                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-                    output_result = result.stdout + result.stderr
+        JUDGE0_URL = "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true"
+        RAPIDAPI_KEY = os.environ.get("JUDGE0_API_KEY")
+        RAPIDAPI_HOST = os.environ.get("JUDGE0_API_HOST", "judge0-ce.p.rapidapi.com")
 
-                elif language_id == '62':  # Java
-                    file_path = os.path.join(mnt_dir, 'Main.java')
-                    with open(file_path, 'w', encoding='utf-8') as f:
-                        f.write(source)
-                    
-                    cmd_compile = ['docker', 'run', '--rm', '--memory=200m', '--cpus=0.5', '--net=none', '-v', f'{mnt_dir}:/code', '-w', '/code', 'openjdk:11', 'javac', 'Main.java']
-                    compile_result = subprocess.run(cmd_compile, capture_output=True, text=True, timeout=10)
-                    
-                    if compile_result.returncode != 0:
-                        output_result = compile_result.stderr
-                    else:
-                        cmd_run = ['docker', 'run', '--rm', '--memory=200m', '--cpus=0.5', '--net=none', '-v', f'{mnt_dir}:/code', '-w', '/code', 'openjdk:11', 'java', 'Main']
-                        run_result = subprocess.run(cmd_run, capture_output=True, text=True, timeout=10)
-                        output_result = run_result.stdout + run_result.stderr
+        if not RAPIDAPI_KEY:
+            return jsonify({"output": "Judge0 API Key is missing in environment configuration."}), 500
 
-                elif language_id == '50':  # C
-                    file_path = os.path.join(mnt_dir, 'script.c')
-                    with open(file_path, 'w', encoding='utf-8') as f:
-                        f.write(source)
-                    
-                    cmd_compile = ['docker', 'run', '--rm', '--memory=100m', '--cpus=0.5', '--net=none', '-v', f'{mnt_dir}:/code', '-w', '/code', 'gcc:latest', 'gcc', 'script.c', '-o', 'script.exe']
-                    compile_result = subprocess.run(cmd_compile, capture_output=True, text=True, timeout=10)
-                    
-                    if compile_result.returncode != 0:
-                        output_result = compile_result.stderr
-                    else:
-                        cmd_run = ['docker', 'run', '--rm', '--memory=100m', '--cpus=0.5', '--net=none', '-v', f'{mnt_dir}:/code', '-w', '/code', 'gcc:latest', './script.exe']
-                        run_result = subprocess.run(cmd_run, capture_output=True, text=True, timeout=10)
-                        output_result = run_result.stdout + run_result.stderr
+        # Encode code in base64 as recommended by Judge0
+        encoded_source = base64.b64encode(source.encode('utf-8')).decode('utf-8')
 
-                elif language_id == '54':  # C++
-                    file_path = os.path.join(mnt_dir, 'script.cpp')
-                    with open(file_path, 'w', encoding='utf-8') as f:
-                        f.write(source)
-                        
-                    cmd_compile = ['docker', 'run', '--rm', '--memory=100m', '--cpus=0.5', '--net=none', '-v', f'{mnt_dir}:/code', '-w', '/code', 'gcc:latest', 'g++', 'script.cpp', '-o', 'script.exe']
-                    compile_result = subprocess.run(cmd_compile, capture_output=True, text=True, timeout=10)
-                    
-                    if compile_result.returncode != 0:
-                        output_result = compile_result.stderr
-                    else:
-                        cmd_run = ['docker', 'run', '--rm', '--memory=100m', '--cpus=0.5', '--net=none', '-v', f'{mnt_dir}:/code', '-w', '/code', 'gcc:latest', './script.exe']
-                        run_result = subprocess.run(cmd_run, capture_output=True, text=True, timeout=10)
-                        output_result = run_result.stdout + run_result.stderr
+        payload = {
+            "language_id": int(language_id),
+            "source_code": encoded_source,
+            "stdin": ""
+        }
 
-                elif language_id == '63':  # Node.js
-                    file_path = os.path.join(mnt_dir, 'script.js')
-                    with open(file_path, 'w', encoding='utf-8') as f:
-                        f.write(source)
-                        
-                    cmd = ['docker', 'run', '--rm', '--memory=100m', '--cpus=0.5', '--net=none', '-v', f'{mnt_dir}:/code', '-w', '/code', 'node:16-slim', 'node', 'script.js']
-                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-                    output_result = result.stdout + result.stderr
+        headers = {
+            "content-type": "application/json",
+            "Content-Type": "application/json",
+            "X-RapidAPI-Key": RAPIDAPI_KEY,
+            "X-RapidAPI-Host": RAPIDAPI_HOST
+        }
 
-                else:
-                    output_result = f"Unsupported language ID: {language_id}"
+        try:
+            response = requests.post(JUDGE0_URL, json=payload, headers=headers, timeout=15)
+            response.raise_for_status()
+            result_data = response.json()
 
-            except subprocess.TimeoutExpired:
-                output_result = "Execution timed out (10 seconds limit)."
-            except FileNotFoundError as e:
-                output_result = f"Docker not found on system: {str(e)}\nMake sure Docker is installed on your server."
-            except Exception as e:
-                output_result = f"Docker execution error: {str(e)}"
+            # Process output
+            stdout = base64.b64decode(result_data.get("stdout") or "").decode("utf-8") if result_data.get("stdout") else ""
+            stderr = base64.b64decode(result_data.get("stderr") or "").decode("utf-8") if result_data.get("stderr") else ""
+            compile_output = base64.b64decode(result_data.get("compile_output") or "").decode("utf-8") if result_data.get("compile_output") else ""
+            
+            output_result = stdout or compile_output or stderr or result_data.get("message") or "No output"
+            
+            # If there's a specific status error
+            status = result_data.get("status", {})
+            if status.get("id") > 3: # Not Accepted
+                output_result = f"Status: {status.get('description')}\n{output_result}"
+
+        except requests.exceptions.RequestException as e:
+            output_result = f"Judge0 API Error: {str(e)}"
+        except Exception as e:
+            output_result = f"Unexpected error: {str(e)}"
         
         # Track practice execution
         if 'user_id' in session:
