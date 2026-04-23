@@ -840,13 +840,20 @@ def run():
         if not RAPIDAPI_KEY:
             return jsonify({"output": "Judge0 API Key is missing in environment configuration."}), 500
 
-        # Encode code in base64 as recommended by Judge0
-        encoded_source = base64.b64encode(source.encode('utf-8')).decode('utf-8')
+        data = request.get_json()
+        source_code = data.get("code", "")
+        language_id = data.get("language_id", "71")  # Default to Python
+        stdin = data.get("stdin", "")
+
+        # Judge0 expects base64 encoded source code and stdin if base64_encoded=true
+        import base64
+        encoded_source = base64.b64encode(source_code.encode('utf-8')).decode('utf-8')
+        encoded_stdin = base64.b64encode(stdin.encode('utf-8')).decode('utf-8')
 
         payload = {
             "language_id": int(language_id),
             "source_code": encoded_source,
-            "stdin": ""
+            "stdin": encoded_stdin
         }
 
         headers = {

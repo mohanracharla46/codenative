@@ -127,11 +127,12 @@ async function runCode() {
 
         const code = editor.getValue();
         const language_id = langSelect.value;
+        const stdin = document.getElementById("stdin") ? document.getElementById("stdin").value : "";
 
         const response = await fetch("/run", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ code, language_id })
+            body: JSON.stringify({ code, language_id, stdin })
         });
 
         // If server returned non-JSON (rare), handle gracefully

@@ -162,9 +162,16 @@
                 <div id="editor">print("Hello, Python Scholar!")</div>
             </div>
 
-            <div class="playground-console">
-                <div class="console-label">CONSOLE OUTPUT</div>
-                <pre id="output">Press Run to execute.</pre>
+            <div class="playground-execution-area">
+                <div class="playground-input">
+                    <div class="console-label">CUSTOM INPUT (STDIN)</div>
+                    <textarea id="stdin" placeholder="Enter input for your program here..."></textarea>
+                </div>
+
+                <div class="playground-console">
+                    <div class="console-label">CONSOLE OUTPUT</div>
+                    <pre id="output">Press Run to execute.</pre>
+                </div>
             </div>
         </div>
 
@@ -288,11 +295,12 @@
 
                 const code = editor.getValue();
                 const language_id = langSelect.value;
+                const stdin = document.getElementById("stdin") ? document.getElementById("stdin").value : "";
 
                 const response = await fetch("/run", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ code, language_id })
+                    body: JSON.stringify({ code, language_id, stdin })
                 });
 
                 const text = await response.text();

@@ -140,9 +140,16 @@ let name = "CodeNative";
 console.log("Welcome to " + name);</div>
             </div>
 
-            <div class="playground-console">
-                <div class="console-label">CONSOLE OUTPUT</div>
-                <pre id="output">Press Run to execute.</pre>
+            <div class="playground-execution-area">
+                <div class="playground-input">
+                    <div class="console-label">CUSTOM INPUT (STDIN)</div>
+                    <textarea id="stdin" placeholder="Enter input for your program here..."></textarea>
+                </div>
+
+                <div class="playground-console">
+                    <div class="console-label">CONSOLE OUTPUT</div>
+                    <pre id="output">Press Run to execute.</pre>
+                </div>
             </div>
         </div>
 
