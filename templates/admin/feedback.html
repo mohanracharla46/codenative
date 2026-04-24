@@ -246,31 +246,26 @@
             <a href="/admin" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
         </div>
 
-        {% set total = feedbacks|length %}
-        {% set sum_rating = 0 %}
-        {% for f in feedbacks %}{% if f.rating %}{% set sum_rating = sum_rating + f.rating %}{% endif %}{% endfor %}
-        {% set avg = (sum_rating / total)|round(1) if total > 0 else 0 %}
-
         <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-icon icon-blue"><i class="fas fa-comments"></i></div>
                 <div class="stat-info">
                     <h3>Total Responses</h3>
-                    <div>{{ total }}</div>
+                    <div>{{ stats.total }}</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon icon-gold"><i class="fas fa-star"></i></div>
                 <div class="stat-info">
                     <h3>Average Rating</h3>
-                    <div>{{ avg }} / 5.0</div>
+                    <div>{{ stats.avg }} / 5.0</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon icon-green"><i class="fas fa-heart"></i></div>
                 <div class="stat-info">
                     <h3>User Satisfaction</h3>
-                    <div>{{ (avg * 20)|round }}%</div>
+                    <div>{{ stats.satisfaction }}%</div>
                 </div>
             </div>
         </div>

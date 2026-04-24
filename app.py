@@ -900,7 +900,30 @@ def admin_feedback():
     conn = get_db_connection()
     feedbacks = execute_query(conn, "SELECT * FROM feedback ORDER BY created_at DESC").fetchall()
     conn.close()
-    return render_template("admin/feedback.html", feedbacks=feedbacks)
+    
+    # Calculate stats
+    total_responses = len(feedbacks)
+    sum_ratings = 0
+    valid_ratings_count = 0
+    
+    for f in feedbacks:
+        if f['rating']:
+            try:
+                sum_ratings += int(f['rating'])
+                valid_ratings_count += 1
+            except (ValueError, TypeError):
+                continue
+                
+    avg_rating = round(sum_ratings / valid_ratings_count, 1) if valid_ratings_count > 0 else 0
+    satisfaction = round((avg_rating / 5) * 100, 1) if avg_rating > 0 else 0
+    
+    stats = {
+        'total': total_responses,
+        'avg': avg_rating,
+        'satisfaction': satisfaction
+    }
+    
+    return render_template("admin/feedback.html", feedbacks=feedbacks, stats=stats)
 
 # Admin Routes
 @app.route("/admin")
