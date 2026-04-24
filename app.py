@@ -16,11 +16,20 @@ import random
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+# Google OAuth imports
+from google_auth_oauthlib.flow import Flow
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+
 load_dotenv() # Load variables from .env
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = os.environ.get('SECRET_KEY', 'codenative_fallback_secret_key_secure_12345')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+
+# Allow HTTP for OAuth in development
+if not os.environ.get('DATABASE_URL') or '127.0.0.1' in os.environ.get('GOOGLE_REDIRECT_URI', ''):
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 # Database configuration
 DATABASE = 'users.db'
@@ -99,7 +108,8 @@ def init_db():
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
             mobile TEXT,
-            password TEXT NOT NULL,
+            password TEXT, -- Password can be null for Google-only users
+            google_id TEXT UNIQUE,
             is_admin INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -109,7 +119,8 @@ def init_db():
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
             mobile TEXT,
-            password TEXT NOT NULL,
+            password TEXT, -- Password can be null for Google-only users
+            google_id TEXT UNIQUE,
             is_admin INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -207,6 +218,17 @@ def init_db():
         if not cursor.fetchone():
             cursor.execute("ALTER TABLE users ADD COLUMN otp_expiry TIMESTAMP")
         
+        # Check if google_id column exists (Postgres migration)
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='users' AND column_name='google_id'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE users ADD COLUMN google_id TEXT UNIQUE")
+        
+        # Ensure password column can be NULL (Postgres migration)
+        try:
+            cursor.execute("ALTER TABLE users ALTER COLUMN password DROP NOT NULL")
+        except Exception as e:
+            print(f"Notice: Could not drop NOT NULL on password (might already be NULL): {e}")
+
         conn.commit()
     else:
         # SQLite
@@ -229,6 +251,9 @@ def init_db():
             conn.execute("ALTER TABLE users ADD COLUMN otp_code TEXT")
         if 'otp_expiry' not in columns:
             conn.execute("ALTER TABLE users ADD COLUMN otp_expiry TIMESTAMP")
+        
+        if 'google_id' not in columns:
+            conn.execute("ALTER TABLE users ADD COLUMN google_id TEXT")
         
         # Check if custom_css/js columns exist (SQLite migration)
         cursor = conn.execute("PRAGMA table_info(content)")
@@ -472,6 +497,126 @@ def reset_password():
     else:
         conn.close()
         return jsonify({"message": "Session expired or invalid. Please try again."}), 400
+
+# Google OAuth Configuration
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI", "http://127.0.0.1:5000/login/google/callback")
+# In production, this must be an HTTPS URL. For local dev, http is fine.
+GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
+
+@app.route("/login/google")
+def login_google():
+    """Initiate Google OAuth flow"""
+    # Use a dummy secret key for the flow if one isn't provided
+    redirect_uri = GOOGLE_REDIRECT_URI
+    
+    # Configure OAuth 2.0 Flow
+    flow = Flow.from_client_config(
+        {
+            "web": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+            }
+        },
+        scopes=[
+            "https://www.googleapis.com/auth/userinfo.profile",
+            "https://www.googleapis.com/auth/userinfo.email",
+            "openid"
+        ],
+        redirect_uri=redirect_uri
+    )
+
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true'
+    )
+    
+    session['oauth_state'] = state
+    # Store the code verifier for PKCE
+    session['code_verifier'] = flow.code_verifier
+    return redirect(authorization_url)
+
+@app.route("/login/google/callback")
+def google_callback():
+    """Handle Google OAuth callback"""
+    state = session.get('oauth_state')
+    
+    flow = Flow.from_client_config(
+        {
+            "web": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+            }
+        },
+        scopes=[
+            "https://www.googleapis.com/auth/userinfo.profile",
+            "https://www.googleapis.com/auth/userinfo.email",
+            "openid"
+        ],
+        state=state,
+        redirect_uri=GOOGLE_REDIRECT_URI
+    )
+    
+    # Restore the code verifier for PKCE
+    flow.code_verifier = session.get('code_verifier')
+
+    try:
+        flow.fetch_token(authorization_response=request.url)
+    except Exception as e:
+        print(f"Error fetching token: {e}")
+        return redirect(url_for('signin_page', error='oauth_failed'))
+
+    credentials = flow.credentials
+    
+    # Verify the ID token
+    try:
+        id_info = id_token.verify_oauth2_token(
+            credentials.id_token, 
+            google_requests.Request(), 
+            GOOGLE_CLIENT_ID
+        )
+    except ValueError:
+        return redirect(url_for('signin_page', error='invalid_token'))
+
+    google_id = id_info.get('sub')
+    email = id_info.get('email')
+    name = id_info.get('name')
+    
+    if not email:
+        return redirect(url_for('signin_page', error='no_email'))
+
+    conn = get_db_connection()
+    # Check if user exists by google_id
+    user = execute_query(conn, "SELECT * FROM users WHERE google_id = ?", (google_id,)).fetchone()
+    
+    if not user:
+        # Check if user exists by email (link account)
+        user = execute_query(conn, "SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+        if user:
+            execute_query(conn, "UPDATE users SET google_id = ? WHERE id = ?", (google_id, user['id']))
+            conn.commit()
+        else:
+            # Create new user
+            execute_query(conn, "INSERT INTO users (name, email, google_id) VALUES (?, ?, ?)", (name, email, google_id))
+            conn.commit()
+            user = execute_query(conn, "SELECT * FROM users WHERE google_id = ?", (google_id,)).fetchone()
+
+    conn.close()
+
+    # Log user in
+    session.permanent = True
+    session['user_id'] = user['id']
+    session['user_name'] = user['name']
+    session['user_email'] = user['email']
+    session['is_admin'] = bool(user['is_admin'])
+    
+    flash(f"Signed in as {user['name']}", "success")
+    return redirect(url_for('dashboard') if not user['is_admin'] else url_for('admin_dashboard'))
 
 @app.route("/logout")
 def logout():

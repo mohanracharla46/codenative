@@ -16,7 +16,7 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://codenative.in/java.html">
+    <meta property="og:url" content="https://codenative.co.in/java.html">
     <meta property="og:title" content="Java Programming Tutorial | Code Native">
     <meta property="og:description"
         content="Master Java programming in Telugu. Learn OOPs, syntax, data types, and more with our interactive Java tutorial and compiler.">
@@ -24,7 +24,7 @@
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://codenative.in/java.html">
+    <meta property="twitter:url" content="https://codenative.co.in/java.html">
     <meta property="twitter:title" content="Java Programming Tutorial | Code Native">
     <meta property="twitter:description"
         content="Master Java programming in Telugu. Learn OOPs, syntax, data types, and more with our interactive Java tutorial and compiler.">
@@ -40,6 +40,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js"></script>
     <script src="/static/theme.js"></script>
+    <style>
+        .sidebar-skeleton { padding: 15px; }
+        .skeleton-item {
+            height: 44px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .skeleton-item::after {
+            content: "";
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: skeleton-loading 1.5s infinite;
+        }
+        @keyframes skeleton-loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
 </head>
 
 <body>
@@ -275,43 +298,66 @@
         const lessonCache = {}; // Client-side cache
 
         async function loadTopics() {
+            const cacheKey = `topics_${currentLang}`;
+            const cachedTopics = localStorage.getItem(cacheKey);
+
+            if (cachedTopics) {
+                renderTopics(JSON.parse(cachedTopics));
+            } else {
+                sidebarTopics.innerHTML = `
+                    <div class="sidebar-skeleton">
+                        <div class="skeleton-item"></div>
+                        <div class="skeleton-item"></div>
+                        <div class="skeleton-item"></div>
+                        <div class="skeleton-item"></div>
+                    </div>
+                `;
+            }
+
             try {
                 const res = await fetch(`/api/content/${currentLang}`);
                 const topics = await res.json();
                 
                 if (topics.length > 0) {
-                    sidebarTopics.innerHTML = '';
-                    topics.forEach((topic, index) => {
-                        const li = document.createElement('li');
-                        li.className = `topic ${index === 0 ? 'active' : ''} ${topic.completed ? 'completed' : ''}`;
-                        li.dataset.topic = topic.topic_slug;
-                        li.dataset.index = index;
-                        
-                        // Add lock icon for guests on subsequent lessons
-                        let lockIcon = '';
-                        if (!isLoggedIn && index > 0) {
-                            lockIcon = '<i class="fas fa-lock" style="margin-right: 8px; font-size: 12px; opacity: 0.6;"></i>';
-                        }
-
-                        // Create content with checkmark if completed
-                        li.innerHTML = `
-                            ${topic.completed ? '<i class="fas fa-check-circle completion-mark"></i>' : ''}
-                            ${lockIcon}
-                            <span class="topic-title">${topic.topic_title}</span>
-                        `;
-                        
-                        li.onclick = () => {
-                            if (!isLoggedIn && index > 0) {
-                                window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
-                                return;
-                            }
-                            loadSpecificTopic(topic.topic_slug, li);
-                        };
-                        sidebarTopics.appendChild(li);
-                    });
-                    loadSpecificTopic(topics[0].topic_slug, sidebarTopics.firstChild);
+                    localStorage.setItem(cacheKey, JSON.stringify(topics));
+                    renderTopics(topics);
                 }
             } catch (err) { console.error(err); }
+        }
+
+        function renderTopics(topics) {
+            if (!topics || topics.length === 0) return;
+            sidebarTopics.innerHTML = '';
+            topics.forEach((topic, index) => {
+                const li = document.createElement('li');
+                li.className = `topic ${index === 0 ? 'active' : ''} ${topic.completed ? 'completed' : ''}`;
+                li.dataset.topic = topic.topic_slug;
+                li.dataset.index = index;
+                
+                let lockIcon = '';
+                if (!isLoggedIn && index > 0) {
+                    lockIcon = '<i class="fas fa-lock" style="margin-right: 8px; font-size: 12px; opacity: 0.6;"></i>';
+                }
+
+                li.innerHTML = `
+                    ${topic.completed ? '<i class="fas fa-check-circle completion-mark"></i>' : ''}
+                    ${lockIcon}
+                    <span class="topic-title">${topic.topic_title}</span>
+                `;
+                
+                li.onclick = () => {
+                    if (!isLoggedIn && index > 0) {
+                        window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
+                        return;
+                    }
+                    loadSpecificTopic(topic.topic_slug, li);
+                };
+                sidebarTopics.appendChild(li);
+            });
+            
+            if (!document.querySelector('.topic.active')) {
+                loadSpecificTopic(topics[0].topic_slug, sidebarTopics.firstChild);
+            }
         }
 
         async function loadSpecificTopic(slug, el) {
