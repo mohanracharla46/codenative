@@ -1,3 +1,17 @@
+// DOM
+const langSelect = document.getElementById("lang");
+const runBtn = document.getElementById("runBtn");
+const clearBtn = document.getElementById("clearBtn");
+const outputEl = document.getElementById("output");
+
+const snippets = {
+    "71": 'print("Hello, Python Scholar!")',
+    "62": 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, Java Scholar!");\n    }\n}',
+    "50": '#include <stdio.h>\n\nint main() {\n    printf("Hello, C Scholar!\\n");\n    return 0;\n}',
+    "54": '#include <iostream>\n\nint main() {\n    std::cout << "Hello, C++ Scholar!" << std::endl;\n    return 0;\n}',
+    "63": 'console.log("Hello, JavaScript Scholar!");'
+};
+
 // Initialize Ace Editor
 const editor = ace.edit("editor");
 editor.setTheme("ace/theme/monokai");
@@ -8,16 +22,6 @@ editor.setOptions({
     tabSize: 4,
     useWorker: false
 });
-
-// DOM
-const langSelect = document.getElementById("lang");
-const runBtn = document.getElementById("runBtn");
-const clearBtn = document.getElementById("clearBtn");
-const outputEl = document.getElementById("output");
-
-
-
-
 
 // change mode and tab name on language select
 langSelect.addEventListener("change", () => {
@@ -44,7 +48,25 @@ langSelect.addEventListener("change", () => {
         editor.session.setMode("ace/mode/javascript");
         tabFileName.innerText = "script.js";
     }
+
+    // Update snippet if editor is empty or just has a default message
+    if (snippets[lang]) {
+        editor.setValue(snippets[lang], -1);
+    }
 });
+
+// Handle query parameters for language
+const urlParams = new URLSearchParams(window.location.search);
+const langParam = urlParams.get('lang');
+if (langParam) {
+    if (langParam === 'python') langSelect.value = "71";
+    else if (langParam === 'java') langSelect.value = "62";
+    else if (langParam === 'c') langSelect.value = "50";
+    else if (langParam === 'cpp') langSelect.value = "54";
+    else if (langParam === 'js') langSelect.value = "63";
+    
+    langSelect.dispatchEvent(new Event('change'));
+}
 
 // Run handler
 runBtn.addEventListener("click", runCode);
