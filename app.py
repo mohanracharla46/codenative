@@ -192,6 +192,7 @@ def init_db():
             name TEXT,
             email TEXT,
             mobile TEXT,
+            college TEXT,
             rating INTEGER,
             message TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -203,6 +204,7 @@ def init_db():
             name TEXT,
             email TEXT,
             mobile TEXT,
+            college TEXT,
             rating INTEGER,
             message TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -249,10 +251,14 @@ def init_db():
         if not cursor.fetchone():
             cursor.execute("ALTER TABLE users ADD COLUMN google_id TEXT UNIQUE")
         
-        # Check if feedback mobile column exists (Postgres migration)
+        # Check if feedback mobile/college columns exist (Postgres migration)
         cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='feedback' AND column_name='mobile'")
         if not cursor.fetchone():
             cursor.execute("ALTER TABLE feedback ADD COLUMN mobile TEXT")
+        
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='feedback' AND column_name='college'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE feedback ADD COLUMN college TEXT")
 
         conn.commit()
     else:
@@ -867,7 +873,7 @@ def submit_feedback():
         data = request.get_json()
         name = data.get('name')
         email = data.get('email')
-        mobile = data.get('mobile')
+        college = data.get('college')
         rating = data.get('rating')
         message = data.get('message')
         user_id = session.get('user_id')
@@ -877,8 +883,8 @@ def submit_feedback():
 
         conn = get_db_connection()
         execute_query(conn, 
-            "INSERT INTO feedback (user_id, name, email, mobile, rating, message) VALUES (?, ?, ?, ?, ?, ?)",
-            (user_id, name, email, mobile, rating, message)
+            "INSERT INTO feedback (user_id, name, email, college, rating, message) VALUES (?, ?, ?, ?, ?, ?)",
+            (user_id, name, email, college, rating, message)
         )
         conn.commit()
         conn.close()

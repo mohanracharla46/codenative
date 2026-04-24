@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i class="fas fa-star" data-v="4"></i>
                         <i class="fas fa-star" data-v="5"></i>
                     </div>
-                    <input type="tel" id="modal-mobile" placeholder="Phone Number (Optional)" class="modal-input">
+                    <input type="text" id="modal-college" placeholder="College Name" class="modal-input">
                     <textarea id="modal-message" placeholder="What can we improve?"></textarea>
                     <button id="submit-modal-feedback" class="submit-btn">Send Feedback</button>
                 </div>
@@ -132,14 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         submit.addEventListener('click', async () => {
             const message = document.getElementById('modal-message').value;
-            const mobile = document.getElementById('modal-mobile').value;
+            const college = document.getElementById('modal-college').value;
             if (!message && rating === 0) return;
 
             try {
                 const res = await fetch('/api/submit_feedback', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ rating, message, mobile })
+                    body: JSON.stringify({ rating, message, college })
                 });
                 if (res.ok) {
                     submit.textContent = "Thank you! ❤️";

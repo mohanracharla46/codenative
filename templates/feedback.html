@@ -192,8 +192,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input type="tel" id="mobile" class="form-input" value="{{ session.get('user_mobile', '') }}" placeholder="Enter your mobile number">
+                    <label class="form-label">College Name</label>
+                    <input type="text" id="college" class="form-input" placeholder="Enter your college name">
                 </div>
 
                 <div class="form-group">
@@ -265,7 +265,7 @@
             const data = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
-                mobile: document.getElementById('mobile').value,
+                college: document.getElementById('college').value,
                 message: document.getElementById('message').value,
                 rating: selectedRating
             };
