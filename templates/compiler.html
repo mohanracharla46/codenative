@@ -62,15 +62,16 @@
 
     <div class="compiler-page">
         <div class="compiler-hero">
+            <div class="compiler-badge">Powerful & Instant</div>
             <h1>Online Code Compiler</h1>
-            <p>Write, compile, and run code in multiple programming languages instantly</p>
+            <p>Master your craft with our high-performance interactive coding playground. Write, test, and run code instantly without any setup.</p>
         </div>
 
         <div class="playground-container">
             <div class="playground-title-bar">
                 <div class="title-left">
-                    <i class="fas fa-terminal" style="margin-right: 10px; color: #a78bfa; font-size: 14px;"></i>
-                    <span>INTERACTIVE PLAYGROUND</span>
+                    <i class="fas fa-terminal" style="margin-right: 10px; color: #6366f1; font-size: 14px;"></i>
+                    <span>INTERACTIVE PLAYGROUND v2.0</span>
                 </div>
                 <div class="traffic-lights">
                     <span class="light red"></span>
@@ -81,21 +82,21 @@
 
             <div class="playground-tab-bar">
                 <div class="tab-item active">
-                    <span class="file-name">main.py</span>
+                    <span class="file-name"><i class="fas fa-file-code"></i> main.py</span>
                     <div class="active-indicator"></div>
                 </div>
                 <div class="playground-controls">
                     <div class="lang-selector">
                         <select id="lang">
-                            <option value="71">Python</option>
-                            <option value="62">Java</option>
-                            <option value="50">C</option>
-                            <option value="54">C++</option>
-                            <option value="63">JavaScript</option>
+                            <option value="71">Python 3</option>
+                            <option value="62">Java (OpenJDK 13)</option>
+                            <option value="50">C (GCC 9.2.0)</option>
+                            <option value="54">C++ (GCC 9.2.0)</option>
+                            <option value="63">JavaScript (Node.js 12)</option>
                         </select>
                     </div>
                     <button id="clearBtn" class="btn-playground-clear">Clear</button>
-                    <button id="runBtn" class="btn-playground-run"><i class="fas fa-play" style="font-size: 10px; margin-right: 6px;"></i> Run Code</button>
+                    <button id="runBtn" class="btn-playground-run"><i class="fas fa-play" style="font-size: 10px;"></i> Run Code</button>
                 </div>
             </div>
 
@@ -105,14 +106,33 @@
 
             <div class="playground-execution-area">
                 <div class="playground-input">
-                    <div class="console-label">CUSTOM INPUT (STDIN)</div>
+                    <div class="console-label"><i class="fas fa-keyboard"></i> CUSTOM INPUT (STDIN)</div>
                     <textarea id="stdin" placeholder="Enter input for your program here..."></textarea>
                 </div>
 
                 <div class="playground-console">
-                    <div class="console-label">CONSOLE OUTPUT</div>
+                    <div class="console-label"><i class="fas fa-desktop"></i> CONSOLE OUTPUT</div>
                     <pre id="output">Press Run to execute.</pre>
                 </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="compiler-features">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                <h3>Lightning Fast</h3>
+                <p>Execute your code in milliseconds using our optimized Judge0 backend integration.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+                <h3>Multi-Language</h3>
+                <p>Seamlessly switch between Python, Java, C, C++, and JavaScript with zero configuration.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Secure Sandboxing</h3>
+                <p>Your code runs in a highly secure, isolated environment for your peace of mind.</p>
             </div>
         </div>
     </div>

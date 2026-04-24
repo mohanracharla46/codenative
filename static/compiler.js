@@ -30,23 +30,23 @@ langSelect.addEventListener("change", () => {
 
     if (lang == "71") {
         editor.session.setMode("ace/mode/python");
-        tabFileName.innerText = "main.py";
+        tabFileName.innerHTML = '<i class="fas fa-file-code"></i> main.py';
     }
     else if (lang == "62") {
         editor.session.setMode("ace/mode/java");
-        tabFileName.innerText = "Main.java";
+        tabFileName.innerHTML = '<i class="fas fa-file-code"></i> Main.java';
     }
     else if (lang == "50") {
         editor.session.setMode("ace/mode/c_cpp");
-        tabFileName.innerText = "main.c";
+        tabFileName.innerHTML = '<i class="fas fa-file-code"></i> main.c';
     }
     else if (lang == "54") {
         editor.session.setMode("ace/mode/c_cpp");
-        tabFileName.innerText = "main.cpp";
+        tabFileName.innerHTML = '<i class="fas fa-file-code"></i> main.cpp';
     }
     else if (lang == "63") {
         editor.session.setMode("ace/mode/javascript");
-        tabFileName.innerText = "script.js";
+        tabFileName.innerHTML = '<i class="fas fa-file-code"></i> script.js';
     }
 
     // Update snippet if editor is empty or just has a default message
