@@ -531,11 +531,13 @@
     width: 100%;
     max-width: 650px;
     background: #161b22;
-    border-radius: 20px;
+    border-radius: 24px; /* More curvy */
     box-shadow: 0 50px 100px rgba(0,0,0,0.4);
     margin-bottom: 60px;
     position: relative;
-    overflow: visible; /* Allow cursor to move to footer */
+    overflow: hidden; /* Ensure children follow the curve */
+    border: 1px solid rgba(255,255,255,0.05);
+    animation: windowOrbit 12s infinite ease-in-out;
 }
 
 /* Simulated Cursor Pro - RE-ADJUSTED COORDINATES */
@@ -824,21 +826,40 @@
     95%, 100% { opacity: 0; }
 }
 
-/* Mobile Adjustment */
-@media (max-width: 768px) {
-    .animated-demo-container { height: 450px; padding: 20px; perspective: none; }
-    .demo-window-3d { transform: none; animation: none; }
-    .simulated-cursor-pro { display: none; }
-    .demo-body { font-size: 15px; padding: 20px; }
-    .sim-run-btn-pro { padding: 8px 16px; font-size: 13px; }
-    .demo-progress-steps { bottom: 20px; flex-direction: row; gap: 10px; }
-    .p-step { padding: 8px 16px; font-size: 11px; }
+/* Section Header for Tutorial */
+.section-header {
+    text-align: center;
+    margin-bottom: 40px;
 }
 
-/* Mobile Adjustments */
+.icon-tutorial {
+    color: #6366f1;
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.tutorial-title {
+    font-size: 36px;
+    color: #1e293b;
+    font-weight: 800;
+}
+
+.tutorial-subtitle {
+    color: #64748b;
+    font-size: 18px;
+}
+
+/* --- Mobile Responsiveness Consolidate --- */
+
+@media (max-width: 1024px) {
+    .compiler-hero h1 { font-size: 48px; }
+    .playground-container { max-width: 95%; }
+}
+
 @media (max-width: 992px) {
     .compiler-features {
         grid-template-columns: 1fr;
+        gap: 20px;
     }
     
     .playground-execution-area {
@@ -852,19 +873,96 @@
 }
 
 @media (max-width: 768px) {
+    .compiler-page { padding: 40px 15px; }
+    
     .compiler-hero h1 {
-        font-size: 36px;
+        font-size: 32px;
+        letter-spacing: -1px;
     }
     
     .compiler-hero p {
-        font-size: 18px;
+        font-size: 16px;
     }
-    
+
     .playground-container {
-        border-radius: 0;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .playground-title-bar {
+        padding: 12px 16px;
+    }
+
+    .playground-tab-bar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0;
+    }
+
+    .tab-item {
+        border-left: none;
+        border-right: none;
+        padding: 12px 16px;
+    }
+
+    .playground-controls {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+        background: #161b22;
+        border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .lang-selector {
+        width: 100%;
+    }
+
+    .lang-selector select {
+        width: 100%;
+    }
+
+    .btn-playground-clear {
+        flex: 1;
+        padding: 10px;
+    }
+
+    .btn-playground-run {
+        flex: 2;
+        padding: 10px;
+        justify-content: center;
     }
     
     #editor {
-        height: 400px;
+        height: 350px;
     }
+
+    .playground-input, .playground-console {
+        padding: 16px;
+    }
+
+    #stdin, #output {
+        height: 120px;
+        font-size: 13px;
+    }
+
+    /* Demo Section Adjustments */
+    .tutorial-grid { padding: 20px 10px; border-radius: 20px; }
+    .animated-demo-container { height: auto; padding: 0; }
+    .demo-window-3d { width: 100%; margin-bottom: 30px; animation: none; transform: none !important; }
+    .simulated-cursor-pro { display: none; }
+    .demo-body { font-size: 14px; padding: 20px; }
+    .demo-execution-sim { grid-template-columns: 1fr; }
+    .sim-textarea-pro, .sim-console-pro { height: 70px; font-size: 13px; }
+    .demo-progress-steps { flex-direction: column; width: 100%; gap: 10px; }
+    .p-step { width: 100%; opacity: 1 !important; animation: none !important; background: #4f46e5 !important; color: white !important; }
+    
+    .tutorial-title { font-size: 28px; }
+    .tutorial-subtitle { font-size: 15px; }
+}
+
+@media (max-width: 480px) {
+    .compiler-hero h1 { font-size: 28px; }
+    .compiler-badge { font-size: 10px; padding: 4px 12px; }
+    .playground-title-bar .title-left span { font-size: 10px; }
+    .traffic-lights { display: none; }
 }

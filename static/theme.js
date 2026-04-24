@@ -165,4 +165,27 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     injectFeedbackWidget();
+
+    // ── Global Mobile Menu Toggle ──────────────────────────────────────
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const headerActions = document.getElementById('headerActions');
+    
+    if (mobileMenuToggle && headerActions) {
+        mobileMenuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            headerActions.classList.toggle('active');
+            const icon = headerActions.classList.contains('active') ? 'fa-times' : 'fa-bars';
+            mobileMenuToggle.querySelector('i').className = `fas ${icon}`;
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (headerActions.classList.contains('active')) {
+                if (!headerActions.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                    headerActions.classList.remove('active');
+                    mobileMenuToggle.querySelector('i').className = 'fas fa-bars';
+                }
+            }
+        });
+    }
 });

@@ -46,7 +46,12 @@
     <header class="header">
         <div class="container header-inner">
             <div class="logo"><a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a></div>
-            <div class="header-actions">
+            
+            <button id="mobileMenuToggle" class="theme-toggle mobile-only" aria-label="Toggle Menu" style="display: none; margin-left: auto; margin-right: 15px;">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="header-actions" id="headerActions">
                 {% if session.get('is_admin') %}
                 <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock" style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
                 {% endif %}
@@ -119,10 +124,10 @@
 
         <!-- How to Use Section -->
         <div class="how-to-use-section">
-            <div class="section-header" style="text-align: center; margin-bottom: 40px;">
-                <i class="fas fa-play-circle" style="color: #6366f1; font-size: 32px; margin-bottom: 15px;"></i>
-                <h2 style="font-size: 36px; color: #1e293b; font-weight: 800;">How to Use the Compiler</h2>
-                <p style="color: #64748b; font-size: 18px;">Master the interactive coding experience in three simple steps.</p>
+            <div class="section-header">
+                <i class="fas fa-play-circle icon-tutorial"></i>
+                <h2 class="tutorial-title">How to Use the Compiler</h2>
+                <p class="tutorial-subtitle">Master the interactive coding experience in three simple steps.</p>
             </div>
             
             <div class="tutorial-grid">

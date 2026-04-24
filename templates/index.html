@@ -93,6 +93,141 @@
             color: #d4d4d4;
             background: #1e1e1e;
         }
+
+        /* PREMIUM COMPILER DEMO STYLES */
+        .tutorial-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8fafc;
+            padding: 60px;
+            border-radius: 40px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .animated-demo-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 40px;
+            perspective: 1000px;
+        }
+
+        .demo-window-3d {
+            width: 100%;
+            max-width: 650px;
+            background: #161b22;
+            border-radius: 24px; /* More curvy */
+            box-shadow: 0 50px 100px rgba(0,0,0,0.4);
+            margin-bottom: 60px;
+            position: relative;
+            overflow: hidden; /* Ensure children follow the curve */
+            border: 1px solid rgba(255,255,255,0.05);
+            animation: windowOrbit 12s infinite ease-in-out;
+        }
+
+        .simulated-cursor-pro {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            color: white;
+            font-size: 24px;
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.8), 0 5px 15px rgba(0,0,0,0.5);
+            z-index: 9999;
+            pointer-events: none;
+            animation: cursorMovePro 15s infinite cubic-bezier(0.65, 0, 0.35, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .demo-header {
+            background: #0d1117;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .demo-dots { display: flex; gap: 8px; }
+        .demo-dots span { width: 10px; height: 10px; border-radius: 50%; }
+        .demo-dots span:nth-child(1) { background: #ff5f56; }
+        .demo-dots span:nth-child(2) { background: #ffbd2e; }
+        .demo-dots span:nth-child(3) { background: #27c93f; }
+
+        .demo-tab { margin-left: 15px; font-size: 13px; color: #f1f5f9; font-weight: 700; }
+        .demo-body { padding: 40px; font-family: 'JetBrains Mono', monospace; font-size: 20px; background: #0d1117; line-height: 2; }
+
+        .code-line-anim { color: #e2e8f0; opacity: 0; animation: codeTypePro 15s infinite; }
+        .code-keyword { color: #f472b6; }
+        .code-string { color: #fbbf24; }
+
+        .demo-execution-sim { display: grid; grid-template-columns: 1fr 1fr; background: #010409; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sim-input-box, .sim-output-box { padding: 25px; }
+        .sim-input-box { border-right: 1px solid rgba(255,255,255,0.1); }
+        .sim-label { font-size: 11px; font-weight: 900; color: #475569; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.1em; }
+
+        .sim-textarea-pro { background: #0d1117; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; height: 90px; padding: 15px; color: #f1f5f9; font-size: 16px; }
+        .typing-stdin-pro { display: inline-block; overflow: hidden; white-space: nowrap; width: 0; animation: stdinTypePro 15s infinite; }
+        .sim-console-pro { background: rgba(0,0,0,0.3); border-radius: 12px; height: 90px; padding: 15px; color: #10b981; font-size: 14px; font-family: monospace; }
+        .sim-console-pro div { opacity: 0; animation: outputShowPro 15s infinite; }
+        .out-line-spinner { color: #94a3b8; font-size: 12px; }
+
+        .sim-footer { padding: 25px; background: #0d1117; display: flex; justify-content: center; border-top: 1px solid rgba(255,255,255,0.05); }
+        .sim-run-btn-pro { background: #6366f1; color: white; font-size: 15px; font-weight: 800; padding: 12px 30px; border-radius: 12px; animation: runBtnWorkflow 15s infinite; }
+
+        .demo-progress-steps { display: flex; gap: 20px; z-index: 10; }
+        .p-step { background: white; padding: 12px 28px; border-radius: 100px; color: #94a3b8; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); transition: all 0.6s ease; opacity: 0.4; }
+        .p-step span { font-size: 16px; font-weight: 800; color: inherit; }
+
+        @keyframes windowOrbit { 0%, 100% { transform: rotateX(5deg) rotateY(-5deg); } 50% { transform: rotateX(2deg) rotateY(5deg); } }
+        @keyframes cursorMovePro { 
+            0% { top: 60px; left: 60px; opacity: 0; } 
+            5% { opacity: 1; } 
+            25% { top: 100px; left: 60px; } 
+            35% { top: 250px; left: 80px; } 
+            55% { top: 280px; left: 180px; } 
+            65% { top: 435px; left: 310px; } /* Centered click */
+            70% { transform: scale(0.8); } 
+            75% { transform: scale(1); top: 435px; left: 310px; opacity: 1; } 
+            85% { opacity: 0; } 
+            100% { top: 60px; left: 60px; opacity: 0; } 
+        }
+        @keyframes codeTypePro { 0%, 5% { opacity: 0; transform: translateY(5px); } 10%, 90% { opacity: 1; transform: translateY(0); } 95%, 100% { opacity: 0; } }
+        @keyframes stdinTypePro { 0%, 45% { width: 0; } 60%, 90% { width: 100%; } 95%, 100% { width: 0; } }
+        @keyframes runBtnWorkflow { 0%, 69% { background: #6366f1; transform: scale(1); } 70% { background: #4f46e5; transform: scale(0.9); } 71%, 85% { background: #10b981; transform: scale(1); } 90%, 100% { background: #6366f1; } }
+        @keyframes outputShowPro { 0%, 72% { opacity: 0; transform: translateY(10px); } 75%, 90% { opacity: 1; transform: translateY(0); } 95%, 100% { opacity: 0; } }
+        @keyframes stepActive1 { 0%, 34% { background: #4f46e5; color: white; opacity: 1; transform: scale(1.05); box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3); } 35%, 100% { background: white; color: #94a3b8; opacity: 0.4; transform: scale(1); } }
+        @keyframes stepActive2 { 0%, 34% { background: white; color: #94a3b8; opacity: 0.4; } 35%, 64% { background: #4f46e5; color: white; opacity: 1; transform: scale(1.05); box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3); } 65%, 100% { background: white; color: #94a3b8; opacity: 0.4; transform: scale(1); } }
+        @keyframes stepActive3 { 0%, 64% { background: white; color: #94a3b8; opacity: 0.4; } 65%, 92% { background: #10b981; color: white; opacity: 1; transform: scale(1.05); box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3); } 93%, 100% { background: white; color: #94a3b8; opacity: 0.4; transform: scale(1); } }
+        .s-1 { animation: stepActive1 15s infinite; }
+        .s-2 { animation: stepActive2 15s infinite; }
+        .s-3 { animation: stepActive3 15s infinite; }
+        .typing-cursor-editor, .typing-cursor-stdin { display: inline-block; width: 2px; height: 1.2em; background: #6366f1; margin-left: 2px; vertical-align: middle; animation: caretBlink 0.8s infinite; }
+        .typing-cursor-editor { animation-delay: 0s; opacity: 0; animation-name: caretBlink, caretShowEditor; animation-duration: 0.8s, 15s; }
+        .typing-cursor-stdin { animation-delay: 0s; opacity: 0; animation-name: caretBlink, caretShowStdin; animation-duration: 0.8s, 15s; }
+        @keyframes caretShowEditor { 0%, 5% { opacity: 0; } 10%, 25% { opacity: 1; } 30%, 100% { opacity: 0; } }
+        @keyframes caretShowStdin { 0%, 40% { opacity: 0; } 45%, 60% { opacity: 1; } 65%, 100% { opacity: 0; } }
+
+        /* Mobile Adjustment for Demo */
+        @media (max-width: 768px) {
+            .tutorial-grid { padding: 15px 5px; }
+            .animated-demo-container { height: auto; padding: 5px; perspective: none; }
+            .demo-window-3d { width: 95%; max-width: 100%; transform: none; margin: 0 auto 20px; animation: none; }
+            .simulated-cursor-pro { display: none; }
+            .demo-body { font-size: 13px; padding: 15px 10px; line-height: 1.5; }
+            .demo-execution-sim { grid-template-columns: 1fr; }
+            .sim-input-box, .sim-output-box { padding: 15px; }
+            .sim-textarea-pro, .sim-console-pro { height: 60px; font-size: 13px; }
+            .sim-footer { padding: 10px; }
+            .sim-run-btn-pro { padding: 8px 15px; font-size: 12px; }
+            .demo-progress-steps { flex-direction: column; width: 100%; gap: 6px; }
+            .p-step { width: 100%; padding: 8px 12px; font-size: 12px; }
+        }
     </style>
 </head>
 
@@ -333,7 +468,71 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- Premium Compiler Showcase Section -->
+        <section class="premium-compiler-section reveal-up" id="compiler-demo" style="margin-top: 80px;">
+            <div class="section-header" style="text-align: center; margin: 0 auto 40px; max-width: 800px;">
+                <div class="subtitle" style="margin-bottom: 10px; display: inline-block;">Interactive Playground</div>
+                <h2 style="font-size: 42px; font-weight: 800; color: #1e293b; margin-bottom: 20px;">Experience our <span style="color: var(--primary-color);">Premium Compiler</span></h2>
+                <p style="font-size: 18px; color: #64748b; line-height: 1.6;">
+                    Don't just read code—run it. Our state-of-the-art interactive environment lets you practice, debug, and master programming in real-time.
+                </p>
+            </div>
+
+            <div class="tutorial-grid" style="background: #f8fafc; border: 1px solid rgba(0,0,0,0.05); border-radius: 40px; padding: 60px; margin-bottom: 100px;">
+                <div class="animated-demo-container">
+                    <!-- 3D Demo Window -->
+                    <div class="demo-window-3d">
+                        <div class="simulated-cursor-pro"><i class="fas fa-mouse-pointer"></i></div>
+                        
+                        <div class="demo-header">
+                            <div class="demo-dots"><span></span><span></span><span></span></div>
+                            <div class="demo-tab"><i class="fas fa-file-code"></i> playground.py</div>
+                        </div>
+                        
+                        <div class="demo-body">
+                            <div class="code-line-anim">name = <span class="code-keyword">input</span>()<span class="typing-cursor-editor">|</span></div>
+                            <div class="code-line-anim"><span class="code-keyword">print</span>(<span class="code-string">f"Hello, {name}!"</span>)</div>
+                        </div>
+
+                        <div class="demo-execution-sim">
+                            <div class="sim-input-box">
+                                <div class="sim-label">STDIN</div>
+                                <div class="sim-textarea-pro">
+                                    <span class="typing-stdin-pro">CodeNative</span><span class="typing-cursor-stdin">|</span>
+                                </div>
+                            </div>
+                            <div class="sim-output-box">
+                                <div class="sim-label">CONSOLE</div>
+                                <div class="sim-console-pro">
+                                    <div class="out-line-1">> Running...</div>
+                                    <div class="out-line-spinner"><i class="fas fa-spinner fa-spin"></i> Processing...</div>
+                                    <div class="out-line-2">Hello, CodeNative!</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sim-footer">
+                            <div class="sim-run-btn-pro">
+                                <span class="btn-txt-run">Run Code</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Steps -->
+                    <div class="demo-progress-steps">
+                        <div class="p-step s-1"><span>1</span> Writing</div>
+                        <div class="p-step s-2"><span>2</span> Input</div>
+                        <div class="p-step s-3"><span>3</span> Output</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 50px;">
+                    <a href="/compiler.html" class="btn-cta" style="padding: 15px 40px; font-size: 18px; text-decoration: none;">Try the Live Compiler</a>
+                </div>
+            </div>
+        </section>
     </div>
 
     <footer class="footer">
