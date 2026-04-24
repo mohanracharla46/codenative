@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i class="fas fa-star" data-v="4"></i>
                         <i class="fas fa-star" data-v="5"></i>
                     </div>
+                    <input type="tel" id="modal-mobile" placeholder="Phone Number (Optional)" class="modal-input">
                     <textarea id="modal-message" placeholder="What can we improve?"></textarea>
                     <button id="submit-modal-feedback" class="submit-btn">Send Feedback</button>
                 </div>
@@ -88,6 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 .stars { font-size: 2rem; color: #e2e8f0; margin-bottom: 1.5rem; cursor: pointer; }
                 .stars i.active { color: #f59e0b; }
+                .modal-input {
+                    width: 100%; padding: 0.8rem 1rem; border-radius: 12px; border: 2px solid #f1f5f9;
+                    margin-bottom: 1rem; font-family: inherit; font-size: 0.9rem;
+                }
                 #modal-message {
                     width: 100%; padding: 1rem; border-radius: 12px; border: 2px solid #f1f5f9;
                     margin-bottom: 1.5rem; font-family: inherit; resize: none; min-height: 80px;
@@ -127,13 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         submit.addEventListener('click', async () => {
             const message = document.getElementById('modal-message').value;
+            const mobile = document.getElementById('modal-mobile').value;
             if (!message && rating === 0) return;
 
             try {
                 const res = await fetch('/api/submit_feedback', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ rating, message })
+                    body: JSON.stringify({ rating, message, mobile })
                 });
                 if (res.ok) {
                     submit.textContent = "Thank you! ❤️";

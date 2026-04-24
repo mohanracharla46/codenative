@@ -115,7 +115,10 @@
                 <div class="card-header">
                     <div class="user-info">
                         <h3>{{ f.name or 'Anonymous' }}</h3>
-                        <p>{{ f.email or 'No email provided' }}</p>
+                        <p><i class="far fa-envelope"></i> {{ f.email or 'No email' }}</p>
+                        {% if f.mobile %}
+                        <p><i class="fas fa-phone-alt"></i> {{ f.mobile }}</p>
+                        {% endif %}
                     </div>
                     <div class="rating">
                         {% if f.rating %}

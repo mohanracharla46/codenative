@@ -191,6 +191,7 @@ def init_db():
             user_id INTEGER,
             name TEXT,
             email TEXT,
+            mobile TEXT,
             rating INTEGER,
             message TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -201,6 +202,7 @@ def init_db():
             user_id INTEGER,
             name TEXT,
             email TEXT,
+            mobile TEXT,
             rating INTEGER,
             message TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -247,11 +249,10 @@ def init_db():
         if not cursor.fetchone():
             cursor.execute("ALTER TABLE users ADD COLUMN google_id TEXT UNIQUE")
         
-        # Ensure password column can be NULL (Postgres migration)
-        try:
-            cursor.execute("ALTER TABLE users ALTER COLUMN password DROP NOT NULL")
-        except Exception as e:
-            print(f"Notice: Could not drop NOT NULL on password (might already be NULL): {e}")
+        # Check if feedback mobile column exists (Postgres migration)
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='feedback' AND column_name='mobile'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE feedback ADD COLUMN mobile TEXT")
 
         conn.commit()
     else:
@@ -866,6 +867,7 @@ def submit_feedback():
         data = request.get_json()
         name = data.get('name')
         email = data.get('email')
+        mobile = data.get('mobile')
         rating = data.get('rating')
         message = data.get('message')
         user_id = session.get('user_id')
@@ -875,8 +877,8 @@ def submit_feedback():
 
         conn = get_db_connection()
         execute_query(conn, 
-            "INSERT INTO feedback (user_id, name, email, rating, message) VALUES (?, ?, ?, ?, ?)",
-            (user_id, name, email, rating, message)
+            "INSERT INTO feedback (user_id, name, email, mobile, rating, message) VALUES (?, ?, ?, ?, ?, ?)",
+            (user_id, name, email, mobile, rating, message)
         )
         conn.commit()
         conn.close()
