@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Feedback - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .admin-header h1 {
+            font-size: 1.8rem;
+            color: #0f172a;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #4f46e5;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feedback-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feedback-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 0.75rem;
+        }
+
+        .user-info h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #1e293b;
+        }
+
+        .user-info p {
+            margin: 0.25rem 0 0 0;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .rating {
+            color: #f59e0b;
+            font-weight: 700;
+        }
+
+        .card-body {
+            color: #334155;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .card-footer {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-align: right;
+        }
+
+        .empty-state {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 5rem;
+            color: #64748b;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-header">
+        <h1><i class="fas fa-comments"></i> User Feedback</h1>
+        <a href="/admin" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+
+    <div class="feedback-grid">
+        {% if feedbacks %}
+            {% for f in feedbacks %}
+            <div class="feedback-card">
+                <div class="card-header">
+                    <div class="user-info">
+                        <h3>{{ f.name or 'Anonymous' }}</h3>
+                        <p>{{ f.email or 'No email provided' }}</p>
+                    </div>
+                    <div class="rating">
+                        {% if f.rating %}
+                            {% for i in range(f.rating) %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
+                        {% else %}
+                            No Rating
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    {{ f.message }}
+                </div>
+                <div class="card-footer">
+                    <i class="far fa-clock"></i> {{ f.created_at }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h2>No feedback yet</h2>
+                <p>User feedback will appear here once submitted.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>

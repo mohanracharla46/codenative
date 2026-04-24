@@ -184,6 +184,29 @@ def init_db():
         )
     '''
 
+    # SQL for Feedback Table
+    feedback_sql = '''
+        CREATE TABLE IF NOT EXISTS feedback (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER,
+            name TEXT,
+            email TEXT,
+            rating INTEGER,
+            message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            name TEXT,
+            email TEXT,
+            rating INTEGER,
+            message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         cursor.execute(users_sql)
@@ -191,6 +214,7 @@ def init_db():
         cursor.execute(stats_sql)
         cursor.execute(activity_sql)
         cursor.execute(progress_sql)
+        cursor.execute(feedback_sql)
         
         # Check if is_admin column exists (Postgres migration)
         cursor.execute("""
@@ -237,6 +261,7 @@ def init_db():
         conn.execute(stats_sql)
         conn.execute(activity_sql)
         conn.execute(progress_sql)
+        conn.execute(feedback_sql)
         
         # Check if is_admin column exists (SQLite migration)
         cursor = conn.execute("PRAGMA table_info(users)")
@@ -830,6 +855,44 @@ def js_page():
 @app.route("/videos.html")
 def videos_page():
     return render_template("videos.html")
+
+@app.route("/feedback.html")
+def feedback_page():
+    return render_template("feedback.html")
+
+@app.route("/api/submit_feedback", methods=["POST"])
+def submit_feedback():
+    try:
+        data = request.get_json()
+        name = data.get('name')
+        email = data.get('email')
+        rating = data.get('rating')
+        message = data.get('message')
+        user_id = session.get('user_id')
+
+        if not message:
+            return jsonify({"message": "Message is required"}), 400
+
+        conn = get_db_connection()
+        execute_query(conn, 
+            "INSERT INTO feedback (user_id, name, email, rating, message) VALUES (?, ?, ?, ?, ?)",
+            (user_id, name, email, rating, message)
+        )
+        conn.commit()
+        conn.close()
+
+        return jsonify({"message": "Feedback submitted successfully! Thank you. 😊"}), 200
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+# Admin Feedback Route
+@app.route("/admin/feedback")
+@admin_required
+def admin_feedback():
+    conn = get_db_connection()
+    feedbacks = execute_query(conn, "SELECT * FROM feedback ORDER BY created_at DESC").fetchall()
+    conn.close()
+    return render_template("admin/feedback.html", feedbacks=feedbacks)
 
 # Admin Routes
 @app.route("/admin")
