@@ -723,14 +723,81 @@
     100% { top: 40px; left: 40px; opacity: 0; }
 }
 
-/* Step Highlighting - RESTORED */
+/* Step Highlighting - ENHANCED */
 .s-1 { animation: stepActive1 15s infinite; }
 .s-2 { animation: stepActive2 15s infinite; }
 .s-3 { animation: stepActive3 15s infinite; }
 
-@keyframes stepActive1 { 0%, 34% { color: #1e293b; border-color: #6366f1; transform: scale(1.1); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2); } 35%, 100% { opacity: 0.5; } }
-@keyframes stepActive2 { 0%, 34% { opacity: 0.5; } 35%, 64% { color: #1e293b; border-color: #6366f1; transform: scale(1.1); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2); } 65%, 100% { opacity: 0.5; } }
-@keyframes stepActive3 { 0%, 64% { opacity: 0.5; } 65%, 90% { color: #1e293b; border-color: #10b981; transform: scale(1.1); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); } 95%, 100% { opacity: 0.5; } }
+/* Step Highlighting - CRYSTAL CLEAR */
+.p-step {
+    background: white;
+    padding: 12px 28px;
+    border-radius: 100px;
+    color: #94a3b8; /* Lighter grey for inactive */
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.6s ease;
+    opacity: 0.4;
+}
+
+.p-step span {
+    font-size: 16px;
+    font-weight: 800;
+    color: inherit;
+}
+
+@keyframes stepActive1 { 
+    0%, 34% { 
+        background: #4f46e5; 
+        color: white; 
+        opacity: 1;
+        transform: scale(1.05); 
+        box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3); 
+    } 
+    35%, 100% { 
+        background: white; 
+        color: #94a3b8;
+        opacity: 0.4;
+        transform: scale(1);
+    } 
+}
+@keyframes stepActive2 { 
+    0%, 34% { background: white; color: #94a3b8; opacity: 0.4; } 
+    35%, 64% { 
+        background: #4f46e5; 
+        color: white; 
+        opacity: 1;
+        transform: scale(1.05); 
+        box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3); 
+    } 
+    65%, 100% { 
+        background: white; 
+        color: #94a3b8;
+        opacity: 0.4;
+        transform: scale(1);
+    } 
+}
+@keyframes stepActive3 { 
+    0%, 64% { background: white; color: #94a3b8; opacity: 0.4; } 
+    65%, 92% { 
+        background: #10b981; 
+        color: white; 
+        opacity: 1;
+        transform: scale(1.05); 
+        box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3); 
+    } 
+    93%, 100% { 
+        background: white; 
+        color: #94a3b8;
+        opacity: 0.4;
+        transform: scale(1);
+    } 
+}
 
 @keyframes codeTypePro {
     0%, 5% { opacity: 0; transform: translateY(5px); }
