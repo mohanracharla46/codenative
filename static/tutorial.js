@@ -287,6 +287,12 @@ const TutorialLoader = {
                 if (!el.querySelector('.completion-mark')) {
                     el.insertAdjacentHTML('afterbegin', '<i class="fas fa-check-circle completion-mark"></i>');
                 }
+                
+                // Trigger feedback popup if 1st or 2nd lesson
+                const completedCount = document.querySelectorAll('.topic.completed').length;
+                if (completedCount === 1 || completedCount === 2) {
+                    if (typeof FeedbackSystem !== 'undefined') FeedbackSystem.showPrompt();
+                }
             }
         } catch (e) { console.error('Progress update failed'); }
     },
@@ -352,5 +358,173 @@ const TutorialLoader = {
                 <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Linking Lesson...</p>
             </div>
         `;
+    }
+/**
+ * Feedback System - Handles proactive feedback prompts
+ */
+const FeedbackSystem = {
+    showPrompt() {
+        // Don't show if already given feedback in this session or recently
+        if (localStorage.getItem('feedback_submitted') || sessionStorage.getItem('feedback_dismissed')) {
+            return;
+        }
+
+        // Delay slightly for better UX
+        setTimeout(() => {
+            this.injectModal();
+        }, 1500);
+    },
+
+    injectModal() {
+        if (document.getElementById('feedbackModal')) return;
+
+        const modalHtml = `
+        <div id="feedbackModal" class="feedback-overlay">
+            <div class="feedback-card">
+                <button class="feedback-close" onclick="FeedbackSystem.dismiss()">&times;</button>
+                <div class="feedback-header">
+                    <div class="feedback-icon-wrapper">
+                        <i class="fas fa-star fa-beat"></i>
+                    </div>
+                    <h3>Enjoying Code Native?</h3>
+                    <p>You've just finished a lesson! How would you rate your experience so far?</p>
+                </div>
+                
+                <div class="feedback-rating">
+                    <span class="star" data-value="1"><i class="fas fa-star"></i></span>
+                    <span class="star" data-value="2"><i class="fas fa-star"></i></span>
+                    <span class="star" data-value="3"><i class="fas fa-star"></i></span>
+                    <span class="star" data-value="4"><i class="fas fa-star"></i></span>
+                    <span class="star" data-value="5"><i class="fas fa-star"></i></span>
+                </div>
+
+                <div id="feedbackCommentArea" style="display: none; margin-top: 20px;">
+                    <textarea id="feedbackMessage" placeholder="Any suggestions to make it better for you? (Optional)" class="feedback-textarea"></textarea>
+                    <button id="submitFeedbackBtn" class="feedback-submit-btn" onclick="FeedbackSystem.submit()">Submit Feedback</button>
+                </div>
+                
+                <div class="feedback-footer">
+                    <button class="btn-later" onclick="FeedbackSystem.dismiss()">Maybe later</button>
+                </div>
+            </div>
+        </div>`;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .feedback-overlay {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px);
+                z-index: 9999; display: flex; align-items: center; justify-content: center;
+                animation: fadeIn 0.3s ease;
+            }
+            .feedback-card {
+                background: white; width: 100%; max-width: 420px; padding: 40px;
+                border-radius: 28px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                position: relative; text-align: center; animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            .feedback-close {
+                position: absolute; top: 20px; right: 20px; background: none; border: none;
+                font-size: 24px; color: #94a3b8; cursor: pointer; transition: 0.2s;
+            }
+            .feedback-close:hover { color: #1e293b; transform: scale(1.1); }
+            .feedback-icon-wrapper {
+                width: 70px; height: 70px; background: #eef2ff; color: #6366f1;
+                border-radius: 20px; display: flex; align-items: center; justify-content: center;
+                font-size: 30px; margin: 0 auto 24px; transform: rotate(-5deg);
+            }
+            .feedback-header h3 { font-size: 24px; font-weight: 800; color: #1e293b; margin-bottom: 12px; }
+            .feedback-header p { font-size: 15px; color: #64748b; line-height: 1.5; }
+            .feedback-rating { display: flex; justify-content: center; gap: 12px; margin-top: 30px; }
+            .star { font-size: 32px; color: #e2e8f0; cursor: pointer; transition: all 0.2s; }
+            .star:hover { transform: scale(1.2); color: #f59e0b; }
+            .star.active { color: #f59e0b; }
+            .feedback-textarea {
+                width: 100%; height: 100px; border: 1px solid #e2e8f0; border-radius: 16px;
+                padding: 16px; font-family: inherit; font-size: 14px; margin-bottom: 20px;
+                resize: none; outline: none; transition: 0.2s;
+            }
+            .feedback-textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+            .feedback-submit-btn {
+                width: 100%; background: #6366f1; color: white; border: none;
+                padding: 14px; border-radius: 16px; font-weight: 700; font-size: 15px;
+                cursor: pointer; transition: 0.3s;
+            }
+            .feedback-submit-btn:hover { background: #4f46e5; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3); }
+            .feedback-footer { margin-top: 24px; }
+            .btn-later { background: none; border: none; color: #94a3b8; font-size: 14px; font-weight: 600; cursor: pointer; }
+            .btn-later:hover { color: #64748b; text-decoration: underline; }
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes slideUp { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        `;
+        document.head.appendChild(style);
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // Star logic
+        let selectedRating = 0;
+        const stars = document.querySelectorAll('.star');
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = star.dataset.value;
+                stars.forEach(s => {
+                    s.classList.toggle('active', s.dataset.value <= selectedRating);
+                });
+                document.getElementById('feedbackCommentArea').style.display = 'block';
+            });
+        });
+
+        this.selectedRatingValue = () => selectedRating;
+    },
+
+    dismiss() {
+        const modal = document.getElementById('feedbackModal');
+        if (modal) {
+            modal.style.opacity = '0';
+            setTimeout(() => modal.remove(), 300);
+        }
+        sessionStorage.setItem('feedback_dismissed', 'true');
+    },
+
+    async submit() {
+        const rating = this.selectedRatingValue();
+        const message = document.getElementById('feedbackMessage').value;
+        const submitBtn = document.getElementById('submitFeedbackBtn');
+
+        if (!rating) return;
+
+        try {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+            const res = await fetch('/api/submit_feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    rating: rating,
+                    message: message,
+                    name: 'Tutorial User',
+                    email: '',
+                    college: ''
+                })
+            });
+
+            if (res.ok) {
+                const card = document.querySelector('.feedback-card');
+                card.innerHTML = `
+                    <div class="feedback-success">
+                        <div class="feedback-icon-wrapper" style="background: #ecfdf5; color: #10b981;">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h3>Thank You!</h3>
+                        <p>Your feedback helps us make Code Native better for everyone.</p>
+                        <button class="feedback-submit-btn" style="margin-top: 24px;" onclick="FeedbackSystem.dismiss()">Close</button>
+                    </div>
+                `;
+                localStorage.setItem('feedback_submitted', 'true');
+            }
+        } catch (err) {
+            console.error('Feedback error:', err);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Submit Feedback';
+        }
     }
 };
