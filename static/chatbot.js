@@ -340,9 +340,28 @@
                 body: JSON.stringify({ message: text, language: LANG })
             });
             
+            // Handle specific error codes before parsing JSON
+            if (res.status === 401) {
+                const data = await res.json().catch(() => ({}));
+                removeTypingIndicator();
+                addMessage('bot', renderMarkdown(data.reply || '⚠️ Please login to use the AI chatbot. [Sign In](/signin.html)'));
+                return;
+            }
+
+            if (res.status === 429) {
+                removeTypingIndicator();
+                addMessage('bot', '⏳ Daily limit reached. Please try again tomorrow!');
+                return;
+            }
+
+            if (res.status === 503) {
+                removeTypingIndicator();
+                addMessage('bot', '⚠️ AI Service is temporarily busy. Please try again in a moment.');
+                return;
+            }
+
             if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.message || errorData.reply || `Server error: ${res.status}`);
+                throw new Error(`Server error: ${res.status}`);
             }
             
             const data = await res.json();
@@ -351,16 +370,7 @@
         } catch (err) {
             removeTypingIndicator();
             console.error('Chat error:', err);
-            let errorMsg = '❌ Could not reach the AI. Please check your connection.';
-            
-            if (err.message.includes('401')) {
-                // Use the message from server if possible, otherwise default
-                errorMsg = err.message.length > 20 ? err.message : '⚠️ Please login to use the AI chatbot.';
-            } else {
-                if (err.message.includes('503')) errorMsg = '⚠️ AI Service is temporarily busy. Please try again in a moment.';
-                if (err.message.includes('429')) errorMsg = '⏳ Daily limit reached. Please try again tomorrow!';
-            }
-            addMessage('bot', renderMarkdown(errorMsg));
+            addMessage('bot', '❌ Could not reach the AI. Please check your connection.');
         } finally {
             sendBtn.disabled = false;
             input.focus();
