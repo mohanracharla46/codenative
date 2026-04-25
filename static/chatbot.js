@@ -5,9 +5,12 @@
  */
 
 (function () {
-    // ── Detect current language from the URL path ──────────────────────
+    // ── Detect current language from the URL path or query string ──────
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryLang = urlParams.get('lang');
     const pathLang = window.location.pathname.split('/')[1]?.replace('.html', '') || 'programming';
-    const LANG = ['python', 'java', 'c'].includes(pathLang) ? pathLang : 'programming';
+    const currentLang = queryLang || pathLang;
+    const LANG = ['python', 'java', 'c'].includes(currentLang) ? currentLang : 'programming';
 
     const LANG_META = {
         python: { label: 'Python', color: '#3776ab', icon: 'fab fa-python', glow: 'rgba(55,118,171,0.45)' },
