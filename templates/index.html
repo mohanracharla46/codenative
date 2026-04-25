@@ -666,27 +666,6 @@
 
         revealElements.forEach(el => revealObserver.observe(el));
 
-        // Mobile Menu Toggle for Home Page
-        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-        const headerActions = document.getElementById('headerActions');
-        
-        if (mobileMenuToggle) {
-            mobileMenuToggle.addEventListener('click', () => {
-                headerActions.classList.toggle('active');
-                const icon = headerActions.classList.contains('active') ? 'fa-times' : 'fa-bars';
-                mobileMenuToggle.querySelector('i').className = `fas ${icon}`;
-            });
-        }
-
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (headerActions && headerActions.classList.contains('active')) {
-                if (!headerActions.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
-                    headerActions.classList.remove('active');
-                    mobileMenuToggle.querySelector('i').className = 'fas fa-bars';
-                }
-            }
-        });
 
     </script>
 </body>
