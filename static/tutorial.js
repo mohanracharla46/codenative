@@ -23,6 +23,11 @@ const TutorialLoader = {
         this.setupBreadcrumbs();
         this.loadTopics();
         
+        // Proactive feedback trigger: Show prompt after 3 minutes of study
+        setTimeout(() => {
+            if (typeof FeedbackSystem !== 'undefined') FeedbackSystem.showPrompt();
+        }, 3 * 60 * 1000);
+        
         // Handle initial URL hash if any (for deep linking)
         const hash = window.location.hash.replace('#', '');
         if (hash) {

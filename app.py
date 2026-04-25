@@ -899,8 +899,8 @@ def submit_feedback():
         message = data.get('message')
         user_id = session.get('user_id')
 
-        if not message:
-            return jsonify({"message": "Message is required"}), 400
+        if not message and not rating:
+            return jsonify({"message": "Either a rating or a message is required"}), 400
 
         conn = get_db_connection()
         execute_query(conn, 

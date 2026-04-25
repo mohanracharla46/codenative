@@ -40,6 +40,9 @@ def init_db():
             mobile TEXT,
             password TEXT NOT NULL,
             is_admin INTEGER DEFAULT 0,
+            google_id TEXT UNIQUE,
+            otp_code TEXT,
+            otp_expiry TIMESTAMP,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''' if is_pg else '''
@@ -50,6 +53,9 @@ def init_db():
             mobile TEXT,
             password TEXT NOT NULL,
             is_admin INTEGER DEFAULT 0,
+            google_id TEXT UNIQUE,
+            otp_code TEXT,
+            otp_expiry TIMESTAMP,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     '''
@@ -79,42 +85,139 @@ def init_db():
         )
     '''
 
+    # SQL for Feedback Table
+    feedback_sql = '''
+        CREATE TABLE IF NOT EXISTS feedback (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            name TEXT,
+            email TEXT,
+            college TEXT,
+            rating INTEGER,
+            message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id),
+            name TEXT,
+            email TEXT,
+            college TEXT,
+            rating INTEGER,
+            message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
+    # SQL for User Progress
+    progress_sql = '''
+        CREATE TABLE IF NOT EXISTS user_progress (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            language TEXT NOT NULL,
+            topic_slug TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, language, topic_slug)
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS user_progress (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id),
+            language TEXT NOT NULL,
+            topic_slug TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, language, topic_slug)
+        )
+    '''
+
+    # SQL for User Activity (Heatmap)
+    activity_sql = '''
+        CREATE TABLE IF NOT EXISTS user_activity (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            activity_date DATE DEFAULT CURRENT_DATE,
+            practice_count INTEGER DEFAULT 0,
+            UNIQUE(user_id, activity_date)
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS user_activity (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id),
+            activity_date DATE DEFAULT CURRENT_DATE,
+            practice_count INTEGER DEFAULT 0,
+            UNIQUE(user_id, activity_date)
+        )
+    '''
+
+    # SQL for User Stats
+    stats_sql = '''
+        CREATE TABLE IF NOT EXISTS user_stats (
+            user_id INTEGER PRIMARY KEY REFERENCES users(id),
+            study_minutes INTEGER DEFAULT 0,
+            certificates INTEGER DEFAULT 0,
+            current_streak INTEGER DEFAULT 0,
+            max_streak INTEGER DEFAULT 0,
+            last_activity DATE
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS user_stats (
+            user_id INTEGER PRIMARY KEY REFERENCES users(id),
+            study_minutes INTEGER DEFAULT 0,
+            certificates INTEGER DEFAULT 0,
+            current_streak INTEGER DEFAULT 0,
+            max_streak INTEGER DEFAULT 0,
+            last_activity DATE
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         cursor.execute(users_sql)
         cursor.execute(content_sql)
+        cursor.execute(feedback_sql)
+        cursor.execute(progress_sql)
+        cursor.execute(activity_sql)
+        cursor.execute(stats_sql)
         
-        # Check if is_admin column exists
-        cursor.execute("""
-            SELECT column_name 
-            FROM information_schema.columns 
-            WHERE table_name='users' AND column_name='is_admin'
-        """)
-        if not cursor.fetchone():
-            cursor.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0")
+        # Check and add missing columns to users table
+        cols_to_check = {
+            'is_admin': 'INTEGER DEFAULT 0',
+            'mobile': 'TEXT',
+            'google_id': 'TEXT UNIQUE',
+            'otp_code': 'TEXT',
+            'otp_expiry': 'TIMESTAMP'
+        }
         
-        # Check if mobile column exists
-        cursor.execute("""
-            SELECT column_name 
-            FROM information_schema.columns 
-            WHERE table_name='users' AND column_name='mobile'
-        """)
-        if not cursor.fetchone():
-            cursor.execute("ALTER TABLE users ADD COLUMN mobile TEXT")
+        for col, col_type in cols_to_check.items():
+            cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name='users' AND column_name='{col}'")
+            if not cursor.fetchone():
+                cursor.execute(f"ALTER TABLE users ADD COLUMN {col} {col_type}")
         
         conn.commit()
     else:
         # SQLite
         conn.execute(users_sql)
         conn.execute(content_sql)
+        conn.execute(feedback_sql)
+        conn.execute(progress_sql)
+        conn.execute(activity_sql)
+        conn.execute(stats_sql)
         
         cursor = conn.execute("PRAGMA table_info(users)")
-        columns = [col[1] for col in cursor.fetchall()]
-        if 'is_admin' not in columns:
-            conn.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0")
+        existing_cols = [col[1] for col in cursor.fetchall()]
         
-        if 'mobile' not in columns:
-            conn.execute("ALTER TABLE users ADD COLUMN mobile TEXT")
+        cols_to_check = {
+            'is_admin': 'INTEGER DEFAULT 0',
+            'mobile': 'TEXT',
+            'google_id': 'TEXT UNIQUE',
+            'otp_code': 'TEXT',
+            'otp_expiry': 'TIMESTAMP'
+        }
+        
+        for col, col_type in cols_to_check.items():
+            if col not in existing_cols:
+                conn.execute(f"ALTER TABLE users ADD COLUMN {col} {col_type}")
         
         conn.commit()
     
