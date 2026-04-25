@@ -44,8 +44,8 @@ def init_db_pool():
             if db_url.startswith("postgres://"):
                 db_url = db_url.replace("postgres://", "postgresql://", 1)
             
-            # Create a threaded connection pool: min 1, max 20 connections
-            db_pool = pool.ThreadedConnectionPool(1, 20, db_url)
+            # Use SimpleConnectionPool for serverless (more stable)
+            db_pool = pool.SimpleConnectionPool(1, 10, db_url)
             print("INFO: PostgreSQL connection pool initialized.")
         except Exception as e:
             print(f"ERROR: Failed to initialize connection pool: {e}")
@@ -333,10 +333,10 @@ def admin_required(f):
 
 
 # Initialize database on startup
-try:
-    init_db()
-except Exception as e:
-    print(f"Note: Database initialization skipped or failed: {e}")
+# try:
+#     init_db()
+# except Exception as e:
+#     print(f"Note: Database initialization skipped or failed: {e}")
 
 # Authentication Routes
 @app.route("/signin.html")
