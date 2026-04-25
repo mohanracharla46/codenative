@@ -363,6 +363,8 @@ const TutorialLoader = {
             </div>
         `;
     }
+};
+
 /**
  * Feedback System - Handles proactive feedback prompts
  */
