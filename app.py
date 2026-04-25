@@ -84,9 +84,9 @@ def release_db_connection(conn):
         if isinstance(conn, sqlite3.Connection):
             conn.close()
 
-# Initialize pool on startup
-with app.app_context():
-    init_db_pool()
+# Initialize pool on startup (Commented out for Vercel stability - will init on demand)
+# with app.app_context():
+#     init_db_pool()
 
 def execute_query(conn, query, params=None):
     """Abstraction layer to handle different SQL placeholders (?, %s)"""
