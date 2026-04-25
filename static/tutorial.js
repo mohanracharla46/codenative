@@ -20,6 +20,7 @@ const TutorialLoader = {
         
         this.setupNavigation();
         this.setupSidebar();
+        this.setupBreadcrumbs();
         this.loadTopics();
         
         // Handle initial URL hash if any (for deep linking)
@@ -91,6 +92,30 @@ const TutorialLoader = {
                 }
             });
         }
+    },
+
+    setupBreadcrumbs() {
+        const breadcrumb = document.querySelector('.breadcrumb-label');
+        if (!breadcrumb) return;
+
+        const currentText = breadcrumb.textContent;
+        const langMap = {
+            'c': 'C Language',
+            'python': 'Python',
+            'java': 'Java',
+            'js': 'JavaScript',
+            'web': 'Web Development'
+        };
+        const langDisplay = langMap[this.config.lang] || this.config.lang.toUpperCase();
+
+        breadcrumb.style.textTransform = 'none'; // Allow normal casing for breadcrumbs
+        breadcrumb.innerHTML = `
+            <a href="/" class="bc-item">Home</a>
+            <span class="bc-sep"><i class="fas fa-chevron-right"></i></span>
+            <a href="/roadmap.html" class="bc-item">${langDisplay}</a>
+            <span class="bc-sep"><i class="fas fa-chevron-right"></i></span>
+            <span class="bc-item active">${currentText}</span>
+        `;
     },
 
     async loadTopics() {
