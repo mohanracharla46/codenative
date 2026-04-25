@@ -337,12 +337,22 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text, language: LANG })
             });
+            
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.message || errorData.reply || `Server error: ${res.status}`);
+            }
+            
             const data = await res.json();
             removeTypingIndicator();
             addMessage('bot', renderMarkdown(data.reply || 'No response.'));
         } catch (err) {
             removeTypingIndicator();
-            addMessage('bot', '❌ Could not reach the AI. Please check your connection.');
+            console.error('Chat error:', err);
+            let errorMsg = '❌ Could not reach the AI. Please check your connection.';
+            if (err.message.includes('503')) errorMsg = '⚠️ AI Service is temporarily busy. Please try again in a moment.';
+            if (err.message.includes('429')) errorMsg = '⏳ Daily limit reached. Please try again tomorrow!';
+            addMessage('bot', errorMsg);
         } finally {
             sendBtn.disabled = false;
             input.focus();

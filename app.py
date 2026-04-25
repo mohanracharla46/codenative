@@ -1159,7 +1159,6 @@ def run():
 #  AI CHATBOT ENDPOINT  (Gemini 2.0 Flash)
 # ──────────────────────────────────────────────────────────────
 @app.route('/api/chat', methods=['POST'])
-@login_required
 def ai_chat():
     """AI chatbot powered by Gemini. Context-aware for the current language."""
     try:
