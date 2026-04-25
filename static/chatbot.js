@@ -311,6 +311,8 @@
         safe = safe.replace(/`([^`]+)`/g, '<code style="background:#f1f5f9;padding:2px 5px;border-radius:4px;font-family:monospace;color:#6366f1;">$1</code>');
         // Bold **...**
         safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // Links [text](url)
+        safe = safe.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" style="color:#6366f1;font-weight:700;text-decoration:underline;">$1</a>');
         // Line breaks
         safe = safe.replace(/\n/g, '<br>');
         return safe;
@@ -350,9 +352,15 @@
             removeTypingIndicator();
             console.error('Chat error:', err);
             let errorMsg = '❌ Could not reach the AI. Please check your connection.';
-            if (err.message.includes('503')) errorMsg = '⚠️ AI Service is temporarily busy. Please try again in a moment.';
-            if (err.message.includes('429')) errorMsg = '⏳ Daily limit reached. Please try again tomorrow!';
-            addMessage('bot', errorMsg);
+            
+            if (err.message.includes('401')) {
+                // Use the message from server if possible, otherwise default
+                errorMsg = err.message.length > 20 ? err.message : '⚠️ Please login to use the AI chatbot.';
+            } else {
+                if (err.message.includes('503')) errorMsg = '⚠️ AI Service is temporarily busy. Please try again in a moment.';
+                if (err.message.includes('429')) errorMsg = '⏳ Daily limit reached. Please try again tomorrow!';
+            }
+            addMessage('bot', renderMarkdown(errorMsg));
         } finally {
             sendBtn.disabled = false;
             input.focus();

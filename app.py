@@ -1169,6 +1169,11 @@ def ai_chat():
         if not user_message:
             return jsonify({'reply': 'Please type a question first!'}), 400
 
+        if 'user_id' not in session:
+            return jsonify({
+                'reply': 'Hey ra 😄! AI chat use cheyali ante login avvali. [Ikkada click chesi login avvu ra!](/signin.html)'
+            }), 401
+
         gemini_api_key = os.environ.get('GEMINI_API_KEY', '')
         if not gemini_api_key:
             return jsonify({'reply': '⚠️ AI service not configured. Please set GEMINI_API_KEY in environment variables.'}), 503
