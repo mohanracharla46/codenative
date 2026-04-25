@@ -161,7 +161,11 @@ const TutorialLoader = {
 
     renderTopics(topics) {
         const { sidebarTopics, isLoggedIn, initialSlug } = this.config;
-        if (!topics || topics.length === 0) return;
+        
+        if (!topics || topics.length === 0) {
+            this.showEmptySidebar();
+            return;
+        }
 
         sidebarTopics.innerHTML = '';
         topics.forEach((topic, index) => {
