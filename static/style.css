@@ -168,6 +168,10 @@ body {
     gap: 16px;
 }
 
+.mobile-menu-toggle {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .mobile-only {
         display: flex !important;
