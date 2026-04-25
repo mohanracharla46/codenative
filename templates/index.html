@@ -214,6 +214,7 @@
         @keyframes caretShowStdin { 0%, 40% { opacity: 0; } 45%, 60% { opacity: 1; } 65%, 100% { opacity: 0; } }
 
         /* Mobile Adjustment for Demo */
+        /* Mobile Adjustment for Demo */
         @media (max-width: 768px) {
             .tutorial-grid { padding: 15px 5px; }
             .animated-demo-container { height: auto; padding: 5px; perspective: none; }
@@ -227,27 +228,6 @@
             .sim-run-btn-pro { padding: 8px 15px; font-size: 12px; }
             .demo-progress-steps { flex-direction: column; width: 100%; gap: 6px; }
             .p-step { width: 100%; padding: 8px 12px; font-size: 12px; }
-            
-            /* Mobile Menu Active State */
-            .header-actions {
-                display: none;
-                position: absolute;
-                top: 80px;
-                left: 0;
-                width: 100%;
-                background: white;
-                flex-direction: column;
-                padding: 20px;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-                border-bottom: 1px solid #eee;
-                z-index: 100;
-            }
-            .header-actions.active {
-                display: flex;
-            }
-            #mobileMenuToggle {
-                display: flex !important;
-            }
         }
     </style>
 </head>
@@ -270,7 +250,7 @@
             <a href="/" class="logo"><img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native"></a>
             
             <!-- Mobile Menu Toggle -->
-            <button id="mobileMenuToggle" class="theme-toggle mobile-only" aria-label="Toggle Menu" style="margin-left: auto; margin-right: 15px;">
+            <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle Menu" style="margin-left: auto; margin-right: 15px;">
                 <i class="fas fa-bars"></i>
             </button>
 
