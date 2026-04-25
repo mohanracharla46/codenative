@@ -214,323 +214,75 @@ int main() {
             </button>
         </div>
     </div>
-
-<script>
-    // Initialize Ace Editor
-    const editor = ace.edit("editor");
-    editor.setTheme("ace/theme/monokai");
-    editor.session.setMode("ace/mode/c_cpp");
-    editor.setOptions({
-        fontSize: "16px",
-        showPrintMargin: false,
-        tabSize: 4,
-        useWorker: false
-    });
-
-    // DOM
-    const langSelect = document.getElementById("lang");
-    const runBtn = document.getElementById("runBtn");
-    const clearBtn = document.getElementById("clearBtn");
-    const outputEl = document.getElementById("output");
-
-
-
-    // change mode on language select
-    langSelect.addEventListener("change", () => {
-        const lang = langSelect.value;
-        if (lang == "71") editor.session.setMode("ace/mode/python");
-        else if (lang == "62") editor.session.setMode("ace/mode/java");
-        else if (lang == "50") editor.session.setMode("ace/mode/c_cpp");
-        else if (lang == "54") editor.session.setMode("ace/mode/c_cpp");
-        else if (lang == "63") editor.session.setMode("ace/mode/javascript");
-    });
-
-    // Run handler
-    runBtn.addEventListener("click", runCode);
-    clearBtn.addEventListener("click", () => {
-        outputEl.innerText = "";
-    });
-
-    // runCode: sends code to /run and shows output
-    async function runCode() {
-        try {
-            runBtn.disabled = true;
-            runBtn.innerText = "Running...";
-            outputEl.innerText = "Running...";
-
-            const code = editor.getValue();
-            const language_id = langSelect.value;
-            const stdin = document.getElementById("stdin") ? document.getElementById("stdin").value : "";
-
-            const response = await fetch("/run", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ code, language_id, stdin })
-            });
-
-            const text = await response.text();
-            let data;
-
-            try {
-                data = JSON.parse(text);
-            } catch (err) {
-                outputEl.innerText = `Invalid response from server:\n${text}`;
-                return;
-            }
-
-            outputEl.innerText = data.output || "No output";
-        } catch (err) {
-            outputEl.innerText = `Error: ${err.message}`;
-        } finally {
-            runBtn.disabled = false;
-            runBtn.innerHTML = '<i class="fas fa-play" style="font-size: 10px; margin-right: 6px;"></i> Run Code';
-        }
-    }
-
-    // Dynamic Content Loading
-    const sidebarTopics = document.getElementById('sidebarTopics');
-    const contentBox = document.getElementById('topicContent');
-    const currentLang = 'c';
-    const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
-    const lessonCache = {}; // Client-side cache for instant loading
-
-    async function loadTopics() {
-        const cacheKey = `topics_${currentLang}`;
-        const cachedTopics = localStorage.getItem(cacheKey);
-
-        // Show cached content immediately if available
-        if (cachedTopics) {
-            renderTopics(JSON.parse(cachedTopics));
-        } else {
-            // Show skeleton loader
-            sidebarTopics.innerHTML = `
-                <div class="sidebar-skeleton">
-                    <div class="skeleton-item"></div>
-                    <div class="skeleton-item"></div>
-                    <div class="skeleton-item"></div>
-                    <div class="skeleton-item"></div>
-                </div>
-            `;
-        }
-
-        try {
-            const res = await fetch(`/api/content/${currentLang}`);
-            const topics = await res.json();
-            
-            if (topics.length > 0) {
-                localStorage.setItem(cacheKey, JSON.stringify(topics));
-                renderTopics(topics);
-            }
-        } catch (err) { console.error(err); }
-    }
-
-    function renderTopics(topics) {
-        if (!topics || topics.length === 0) return;
-        sidebarTopics.innerHTML = '';
-        topics.forEach((topic, index) => {
-            const li = document.createElement('li');
-            li.className = `topic ${index === 0 ? 'active' : ''} ${topic.completed ? 'completed' : ''}`;
-            li.dataset.topic = topic.topic_slug;
-            li.dataset.index = index;
-            
-            let lockIcon = '';
-            if (!isLoggedIn && index > 0) {
-                lockIcon = '<i class="fas fa-lock" style="margin-right: 8px; font-size: 12px; opacity: 0.6;"></i>';
-            }
-
-            li.innerHTML = `
-                ${topic.completed ? '<i class="fas fa-check-circle completion-mark"></i>' : ''}
-                ${lockIcon}
-                <span class="topic-title">${topic.topic_title}</span>
-            `;
-            
-            li.onclick = () => {
-                if (!isLoggedIn && index > 0) {
-                    window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
-                    return;
-                }
-                loadSpecificTopic(topic.topic_slug, li);
-            };
-            sidebarTopics.appendChild(li);
+    <script src="/static/tutorial.js"></script>
+    <script>
+        // Initialize Ace Editor
+        const editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/c_cpp");
+        editor.setOptions({
+            fontSize: "16px",
+            showPrintMargin: false,
+            tabSize: 4,
+            useWorker: false
         });
-        
-        // Auto-load first topic if none is active
-        if (!document.querySelector('.topic.active')) {
-             loadSpecificTopic(topics[0].topic_slug, sidebarTopics.firstChild);
-        }
-    }
 
-    async function loadSpecificTopic(slug, el) {
-        try {
-            const topicIndex = el ? parseInt(el.dataset.index) : 0;
-            
-            // Guest protection for non-first topics
-            if (!isLoggedIn && topicIndex > 0) {
-                window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
-                return;
-            }
+        // DOM for playground
+        const langSelect = document.getElementById("lang");
+        const runBtn = document.getElementById("runBtn");
+        const clearBtn = document.getElementById("clearBtn");
+        const outputEl = document.getElementById("output");
 
-            document.querySelectorAll('.topic').forEach(t => t.classList.remove('active'));
-            if(el) el.classList.add('active');
-            
-            // Show loading state only if not in cache
-            if (!lessonCache[slug]) {
-                contentBox.innerHTML = `
-                    <div style="padding: 100px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <i class="fas fa-code-branch fa-beat-fade" style="font-size: 54px; color: #6366f1; margin-bottom: 20px;"></i>
-                        <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Linking C Lesson...</p>
-                    </div>
-                `;
-            }
+        // change mode on language select
+        langSelect.addEventListener("change", () => {
+            const lang = langSelect.value;
+            if (lang == "71") editor.session.setMode("ace/mode/python");
+            else if (lang == "62") editor.session.setMode("ace/mode/java");
+            else if (lang == "50") editor.session.setMode("ace/mode/c_cpp");
+            else if (lang == "54") editor.session.setMode("ace/mode/c_cpp");
+            else if (lang == "63") editor.session.setMode("ace/mode/javascript");
+        });
 
-            // Fetch from cache or API
-            let data;
-            if (lessonCache[slug]) {
-                data = lessonCache[slug];
-            } else {
-                const res = await fetch(`/api/content/${currentLang}/${slug}`);
-                data = await res.json();
-                lessonCache[slug] = data; // Save to cache
-            }
+        // Run handler
+        runBtn.addEventListener("click", async () => {
+            try {
+                runBtn.disabled = true;
+                runBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 10px; margin-right: 6px;"></i> Running...';
+                outputEl.innerText = "Running...";
 
-            // Clear previous custom styles and scripts
-            document.querySelectorAll('.custom-lesson-asset').forEach(el => el.remove());
+                const code = editor.getValue();
+                const language_id = langSelect.value;
+                const stdin = document.getElementById("stdin") ? document.getElementById("stdin").value : "";
 
-            if(data.content_html) {
-                contentBox.innerHTML = data.content_html;
-            }
-
-            // Inject Custom CSS
-            if(data.custom_css) {
-                const styleTag = document.createElement('style');
-                styleTag.className = 'custom-lesson-asset';
-                styleTag.textContent = data.custom_css;
-                document.head.appendChild(styleTag);
-            }
-
-            // Inject Custom JS
-            if(data.custom_js) {
-                const scriptTag = document.createElement('script');
-                scriptTag.className = 'custom-lesson-asset';
-                scriptTag.textContent = `(function() { ${data.custom_js} })();`;
-                document.body.appendChild(scriptTag);
-            }
-
-            // Update Next Lesson Bar
-            const nextEl = el ? el.nextElementSibling : null;
-            const nextBar = document.getElementById('nextLessonBar');
-            if(nextEl && nextEl.classList.contains('topic')) {
-                nextBar.style.display = 'flex';
-                nextBar.querySelector('h3').textContent = nextEl.querySelector('.topic-title').textContent;
-                
-                nextBar.onclick = () => {
-                    const nextIndex = parseInt(nextEl.dataset.index);
-                    if (!isLoggedIn && nextIndex > 0) {
-                        window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
-                        return;
-                    }
-                    nextEl.click();
-                };
-            } else {
-                nextBar.style.display = 'none';
-            }
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            // Record progress and update UI mark (only if logged in)
-            if (isLoggedIn) {
-                const progressRes = await fetch('/api/complete_topic', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ language: currentLang, topic_slug: slug })
+                const response = await fetch("/run", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ code, language_id, stdin })
                 });
 
-                if (progressRes.ok && el) {
-                    el.classList.add('completed');
-                    if (!el.querySelector('.completion-mark')) {
-                        el.insertAdjacentHTML('afterbegin', '<i class="fas fa-check-circle completion-mark"></i>');
-                    }
-                }
-            }
-        } catch(err) { console.error(err); }
-    }
-
-    // Nav buttons
-    const prevBtn = document.getElementById('prevTopic');
-    const nextBtn = document.getElementById('nextTopic');
-    if (prevBtn) {
-        prevBtn.onclick = () => {
-            const active = document.querySelector('.topic.active');
-            if(active && active.previousElementSibling) active.previousElementSibling.click();
-        };
-    }
-    if (nextBtn) {
-        nextBtn.onclick = () => {
-            const active = document.querySelector('.topic.active');
-            if(active && active.nextElementSibling) active.nextElementSibling.click();
-        };
-    }
-
-    // Mobile Sidebar Toggle
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebarClose = document.getElementById('sidebarClose');
-    const sidebar = document.querySelector('.tutorial-sidebar');
-    const menuIcon = sidebarToggle ? sidebarToggle.querySelector('i') : null;
-
-    function toggleSidebar(e) {
-        if(e) e.stopPropagation();
-        sidebar.classList.toggle('active');
-        if (menuIcon) {
-            if(sidebar.classList.contains('active')) {
-                menuIcon.classList.replace('fa-bars', 'fa-times');
-            } else {
-                menuIcon.classList.replace('fa-times', 'fa-bars');
-            }
-        }
-        if (typeof editor !== 'undefined') {
-            setTimeout(() => editor.resize(), 300);
-        }
-    }
-
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', toggleSidebar);
-    }
-
-    if (sidebarClose) {
-        sidebarClose.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-            if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
-            if (typeof editor !== 'undefined') {
-                setTimeout(() => editor.resize(), 300);
+                const data = await response.json();
+                outputEl.innerText = data.output || "No output";
+            } catch (err) {
+                outputEl.innerText = `Error: ${err.message}`;
+            } finally {
+                runBtn.disabled = false;
+                runBtn.innerHTML = '<i class="fas fa-play" style="font-size: 10px; margin-right: 6px;"></i> Run Code';
             }
         });
-    }
 
-    // Close sidebar when clicking outside
-    document.addEventListener('click', (e) => {
-        if (sidebar && sidebar.classList.contains('active')) {
-            if (!sidebar.contains(e.target) && e.target !== sidebarToggle) {
-                sidebar.classList.remove('active');
-                if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
-                if (typeof editor !== 'undefined') {
-                    setTimeout(() => editor.resize(), 300);
-                }
-            }
-        }
-    });
-
-    // Close sidebar when clicking a topic on mobile
-    if (sidebarTopics) {
-        sidebarTopics.addEventListener("click", (e) => {
-            if (e.target.classList.contains('topic') && window.innerWidth <= 1024) {
-                sidebar.classList.remove("active");
-                if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
-            }
+        clearBtn.addEventListener("click", () => {
+            outputEl.innerText = "";
         });
-    }
 
-    window.addEventListener('DOMContentLoaded', loadTopics);
-</script>
+        // Initialize Tutorial Loader
+        window.addEventListener('DOMContentLoaded', () => {
+            TutorialLoader.init({
+                lang: 'c',
+                isLoggedIn: {{ 'true' if session.get('user_id') else 'false' }},
+                editor: editor
+            });
+        });
+    </script>
     <script src="/static/chatbot.js" defer></script>
 </body>
 </html>

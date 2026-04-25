@@ -175,6 +175,7 @@
         </div>
     </div>
 
+    <script src="/static/tutorial.js"></script>
     <script>
         // Initialize Ace Editor
         const editor = ace.edit("editor");
@@ -187,7 +188,7 @@
             useWorker: false
         });
 
-        // DOM
+        // DOM for playground
         const runBtn = document.getElementById("runBtn");
         const clearBtn = document.getElementById("clearBtn");
         const previewIframe = document.getElementById("preview-iframe");
@@ -206,209 +207,15 @@
 
         // Initial preview
         updatePreview();
-    </script>
 
-    <script>
-        // Dynamic Content Loading
-        const sidebarTopics = document.getElementById('sidebarTopics');
-        const contentBox = document.getElementById('topicContent');
-        const currentLang = 'web';
-        const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
-        const lessonCache = {}; // Client-side cache
-
-        async function loadTopics() {
-            try {
-                const res = await fetch(`/api/content/${currentLang}`);
-                const topics = await res.json();
-                
-                if (topics.length > 0) {
-                    sidebarTopics.innerHTML = '';
-                    topics.forEach((topic, index) => {
-                        const li = document.createElement('li');
-                        li.className = `topic ${index === 0 ? 'active' : ''} ${topic.completed ? 'completed' : ''}`;
-                        li.dataset.topic = topic.topic_slug;
-                        li.dataset.index = index;
-                        
-                        // Add lock icon for guests on subsequent lessons
-                        let lockIcon = '';
-                        if (!isLoggedIn && index > 0) {
-                            lockIcon = '<i class="fas fa-lock" style="margin-right: 8px; font-size: 12px; opacity: 0.6;"></i>';
-                        }
-
-                        // Create content with checkmark if completed
-                        li.innerHTML = `
-                            ${topic.completed ? '<i class="fas fa-check-circle completion-mark"></i>' : ''}
-                            ${lockIcon}
-                            <span class="topic-title">${topic.topic_title}</span>
-                        `;
-                        
-                        li.onclick = () => {
-                            if (!isLoggedIn && index > 0) {
-                                window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
-                                return;
-                            }
-                            loadSpecificTopic(topic.topic_slug, li);
-                        };
-                        sidebarTopics.appendChild(li);
-                    });
-                    loadSpecificTopic(topics[0].topic_slug, sidebarTopics.firstChild);
-                }
-            } catch (err) { console.error(err); }
-        }
-
-        async function loadSpecificTopic(slug, el) {
-            try {
-                const topicIndex = el ? parseInt(el.dataset.index) : 0;
-                
-                // Guest protection for non-first topics
-                if (!isLoggedIn && topicIndex > 0) {
-                    window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
-                    return;
-                }
-
-                document.querySelectorAll('.topic').forEach(t => t.classList.remove('active'));
-                if(el) el.classList.add('active');
-                
-                // Show loading state only if not in cache
-                if (!lessonCache[slug]) {
-                    contentBox.innerHTML = `
-                        <div style="padding: 100px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <i class="fab fa-html5 fa-beat-fade" style="font-size: 54px; color: #e34f26; margin-bottom: 20px;"></i>
-                            <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Launching Web Lesson...</p>
-                        </div>
-                    `;
-                }
-
-                // Fetch from cache or API
-                let data;
-                if (lessonCache[slug]) {
-                    data = lessonCache[slug];
-                } else {
-                    const res = await fetch(`/api/content/${currentLang}/${slug}`);
-                    data = await res.json();
-                    lessonCache[slug] = data; // Save to cache
-                }
-
-                // Clear previous custom styles and scripts
-                document.querySelectorAll('.custom-lesson-asset').forEach(el => el.remove());
-
-                if(data.content_html) {
-                    contentBox.innerHTML = data.content_html;
-                }
-
-                // Inject Custom CSS
-                if(data.custom_css) {
-                    const styleTag = document.createElement('style');
-                    styleTag.className = 'custom-lesson-asset';
-                    styleTag.textContent = data.custom_css;
-                    document.head.appendChild(styleTag);
-                }
-
-                // Inject Custom JS
-                if(data.custom_js) {
-                    const scriptTag = document.createElement('script');
-                    scriptTag.className = 'custom-lesson-asset';
-                    scriptTag.textContent = `(function() { ${data.custom_js} })();`;
-                    document.body.appendChild(scriptTag);
-                }
-
-                // Update Next Lesson Bar
-                const nextEl = el ? el.nextElementSibling : null;
-                const nextBar = document.getElementById('nextLessonBar');
-                if(nextEl && nextEl.classList.contains('topic')) {
-                    nextBar.style.display = 'flex';
-                    nextBar.querySelector('h3').textContent = nextEl.querySelector('.topic-title').textContent;
-                    
-                    nextBar.onclick = () => {
-                        const nextIndex = parseInt(nextEl.dataset.index);
-                        if (!isLoggedIn && nextIndex > 0) {
-                            window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
-                            return;
-                        }
-                        nextEl.click();
-                    };
-                } else {
-                    nextBar.style.display = 'none';
-                }
-
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                // Record progress and update UI mark (only if logged in)
-                if (isLoggedIn) {
-                    const progressRes = await fetch('/api/complete_topic', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ language: currentLang, topic_slug: slug })
-                    });
-
-                    if (progressRes.ok && el) {
-                        el.classList.add('completed');
-                        if (!el.querySelector('.completion-mark')) {
-                            el.insertAdjacentHTML('afterbegin', '<i class="fas fa-check-circle completion-mark"></i>');
-                        }
-                    }
-                }
-            } catch(err) { console.error(err); }
-        }
-
-        // Attach Nav Buttons
-        const prevBtn = document.getElementById('prevTopic');
-        const nextBtn = document.getElementById('nextTopic');
-        
-        if (prevBtn) {
-            prevBtn.onclick = () => {
-                const active = document.querySelector('.topic.active');
-                if(active && active.previousElementSibling) active.previousElementSibling.click();
-            };
-        }
-        
-        if (nextBtn) {
-            nextBtn.onclick = () => {
-                const active = document.querySelector('.topic.active');
-                if(active && active.nextElementSibling) active.nextElementSibling.click();
-            };
-        }
-
-        // Mobile Sidebar Toggle
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebarClose = document.getElementById('sidebarClose');
-        const sidebar = document.querySelector('.tutorial-sidebar');
-        const menuIcon = sidebarToggle ? sidebarToggle.querySelector('i') : null;
-
-        function toggleSidebar(e) {
-            if(e) e.stopPropagation();
-            sidebar.classList.toggle('active');
-            if (menuIcon) {
-                if(sidebar.classList.contains('active')) {
-                    menuIcon.classList.replace('fa-bars', 'fa-times');
-                } else {
-                    menuIcon.classList.replace('fa-times', 'fa-bars');
-                }
-            }
-        }
-
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', toggleSidebar);
-        }
-
-        if (sidebarClose) {
-            sidebarClose.addEventListener('click', () => {
-                sidebar.classList.remove('active');
-                if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
+        // Initialize Tutorial Loader
+        window.addEventListener('DOMContentLoaded', () => {
+            TutorialLoader.init({
+                lang: 'web',
+                isLoggedIn: {{ 'true' if session.get('user_id') else 'false' }},
+                editor: editor
             });
-        }
-
-        // Close sidebar when clicking outside
-        document.addEventListener('click', (e) => {
-            if (sidebar && sidebar.classList.contains('active')) {
-                if (!sidebar.contains(e.target) && e.target !== sidebarToggle) {
-                    sidebar.classList.remove('active');
-                    if (menuIcon) menuIcon.classList.replace('fa-times', 'fa-bars');
-                }
-            }
         });
-
-        window.addEventListener('DOMContentLoaded', loadTopics);
     </script>
     <script src="/static/chatbot.js" defer></script>
 </body>

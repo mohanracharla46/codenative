@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from functools import wraps
 import psycopg2
 import psycopg2.extras
+from psycopg2 import pool
 from dotenv import load_dotenv
 import smtplib
 import random
@@ -33,49 +34,59 @@ if not os.environ.get('DATABASE_URL') or '127.0.0.1' in os.environ.get('GOOGLE_R
 
 # Database configuration
 DATABASE = 'users.db'
+db_pool = None
 
-# NOTE: replace with your RapidAPI key
-RAPIDAPI_KEY = "YOUR_RAPIDAPI_KEY_HERE"
-
-# Use this endpoint to request final result immediately
-JUDGE0_URL = "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true"
-HEADERS = {
-    "X-RapidAPI-Key":"10727c2773msh9eabacde663f00fp132fecjsn0ca2559a7d1e",
-    "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-    "Content-Type": "application/json"
-}
-
-# Authentication Decorator
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            return redirect(url_for('signin_page', next=request.path, error='login_required'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def get_db_connection():
-    """Create a database connection (PostgreSQL if DATABASE_URL exists, else SQLite)"""
+def init_db_pool():
+    global db_pool
     db_url = os.environ.get('DATABASE_URL')
-    if db_url:
+    if db_url and not db_pool:
         try:
-            # Handle potential 'postgres://' vs 'postgresql://' issue common in some platforms
             if db_url.startswith("postgres://"):
                 db_url = db_url.replace("postgres://", "postgresql://", 1)
             
-            conn = psycopg2.connect(db_url, cursor_factory=psycopg2.extras.RealDictCursor)
-            return conn
+            # Create a threaded connection pool: min 1, max 20 connections
+            db_pool = pool.ThreadedConnectionPool(1, 20, db_url)
+            print("INFO: PostgreSQL connection pool initialized.")
         except Exception as e:
-            # If we are in production (on Render), we MUST use the cloud DB. Do not fallback.
-            print(f"CRITICAL: Supabase connection failed: {e}")
+            print(f"ERROR: Failed to initialize connection pool: {e}")
+
+def get_db_connection():
+    """Get a connection from the pool (PostgreSQL) or create new (SQLite)"""
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url:
+        try:
+            if not db_pool:
+                init_db_pool()
+            
+            if db_pool:
+                conn = db_pool.getconn()
+                # Ensure connection is valid
+                if conn:
+                    # Set row factory for dict-like access
+                    conn.cursor_factory = psycopg2.extras.RealDictCursor
+                    return conn
+        except Exception as e:
+            print(f"CRITICAL: DB connection failed: {e}")
             if os.environ.get('RENDER'):
                 raise Exception(f"Failed to connect to Supabase: {e}")
     
-    # Only fallback to SQLite if NOT on Render
+    # Fallback to SQLite
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
+
+def release_db_connection(conn):
+    """Release a connection back to the pool if it's a PostgreSQL connection"""
+    if db_pool and hasattr(conn, 'cursor_factory') and not isinstance(conn, sqlite3.Connection):
+        db_pool.putconn(conn)
+    else:
+        # SQLite connections are closed manually
+        if isinstance(conn, sqlite3.Connection):
+            conn.close()
+
+# Initialize pool on startup
+with app.app_context():
+    init_db_pool()
 
 def execute_query(conn, query, params=None):
     """Abstraction layer to handle different SQL placeholders (?, %s)"""
@@ -297,7 +308,7 @@ def init_db():
         
         conn.commit()
     
-    conn.close()
+    release_db_connection(conn)
     print("Database initialized successfully!")
 
 # Admin Decorator
@@ -346,10 +357,10 @@ def signup():
                 (name, email, mobile, hashed_password)
             )
             conn.commit()
-            conn.close()
+            release_db_connection(conn)
             return jsonify({"message": "Account created successfully"}), 201
         except (sqlite3.IntegrityError, psycopg2.IntegrityError):
-            conn.close()
+            release_db_connection(conn)
             return jsonify({"message": "Email already exists"}), 409
 
     except Exception as e:
@@ -376,7 +387,7 @@ def signin():
             'SELECT * FROM users WHERE email = ? AND password = ?',
             (email, hashed_password)
         ).fetchone()
-        conn.close()
+        release_db_connection(conn)
 
         if user:
             # Promote specific email to admin for development/access
@@ -384,7 +395,7 @@ def signin():
                 conn = get_db_connection()
                 execute_query(conn, 'UPDATE users SET is_admin = 1 WHERE id = ?', (user['id'],))
                 conn.commit()
-                conn.close()
+                release_db_connection(conn)
                 user = dict(user)
                 user['is_admin'] = 1
 
@@ -449,7 +460,7 @@ def forgot_password():
     user = execute_query(conn, "SELECT * FROM users WHERE email = ?", (email,)).fetchone()
     
     if not user:
-        conn.close()
+        release_db_connection(conn)
         return jsonify({"message": "Email not found"}), 404
     
     # Generate 6-digit OTP
@@ -458,7 +469,7 @@ def forgot_password():
     
     execute_query(conn, "UPDATE users SET otp_code = ?, otp_expiry = ? WHERE email = ?", (otp, expiry, email))
     conn.commit()
-    conn.close()
+    release_db_connection(conn)
     
     subject = "Your Code Native Password Reset OTP"
     body = f"Hello,\n\nYour OTP for password reset is: {otp}\n\nThis code will expire in 10 minutes.\n\nIf you did not request this, please ignore this email."
@@ -478,7 +489,7 @@ def verify_otp():
     user = execute_query(conn, "SELECT * FROM users WHERE email = ?", (email,)).fetchone()
     
     if not user:
-        conn.close()
+        release_db_connection(conn)
         return jsonify({"message": "User not found"}), 404
     
     # Check OTP and Expiry
@@ -492,10 +503,10 @@ def verify_otp():
             db_expiry = datetime.strptime(db_expiry, '%Y-%m-%dT%H:%M:%S')
 
     if db_otp == otp and datetime.now() < db_expiry:
-        conn.close()
+        release_db_connection(conn)
         return jsonify({"message": "OTP verified successfully"})
     else:
-        conn.close()
+        release_db_connection(conn)
         return jsonify({"message": "Invalid or expired OTP"}), 400
 
 @app.route("/reset-password", methods=["POST"])
@@ -509,7 +520,7 @@ def reset_password():
     user = execute_query(conn, "SELECT * FROM users WHERE email = ?", (email,)).fetchone()
     
     if not user:
-        conn.close()
+        release_db_connection(conn)
         return jsonify({"message": "User not found"}), 404
         
     db_otp = user['otp_code']
@@ -524,10 +535,10 @@ def reset_password():
         hashed_pw = hash_password(new_password)
         execute_query(conn, "UPDATE users SET password = ?, otp_code = NULL, otp_expiry = NULL WHERE email = ?", (hashed_pw, email))
         conn.commit()
-        conn.close()
+        release_db_connection(conn)
         return jsonify({"message": "Password reset successfully!"})
     else:
-        conn.close()
+        release_db_connection(conn)
         return jsonify({"message": "Session expired or invalid. Please try again."}), 400
 
 # Google OAuth Configuration
@@ -638,7 +649,7 @@ def google_callback():
             conn.commit()
             user = execute_query(conn, "SELECT * FROM users WHERE google_id = ?", (google_id,)).fetchone()
 
-    conn.close()
+    release_db_connection(conn)
 
     # Log user in
     session.permanent = True
@@ -716,7 +727,7 @@ def dashboard():
             course_data['last_topic'] = last_topic['topic_title'] if last_topic else "Not started yet"
             user_courses.append(course_data)
 
-    conn.close()
+    release_db_connection(conn)
     
     total_practices = sum([a['practice_count'] for a in activities])
     total_days_active = len(activities)
@@ -776,7 +787,7 @@ def update_user_activity(user_id, is_practice=False):
     except Exception as e:
         print("Error tracking activity:", e)
     finally:
-        conn.close()
+        release_db_connection(conn)
 
 @app.route("/api/complete_topic", methods=["POST"])
 @login_required
@@ -797,7 +808,7 @@ def complete_topic():
             ON CONFLICT (user_id, language, topic_slug) DO NOTHING
         """, (user_id, language, topic_slug))
         conn.commit()
-        conn.close()
+        release_db_connection(conn)
         
         # Also track this as a study activity
         update_user_activity(user_id, is_practice=False)
@@ -887,7 +898,7 @@ def submit_feedback():
             (user_id, name, email, college, rating, message)
         )
         conn.commit()
-        conn.close()
+        release_db_connection(conn)
 
         return jsonify({"message": "Feedback submitted successfully! Thank you. 😊"}), 200
     except Exception as e:
@@ -899,7 +910,7 @@ def submit_feedback():
 def admin_feedback():
     conn = get_db_connection()
     feedbacks = execute_query(conn, "SELECT * FROM feedback ORDER BY created_at DESC").fetchall()
-    conn.close()
+    release_db_connection(conn)
     
     # Calculate stats
     total_responses = len(feedbacks)
@@ -975,7 +986,7 @@ def admin_dashboard():
         """).fetchall()
 
     all_users = execute_query(conn, 'SELECT id, name, email, is_admin, created_at FROM users ORDER BY id DESC').fetchall()
-    conn.close()
+    release_db_connection(conn)
     
     analytics = {
         "lang_labels": lang_labels,
@@ -1007,7 +1018,7 @@ def add_content():
             VALUES (?, ?, ?, ?, ?)
         ''', (language, topic_slug, topic_title, content_html, order_index))
         conn.commit()
-        conn.close()
+        release_db_connection(conn)
         return jsonify({"message": "Content added/updated successfully"}), 200
     except Exception as e:
         return jsonify({"message": str(e)}), 500
@@ -1019,7 +1030,7 @@ def delete_content(id):
         conn = get_db_connection()
         execute_query(conn, 'DELETE FROM content WHERE id = ?', (id,))
         conn.commit()
-        conn.close()
+        release_db_connection(conn)
         return jsonify({"message": "Content deleted successfully"}), 200
     except Exception as e:
         return jsonify({"message": str(e)}), 500
@@ -1043,14 +1054,14 @@ def get_language_content(language):
     else:
         topics = execute_query(conn, 'SELECT topic_slug, topic_title, 0 as completed FROM content WHERE language = ? ORDER BY order_index', (language.lower(),)).fetchall()
     
-    conn.close()
+    release_db_connection(conn)
     return jsonify([dict(t) for t in topics])
 
 @app.route("/api/content/<language>/<topic_slug>")
 def get_topic_content(language, topic_slug):
     conn = get_db_connection()
     topic = execute_query(conn, 'SELECT id, language, topic_slug, topic_title, content_html, order_index, created_at FROM content WHERE language = ? AND topic_slug = ?', (language.lower(), topic_slug)).fetchone()
-    conn.close()
+    release_db_connection(conn)
     if topic:
         return jsonify(dict(topic))
     return jsonify({"message": "Not found"}), 404
