@@ -616,6 +616,10 @@ const QuizSystem = {
                 <div id="quizOptions" class="quiz-options">
                     <!-- Options injected here -->
                 </div>
+
+                <div id="quizFeedback" class="quiz-feedback-msg" style="display: none;">
+                    <!-- Feedback message here -->
+                </div>
                 
                 <div class="quiz-footer">
                     <span id="quizStep">1 of 3</span>
@@ -663,6 +667,21 @@ const QuizSystem = {
             }
             .quiz-next-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
             .quiz-next-btn:not(:disabled):hover { background: #4f46e5; transform: translateY(-2px); }
+            
+            .quiz-feedback-msg {
+                margin-top: -15px; margin-bottom: 25px; padding: 12px 16px;
+                border-radius: 12px; font-weight: 600; font-size: 14px;
+                text-align: center; animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            }
+            .quiz-feedback-msg.correct-msg { background: #ecfdf5; color: #059669; border: 1px solid #10b981; }
+            .quiz-feedback-msg.wrong-msg { background: #fef2f2; color: #dc2626; border: 1px solid #ef4444; }
+
+            @keyframes bounceIn {
+                0% { transform: scale(0.3); opacity: 0; }
+                50% { transform: scale(1.05); opacity: 1; }
+                70% { transform: scale(0.9); }
+                100% { transform: scale(1); }
+            }
         `;
         document.head.appendChild(style);
         document.body.insertAdjacentHTML('beforeend', modalHtml);
@@ -674,15 +693,19 @@ const QuizSystem = {
         document.getElementById('quizQuestion').textContent = q.question;
         document.getElementById('quizStep').textContent = `Question ${this.currentIndex + 1} of ${this.questions.length}`;
         document.getElementById('quizProgress').style.width = `${((this.currentIndex) / this.questions.length) * 100}%`;
+        
+        const feedbackEl = document.getElementById('quizFeedback');
+        feedbackEl.style.display = 'none';
+        feedbackEl.className = 'quiz-feedback-msg';
 
         const optionsEl = document.getElementById('quizOptions');
         optionsEl.innerHTML = '';
 
-        q.options.forEach(opt => {
+        q.options.forEach((opt, idx) => {
             const div = document.createElement('div');
             div.className = 'quiz-option';
             div.textContent = opt;
-            div.onclick = () => this.selectOption(div, opt, q.answer);
+            div.onclick = () => this.selectOption(div, opt, q.answer, idx);
             optionsEl.appendChild(div);
         });
 
@@ -691,15 +714,33 @@ const QuizSystem = {
         nextBtn.textContent = this.currentIndex === this.questions.length - 1 ? 'Finish Assignment' : 'Next Question';
     },
 
-    selectOption(el, selected, correct) {
+    selectOption(el, selected, correct, selectedIndex) {
         if (this.answered) return;
         this.answered = true;
 
+        const isCorrect = (selected === correct);
         const options = document.querySelectorAll('.quiz-option');
-        options.forEach(opt => {
+        options.forEach((opt, idx) => {
             if (opt.textContent === correct) opt.classList.add('correct');
-            else if (opt.textContent === selected) opt.classList.add('wrong');
+            if (idx === selectedIndex && !isCorrect) opt.classList.add('wrong');
         });
+
+        const feedbackEl = document.getElementById('quizFeedback');
+        feedbackEl.style.display = 'block';
+        
+        if (isCorrect) {
+            feedbackEl.classList.add('correct-msg');
+            const messages = [
+                "Arre wah! Correct answer ra! 🥳",
+                "Super! Correct ga cheppav. 👍",
+                "Kiraak! Correct answer idi. 🔥",
+                "Chala baga cheppav, correct! ✅"
+            ];
+            feedbackEl.textContent = messages[Math.floor(Math.random() * messages.length)];
+        } else {
+            feedbackEl.classList.add('wrong-msg');
+            feedbackEl.textContent = "Ayyo! Wrong answer ra. Correct answer check cheyyi. 😅";
+        }
 
         document.getElementById('quizNextBtn').disabled = false;
     },
