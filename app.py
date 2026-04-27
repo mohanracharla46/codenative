@@ -97,7 +97,7 @@ def execute_query(conn, query, params=None):
         if 'INSERT OR REPLACE' in query:
             # We specifically handle the content table case
             query = query.replace('INSERT OR REPLACE INTO content', 'INSERT INTO content')
-            query += ' ON CONFLICT (language, topic_slug) DO UPDATE SET topic_title = EXCLUDED.topic_title, content_html = EXCLUDED.content_html, order_index = EXCLUDED.order_index'
+            query += ' ON CONFLICT (language, topic_slug) DO UPDATE SET topic_title = EXCLUDED.topic_title, content_html = EXCLUDED.content_html, quiz_json = EXCLUDED.quiz_json, custom_css = EXCLUDED.custom_css, custom_js = EXCLUDED.custom_js, order_index = EXCLUDED.order_index'
     
     cursor = conn.cursor()
     cursor.execute(query, params or ())
