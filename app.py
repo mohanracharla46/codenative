@@ -1023,6 +1023,17 @@ def admin_dashboard():
     all_users = execute_query(conn, 'SELECT id, name, email, is_admin, created_at FROM users ORDER BY id DESC').fetchall()
     release_db_connection(conn)
     
+    # Calculate Active Users (DAU/WAU)
+    if is_pg:
+        active_24h = execute_query(conn, "SELECT COUNT(*) as count FROM user_stats WHERE last_active_date >= CURRENT_DATE - INTERVAL '1 day'").fetchone()
+        active_7d = execute_query(conn, "SELECT COUNT(*) as count FROM user_stats WHERE last_active_date >= CURRENT_DATE - INTERVAL '7 days'").fetchone()
+    else:
+        active_24h = execute_query(conn, "SELECT COUNT(*) as count FROM user_stats WHERE last_active_date >= date('now', '-1 day')").fetchone()
+        active_7d = execute_query(conn, "SELECT COUNT(*) as count FROM user_stats WHERE last_active_date >= date('now', '-7 days')").fetchone()
+
+    dau = active_24h['count'] if active_24h and 'count' in dict(active_24h) else (active_24h[0] if active_24h else 0)
+    wau = active_7d['count'] if active_7d and 'count' in dict(active_7d) else (active_7d[0] if active_7d else 0)
+
     # Calculate User Growth Percentage (This week vs Last week)
     if is_pg:
         this_week = execute_query(conn, "SELECT COUNT(*) as count FROM users WHERE created_at > CURRENT_DATE - INTERVAL '7 days'").fetchone()
@@ -1045,7 +1056,9 @@ def admin_dashboard():
         "lang_counts": lang_counts,
         "user_growth": [dict(r) for r in user_growth],
         "practice_trends": [dict(r) for r in practice_trends],
-        "user_growth_rate": growth_rate
+        "user_growth_rate": growth_rate,
+        "dau": dau,
+        "wau": wau
     }
     
     return render_template("admin/dashboard.html", 

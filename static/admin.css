@@ -227,6 +227,7 @@ body.admin-body {
 .icon-users { background: rgba(99, 102, 241, 0.1); color: var(--admin-primary); }
 .icon-lessons { background: rgba(16, 185, 129, 0.1); color: #10b981; }
 .icon-languages { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.icon-active { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
 
 .stat-info { 
     display: flex; 
