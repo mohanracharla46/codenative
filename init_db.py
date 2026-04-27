@@ -68,6 +68,9 @@ def init_db():
             topic_slug TEXT NOT NULL,
             topic_title TEXT NOT NULL,
             content_html TEXT NOT NULL,
+            quiz_json TEXT,
+            custom_css TEXT,
+            custom_js TEXT,
             order_index INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(language, topic_slug)
@@ -79,6 +82,9 @@ def init_db():
             topic_slug TEXT NOT NULL,
             topic_title TEXT NOT NULL,
             content_html TEXT NOT NULL,
+            quiz_json TEXT,
+            custom_css TEXT,
+            custom_js TEXT,
             order_index INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(language, topic_slug)

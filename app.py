@@ -146,6 +146,8 @@ def init_db():
             topic_title TEXT NOT NULL,
             content_html TEXT NOT NULL,
             quiz_json TEXT,
+            custom_css TEXT,
+            custom_js TEXT,
             order_index INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(language, topic_slug)
@@ -158,6 +160,8 @@ def init_db():
             topic_title TEXT NOT NULL,
             content_html TEXT NOT NULL,
             quiz_json TEXT,
+            custom_css TEXT,
+            custom_js TEXT,
             order_index INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(language, topic_slug)
@@ -1338,8 +1342,8 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
         return jsonify({'reply': f'❌ Something went wrong. Please try again later.'}), 500
 
 
+# Initialize database on startup
+init_db()
+
 if __name__ == "__main__":
-    # In SQLite mode we can init local db, for Supabase you did it manually
-    if not os.environ.get('DATABASE_URL'):
-        init_db()
     app.run(debug=True)
