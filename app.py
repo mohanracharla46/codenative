@@ -28,6 +28,10 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = os.environ.get('SECRET_KEY', 'codenative_fallback_secret_key_secure_12345')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
 
+@app.context_processor
+def inject_ga():
+    return dict(ga_id='G-YHH2J3PXVZ')
+
 # Allow HTTP for OAuth in development
 if not os.environ.get('DATABASE_URL') or '127.0.0.1' in os.environ.get('GOOGLE_REDIRECT_URI', ''):
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
