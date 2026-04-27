@@ -19,17 +19,17 @@ const TutorialLoader = {
         this.config = { ...this.config, ...options };
         this.config.sidebarTopics = document.getElementById('sidebarTopics');
         this.config.contentBox = document.getElementById('topicContent');
-        
+
         this.setupNavigation();
         this.setupSidebar();
         this.setupBreadcrumbs();
         this.loadTopics();
-        
+
         // Proactive feedback trigger: Show prompt after 3 minutes of study
         setTimeout(() => {
             if (typeof FeedbackSystem !== 'undefined') FeedbackSystem.showPrompt();
         }, 3 * 60 * 1000);
-        
+
         // Handle initial URL hash if any (for deep linking)
         const hash = window.location.hash.replace('#', '');
         if (hash) {
@@ -41,14 +41,14 @@ const TutorialLoader = {
     setupNavigation() {
         const prevBtn = document.getElementById('prevTopic');
         const nextBtn = document.getElementById('nextTopic');
-        
+
         if (prevBtn) {
             prevBtn.onclick = () => {
                 const active = document.querySelector('.topic.active');
                 if (active && active.previousElementSibling) active.previousElementSibling.click();
             };
         }
-        
+
         if (nextBtn) {
             nextBtn.onclick = () => {
                 const active = document.querySelector('.topic.active');
@@ -146,7 +146,7 @@ const TutorialLoader = {
         try {
             const res = await fetch(`/api/content/${lang}`);
             if (!res.ok) throw new Error('Failed to fetch topics');
-            
+
             const topics = await res.json();
             if (topics && Array.isArray(topics) && topics.length > 0) {
                 localStorage.setItem(cacheKey, JSON.stringify(topics));
@@ -193,7 +193,7 @@ const TutorialLoader = {
 
     renderTopics(topics) {
         const { sidebarTopics, isLoggedIn, initialSlug } = this.config;
-        
+
         if (!topics || topics.length === 0) {
             this.showEmptySidebar();
             return;
@@ -205,7 +205,7 @@ const TutorialLoader = {
             li.className = `topic ${topic.completed ? 'completed' : ''}`;
             li.dataset.topic = topic.topic_slug;
             li.dataset.index = index;
-            
+
             let lockIcon = '';
             if (!isLoggedIn && index > 0) {
                 lockIcon = '<i class="fas fa-lock" style="margin-right: 8px; font-size: 11px; opacity: 0.5;"></i>';
@@ -217,7 +217,7 @@ const TutorialLoader = {
                 ${lockIcon}
                 <span class="topic-title">${topic.topic_title}</span>
             `;
-            
+
             li.onclick = () => {
                 if (!isLoggedIn && index > 0) {
                     window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
@@ -248,14 +248,14 @@ const TutorialLoader = {
 
     async loadSpecificTopic(slug, el) {
         const { lang, lessonCache, contentBox, isLoggedIn } = this.config;
-        
+
         try {
             const topicIndex = el ? parseInt(el.dataset.index) : 0;
-            
+
             // UI state update
             document.querySelectorAll('.topic').forEach(t => t.classList.remove('active'));
             if (el) el.classList.add('active');
-            
+
             // Update URL hash without jumping
             history.replaceState(null, null, `#${slug}`);
 
@@ -293,7 +293,7 @@ const TutorialLoader = {
             this.updateNextLessonBar(el);
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            
+
             // Save progress
             if (isLoggedIn) {
                 this.markTopicComplete(slug, el);
@@ -327,7 +327,7 @@ const TutorialLoader = {
                 if (!el.querySelector('.completion-mark')) {
                     el.insertAdjacentHTML('afterbegin', '<i class="fas fa-check-circle completion-mark"></i>');
                 }
-                
+
                 // Trigger feedback popup if 1st or 2nd lesson
                 const completedCount = document.querySelectorAll('.topic.completed').length;
                 if (completedCount === 1 || completedCount === 2) {
@@ -347,7 +347,7 @@ const TutorialLoader = {
             const nextTitle = nextEl.querySelector('.topic-title').textContent;
             const titleEl = nextBar.querySelector('h3');
             if (titleEl) titleEl.textContent = nextTitle;
-            
+
             nextBar.onclick = () => {
                 if (this.config.currentQuiz && !this.config.quizCompleted) {
                     QuizSystem.show(this.config.currentQuiz, () => {
@@ -393,13 +393,13 @@ const TutorialLoader = {
 
     showContentLoading() {
         if (!this.config.contentBox) return;
-        const icon = this.config.lang === 'python' ? 'fab fa-python' : 
-                   this.config.lang === 'java' ? 'fab fa-java' : 
-                   this.config.lang === 'c' ? 'fas fa-code-branch' : 'fas fa-book-open';
-        
-        const color = this.config.lang === 'python' ? '#3776ab' : 
-                    this.config.lang === 'java' ? '#ed8b00' : 
-                    this.config.lang === 'c' ? '#00599c' : '#6366f1';
+        const icon = this.config.lang === 'python' ? 'fab fa-python' :
+            this.config.lang === 'java' ? 'fab fa-java' :
+                this.config.lang === 'c' ? 'fas fa-code-branch' : 'fas fa-book-open';
+
+        const color = this.config.lang === 'python' ? '#3776ab' :
+            this.config.lang === 'java' ? '#ed8b00' :
+                this.config.lang === 'c' ? '#00599c' : '#6366f1';
 
         this.config.contentBox.innerHTML = `
             <div style="padding: 100px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
@@ -674,10 +674,10 @@ const QuizSystem = {
         document.getElementById('quizQuestion').textContent = q.question;
         document.getElementById('quizStep').textContent = `Question ${this.currentIndex + 1} of ${this.questions.length}`;
         document.getElementById('quizProgress').style.width = `${((this.currentIndex) / this.questions.length) * 100}%`;
-        
+
         const optionsEl = document.getElementById('quizOptions');
         optionsEl.innerHTML = '';
-        
+
         q.options.forEach(opt => {
             const div = document.createElement('div');
             div.className = 'quiz-option';
@@ -717,7 +717,7 @@ const QuizSystem = {
     finish() {
         const modal = document.getElementById('quizModal');
         const card = modal.querySelector('.quiz-card');
-        
+
         card.innerHTML = `
             <div style="text-align: center; padding: 20px 0;">
                 <div class="feedback-icon-wrapper" style="background: #ecfdf5; color: #10b981; width: 80px; height: 80px; margin: 0 auto 25px; border-radius: 25px; display: flex; align-items: center; justify-content: center; font-size: 32px;">
