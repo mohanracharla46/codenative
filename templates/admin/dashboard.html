@@ -49,7 +49,10 @@
                         <p>Total Users</p>
                         <div>{{ users_count }}</div>
                     </div>
-                    <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> 12%</div>
+                    <div class="stat-trend trend-{{ 'up' if analytics.user_growth_rate >= 0 else 'down' }}">
+                        <i class="fas fa-arrow-{{ 'up' if analytics.user_growth_rate >= 0 else 'down' }}"></i> 
+                        {{ analytics.user_growth_rate }}%
+                    </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon icon-lessons"><i class="fas fa-book-open"></i></div>

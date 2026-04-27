@@ -1023,11 +1023,29 @@ def admin_dashboard():
     all_users = execute_query(conn, 'SELECT id, name, email, is_admin, created_at FROM users ORDER BY id DESC').fetchall()
     release_db_connection(conn)
     
+    # Calculate User Growth Percentage (This week vs Last week)
+    if is_pg:
+        this_week = execute_query(conn, "SELECT COUNT(*) as count FROM users WHERE created_at > CURRENT_DATE - INTERVAL '7 days'").fetchone()
+        last_week = execute_query(conn, "SELECT COUNT(*) as count FROM users WHERE created_at BETWEEN CURRENT_DATE - INTERVAL '14 days' AND CURRENT_DATE - INTERVAL '7 days'").fetchone()
+    else:
+        this_week = execute_query(conn, "SELECT COUNT(*) as count FROM users WHERE created_at > date('now', '-7 days')").fetchone()
+        last_week = execute_query(conn, "SELECT COUNT(*) as count FROM users WHERE created_at BETWEEN date('now', '-14 days') AND date('now', '-7 days')").fetchone()
+    
+    tw_count = this_week['count'] if this_week and 'count' in dict(this_week) else (this_week[0] if this_week else 0)
+    lw_count = last_week['count'] if last_week and 'count' in dict(last_week) else (last_week[0] if last_week else 0)
+    
+    growth_rate = 0
+    if lw_count > 0:
+        growth_rate = round(((tw_count - lw_count) / lw_count) * 100, 1)
+    elif tw_count > 0:
+        growth_rate = 100.0
+
     analytics = {
         "lang_labels": lang_labels,
         "lang_counts": lang_counts,
         "user_growth": [dict(r) for r in user_growth],
-        "practice_trends": [dict(r) for r in practice_trends]
+        "practice_trends": [dict(r) for r in practice_trends],
+        "user_growth_rate": growth_rate
     }
     
     return render_template("admin/dashboard.html", 
