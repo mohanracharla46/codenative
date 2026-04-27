@@ -10,7 +10,9 @@ const TutorialLoader = {
         lessonCache: {},
         sidebarTopics: null,
         contentBox: null,
-        editor: null
+        editor: null,
+        currentQuiz: null,
+        quizCompleted: false
     },
 
     init(options) {
@@ -273,6 +275,10 @@ const TutorialLoader = {
                 lessonCache[slug] = data;
             }
 
+            // Store quiz data and reset completion state
+            this.config.currentQuiz = data.quiz_json ? JSON.parse(data.quiz_json) : null;
+            this.config.quizCompleted = false;
+
             // Clean up custom assets from previous lesson
             document.querySelectorAll('.custom-lesson-asset').forEach(asset => asset.remove());
 
@@ -342,7 +348,16 @@ const TutorialLoader = {
             const titleEl = nextBar.querySelector('h3');
             if (titleEl) titleEl.textContent = nextTitle;
             
-            nextBar.onclick = () => nextEl.click();
+            nextBar.onclick = () => {
+                if (this.config.currentQuiz && !this.config.quizCompleted) {
+                    QuizSystem.show(this.config.currentQuiz, () => {
+                        this.config.quizCompleted = true;
+                        nextEl.click();
+                    });
+                } else {
+                    nextEl.click();
+                }
+            };
         } else {
             nextBar.style.display = 'none';
         }
@@ -561,6 +576,168 @@ const FeedbackSystem = {
             console.error('Feedback error:', err);
             submitBtn.disabled = false;
             submitBtn.innerHTML = 'Submit Feedback';
+        }
+    }
+};
+
+/**
+ * Quiz System - Handles end-of-topic assignments
+ */
+const QuizSystem = {
+    callback: null,
+    questions: [],
+    currentIndex: 0,
+    answered: false,
+
+    show(quizData, onComplete) {
+        if (!quizData || !Array.isArray(quizData) || quizData.length === 0) {
+            onComplete();
+            return;
+        }
+        this.questions = quizData;
+        this.callback = onComplete;
+        this.currentIndex = 0;
+        this.answered = false;
+        this.injectModal();
+    },
+
+    injectModal() {
+        if (document.getElementById('quizModal')) return;
+
+        const modalHtml = `
+        <div id="quizModal" class="quiz-overlay">
+            <div class="quiz-card">
+                <div class="quiz-header">
+                    <div class="quiz-badge">ASSIGNMENT</div>
+                    <h3 id="quizQuestion">Loading question...</h3>
+                    <div class="quiz-progress-bar"><div id="quizProgress" class="quiz-progress-fill"></div></div>
+                </div>
+                
+                <div id="quizOptions" class="quiz-options">
+                    <!-- Options injected here -->
+                </div>
+                
+                <div class="quiz-footer">
+                    <span id="quizStep">1 of 3</span>
+                    <button id="quizNextBtn" class="quiz-next-btn" disabled onclick="QuizSystem.next()">Next Question</button>
+                </div>
+            </div>
+        </div>`;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .quiz-overlay {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px);
+                z-index: 10000; display: flex; align-items: center; justify-content: center;
+                animation: fadeIn 0.3s ease;
+            }
+            .quiz-card {
+                background: white; width: 100%; max-width: 500px; padding: 40px;
+                border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+                text-align: left; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            }
+            .quiz-badge {
+                display: inline-block; padding: 4px 12px; background: #eef2ff;
+                color: #6366f1; font-weight: 800; font-size: 10px; border-radius: 20px;
+                letter-spacing: 1px; margin-bottom: 15px;
+            }
+            .quiz-header h3 { font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 20px; line-height: 1.4; }
+            .quiz-progress-bar { height: 6px; background: #f1f5f9; border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
+            .quiz-progress-fill { height: 100%; background: #6366f1; width: 0%; transition: width 0.3s ease; }
+            .quiz-options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+            .quiz-option {
+                padding: 16px 20px; border: 2px solid #f1f5f9; border-radius: 16px;
+                cursor: pointer; transition: 0.2s; font-weight: 500; color: #475569;
+                display: flex; align-items: center; justify-content: space-between;
+            }
+            .quiz-option:hover { border-color: #6366f1; background: #f8fafc; color: #6366f1; }
+            .quiz-option.selected { border-color: #6366f1; background: #eef2ff; color: #6366f1; }
+            .quiz-option.correct { border-color: #10b981 !important; background: #ecfdf5 !important; color: #059669 !important; }
+            .quiz-option.wrong { border-color: #ef4444 !important; background: #fef2f2 !important; color: #dc2626 !important; }
+            .quiz-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 20px; border-top: 1px solid #f1f5f9; }
+            #quizStep { font-size: 13px; color: #94a3b8; font-weight: 600; }
+            .quiz-next-btn {
+                background: #6366f1; color: white; border: none; padding: 12px 24px;
+                border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s;
+            }
+            .quiz-next-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+            .quiz-next-btn:not(:disabled):hover { background: #4f46e5; transform: translateY(-2px); }
+        `;
+        document.head.appendChild(style);
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        this.renderQuestion();
+    },
+
+    renderQuestion() {
+        const q = this.questions[this.currentIndex];
+        document.getElementById('quizQuestion').textContent = q.question;
+        document.getElementById('quizStep').textContent = `Question ${this.currentIndex + 1} of ${this.questions.length}`;
+        document.getElementById('quizProgress').style.width = `${((this.currentIndex) / this.questions.length) * 100}%`;
+        
+        const optionsEl = document.getElementById('quizOptions');
+        optionsEl.innerHTML = '';
+        
+        q.options.forEach(opt => {
+            const div = document.createElement('div');
+            div.className = 'quiz-option';
+            div.textContent = opt;
+            div.onclick = () => this.selectOption(div, opt, q.answer);
+            optionsEl.appendChild(div);
+        });
+
+        const nextBtn = document.getElementById('quizNextBtn');
+        nextBtn.disabled = true;
+        nextBtn.textContent = this.currentIndex === this.questions.length - 1 ? 'Finish Assignment' : 'Next Question';
+    },
+
+    selectOption(el, selected, correct) {
+        if (this.answered) return;
+        this.answered = true;
+
+        const options = document.querySelectorAll('.quiz-option');
+        options.forEach(opt => {
+            if (opt.textContent === correct) opt.classList.add('correct');
+            else if (opt.textContent === selected) opt.classList.add('wrong');
+        });
+
+        document.getElementById('quizNextBtn').disabled = false;
+    },
+
+    next() {
+        this.answered = false;
+        this.currentIndex++;
+        if (this.currentIndex < this.questions.length) {
+            this.renderQuestion();
+        } else {
+            this.finish();
+        }
+    },
+
+    finish() {
+        const modal = document.getElementById('quizModal');
+        const card = modal.querySelector('.quiz-card');
+        
+        card.innerHTML = `
+            <div style="text-align: center; padding: 20px 0;">
+                <div class="feedback-icon-wrapper" style="background: #ecfdf5; color: #10b981; width: 80px; height: 80px; margin: 0 auto 25px; border-radius: 25px; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 style="font-size: 24px; font-weight: 800; color: #1e293b; margin-bottom: 10px;">Assignment Completed!</h2>
+                <p style="color: #64748b; margin-bottom: 30px;">Great job! You've successfully finished the topic assignment. You can now proceed to the next lesson.</p>
+                <button class="quiz-next-btn" style="width: 100%;" onclick="QuizSystem.close()">Continue to Next Lesson</button>
+            </div>
+        `;
+    },
+
+    close() {
+        const modal = document.getElementById('quizModal');
+        if (modal) {
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.remove();
+                if (this.callback) this.callback();
+            }, 300);
         }
     }
 };

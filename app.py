@@ -145,6 +145,7 @@ def init_db():
             topic_slug TEXT NOT NULL,
             topic_title TEXT NOT NULL,
             content_html TEXT NOT NULL,
+            quiz_json TEXT,
             order_index INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(language, topic_slug)
@@ -156,6 +157,7 @@ def init_db():
             topic_slug TEXT NOT NULL,
             topic_title TEXT NOT NULL,
             content_html TEXT NOT NULL,
+            quiz_json TEXT,
             order_index INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(language, topic_slug)
@@ -270,6 +272,11 @@ def init_db():
         cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='feedback' AND column_name='college'")
         if not cursor.fetchone():
             cursor.execute("ALTER TABLE feedback ADD COLUMN college TEXT")
+
+        # Check if quiz_json column exists (Postgres migration)
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='content' AND column_name='quiz_json'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE content ADD COLUMN quiz_json TEXT")
 
         conn.commit()
     else:
@@ -1020,13 +1027,14 @@ def add_content():
         topic_slug = data.get('topic_slug')
         topic_title = data.get('topic_title')
         content_html = data.get('content_html')
+        quiz_json = data.get('quiz_json')
         order_index = data.get('order_index', 0)
 
         conn = get_db_connection()
         execute_query(conn, '''
-            INSERT OR REPLACE INTO content (language, topic_slug, topic_title, content_html, order_index)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (language, topic_slug, topic_title, content_html, order_index))
+            INSERT OR REPLACE INTO content (language, topic_slug, topic_title, content_html, quiz_json, order_index)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (language, topic_slug, topic_title, content_html, quiz_json, order_index))
         conn.commit()
         release_db_connection(conn)
         return jsonify({"message": "Content added/updated successfully"}), 200
@@ -1070,7 +1078,7 @@ def get_language_content(language):
 @app.route("/api/content/<language>/<topic_slug>")
 def get_topic_content(language, topic_slug):
     conn = get_db_connection()
-    topic = execute_query(conn, 'SELECT id, language, topic_slug, topic_title, content_html, order_index, created_at FROM content WHERE language = ? AND topic_slug = ?', (language.lower(), topic_slug)).fetchone()
+    topic = execute_query(conn, 'SELECT id, language, topic_slug, topic_title, content_html, quiz_json, custom_css, custom_js, order_index, created_at FROM content WHERE language = ? AND topic_slug = ?', (language.lower(), topic_slug)).fetchone()
     release_db_connection(conn)
     if topic:
         return jsonify(dict(topic))

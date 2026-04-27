@@ -521,6 +521,10 @@
                         <input type="number" id="order_index" class="form-control" value="0" required>
                     </div>
                     <div class="form-group">
+                        <label>Quiz Assignment (JSON Array)</label>
+                        <textarea id="quiz_json" class="form-control" style="height: 100px; font-family: monospace;" placeholder='[{"question": "...", "options": ["..."], "answer": "..."}]'></textarea>
+                    </div>
+                    <div class="form-group">
                         <label>Tutorial Content</label>
                         <div class="editor-tabs" style="display: flex; gap: 10px; margin-bottom: 8px;">
                             <button type="button" class="btn-sm-tab active" id="btn-rich-text" onclick="setEditorMode('rich')">Rich Text</button>
@@ -644,6 +648,7 @@
                 topic_title: document.getElementById('topic_title').value,
                 topic_slug: document.getElementById('topic_slug').value,
                 order_index: parseInt(document.getElementById('order_index').value),
+                quiz_json: document.getElementById('quiz_json').value,
                 content_html: currentEditorMode === 'rich' ? 
                               document.getElementById('editor-actual').innerHTML : 
                               document.getElementById('raw-html-editor').value
@@ -676,6 +681,7 @@
             document.getElementById('topic_title').value = item.topic_title;
             document.getElementById('topic_slug').value = item.topic_slug;
             document.getElementById('order_index').value = item.order_index;
+            document.getElementById('quiz_json').value = item.quiz_json || '';
             
             const content = item.content_html || '';
             document.getElementById('editor-actual').innerHTML = content;
