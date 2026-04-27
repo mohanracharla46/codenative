@@ -718,10 +718,22 @@ const QuizSystem = {
         if (this.answered) return;
         this.answered = true;
 
-        const isCorrect = (selected === correct);
+        // Handle numeric index answers or string answers
+        let isCorrect = false;
+        if (typeof correct === 'number') {
+            isCorrect = (selectedIndex === correct);
+        } else {
+            isCorrect = (selected === correct);
+        }
+
         const options = document.querySelectorAll('.quiz-option');
         options.forEach((opt, idx) => {
-            if (opt.textContent === correct) opt.classList.add('correct');
+            if (typeof correct === 'number') {
+                if (idx === correct) opt.classList.add('correct');
+            } else {
+                if (opt.textContent === correct) opt.classList.add('correct');
+            }
+            
             if (idx === selectedIndex && !isCorrect) opt.classList.add('wrong');
         });
 
