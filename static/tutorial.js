@@ -277,7 +277,11 @@ const TutorialLoader = {
 
             // Store quiz data and reset completion state
             this.config.currentQuiz = data.quiz_json ? JSON.parse(data.quiz_json) : null;
-            this.config.quizCompleted = false;
+            this.config.currentSlug = slug;
+            
+            // If already completed in sidebar, don't show quiz again
+            const isAlreadyCompleted = el && el.classList.contains('completed');
+            this.config.quizCompleted = isAlreadyCompleted;
 
             // Clean up custom assets from previous lesson
             document.querySelectorAll('.custom-lesson-asset').forEach(asset => asset.remove());
