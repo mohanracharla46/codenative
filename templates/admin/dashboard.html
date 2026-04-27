@@ -525,6 +525,14 @@
                         <textarea id="quiz_json" class="form-control" style="height: 100px; font-family: monospace;" placeholder='[{"question": "...", "options": ["..."], "answer": "..."}]'></textarea>
                     </div>
                     <div class="form-group">
+                        <label>Custom CSS (Optional)</label>
+                        <textarea id="custom_css" class="form-control" style="height: 80px; font-family: monospace;" placeholder=".custom-style { color: red; }"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Custom JS (Optional)</label>
+                        <textarea id="custom_js" class="form-control" style="height: 80px; font-family: monospace;" placeholder="console.log('hello');"></textarea>
+                    </div>
+                    <div class="form-group">
                         <label>Tutorial Content</label>
                         <div class="editor-tabs" style="display: flex; gap: 10px; margin-bottom: 8px;">
                             <button type="button" class="btn-sm-tab active" id="btn-rich-text" onclick="setEditorMode('rich')">Rich Text</button>
@@ -649,6 +657,8 @@
                 topic_slug: document.getElementById('topic_slug').value,
                 order_index: parseInt(document.getElementById('order_index').value),
                 quiz_json: document.getElementById('quiz_json').value,
+                custom_css: document.getElementById('custom_css').value,
+                custom_js: document.getElementById('custom_js').value,
                 content_html: currentEditorMode === 'rich' ? 
                               document.getElementById('editor-actual').innerHTML : 
                               document.getElementById('raw-html-editor').value
@@ -682,6 +692,8 @@
             document.getElementById('topic_slug').value = item.topic_slug;
             document.getElementById('order_index').value = item.order_index;
             document.getElementById('quiz_json').value = item.quiz_json || '';
+            document.getElementById('custom_css').value = item.custom_css || '';
+            document.getElementById('custom_js').value = item.custom_js || '';
             
             const content = item.content_html || '';
             document.getElementById('editor-actual').innerHTML = content;

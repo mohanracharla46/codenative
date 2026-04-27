@@ -968,7 +968,7 @@ def admin_feedback():
 @admin_required
 def admin_dashboard():
     conn = get_db_connection()
-    contents = execute_query(conn, 'SELECT id, language, topic_slug, topic_title, content_html, order_index, created_at FROM content ORDER BY language, order_index').fetchall()
+    contents = execute_query(conn, 'SELECT id, language, topic_slug, topic_title, content_html, quiz_json, custom_css, custom_js, order_index, created_at FROM content ORDER BY language, order_index').fetchall()
     
     # Total Users
     users_count_res = execute_query(conn, 'SELECT COUNT(*) as count FROM users').fetchone()
@@ -1038,13 +1038,15 @@ def add_content():
         topic_title = data.get('topic_title')
         content_html = data.get('content_html')
         quiz_json = data.get('quiz_json')
+        custom_css = data.get('custom_css')
+        custom_js = data.get('custom_js')
         order_index = data.get('order_index', 0)
 
         conn = get_db_connection()
         execute_query(conn, '''
-            INSERT OR REPLACE INTO content (language, topic_slug, topic_title, content_html, quiz_json, order_index)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (language, topic_slug, topic_title, content_html, quiz_json, order_index))
+            INSERT OR REPLACE INTO content (language, topic_slug, topic_title, content_html, quiz_json, custom_css, custom_js, order_index)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (language, topic_slug, topic_title, content_html, quiz_json, custom_css, custom_js, order_index))
         conn.commit()
         release_db_connection(conn)
         return jsonify({"message": "Content added/updated successfully"}), 200
