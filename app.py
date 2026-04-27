@@ -273,10 +273,18 @@ def init_db():
         if not cursor.fetchone():
             cursor.execute("ALTER TABLE feedback ADD COLUMN college TEXT")
 
-        # Check if quiz_json column exists (Postgres migration)
+        # Check if quiz_json/custom_css/custom_js columns exist (Postgres migration)
         cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='content' AND column_name='quiz_json'")
         if not cursor.fetchone():
             cursor.execute("ALTER TABLE content ADD COLUMN quiz_json TEXT")
+        
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='content' AND column_name='custom_css'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE content ADD COLUMN custom_css TEXT")
+            
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='content' AND column_name='custom_js'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE content ADD COLUMN custom_js TEXT")
 
         conn.commit()
     else:
@@ -312,6 +320,8 @@ def init_db():
             conn.execute("ALTER TABLE content ADD COLUMN custom_css TEXT")
         if 'custom_js' not in columns:
             conn.execute("ALTER TABLE content ADD COLUMN custom_js TEXT")
+        if 'quiz_json' not in columns:
+            conn.execute("ALTER TABLE content ADD COLUMN quiz_json TEXT")
         
         conn.commit()
     
