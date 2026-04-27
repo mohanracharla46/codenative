@@ -1,0 +1,21 @@
+# Code Native
+
+Code Native is a premium educational platform providing high-quality coding tutorials in Telugu. We specialize in making complex programming concepts accessible to native Telugu speakers through interactive lessons and a built-in compiler.
+
+## Core Tutorials
+- C Programming: Fundamentals and advanced concepts.
+- Java: Object-oriented programming and application development.
+- Python: Modern scripting, automation, and logic building.
+- Web Development: HTML, CSS, and interactive JavaScript.
+- Roadmap: Step-by-step guidance for becoming a developer.
+
+## Features
+- Interactive Compiler: Practice code directly in the browser.
+- Assignment Quizzes: Test your knowledge after each topic.
+- Telugu Documentation: Explanations in the native language.
+- User Dashboard: Track your learning progress and streaks.
+
+## Links
+- Homepage: https://codenative.co.in/
+- Roadmap: https://codenative.co.in/roadmap.html
+- Sign In: https://codenative.co.in/signin.html

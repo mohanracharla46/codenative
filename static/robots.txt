@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://codenative.co.in/sitemap.xml

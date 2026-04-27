@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, session, redirect, url_for, flash
+from flask import Flask, request, jsonify, render_template, session, redirect, url_for, flash, Response, send_from_directory
 import requests
 import time
 import sqlite3
@@ -1345,6 +1345,45 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
         print(f"Chat error: {e}")
         return jsonify({'reply': f'❌ Something went wrong. Please try again later.'}), 500
 
+
+@app.route('/robots.txt')
+def robots():
+    return send_from_directory(app.static_folder, 'robots.txt')
+
+@app.route('/llms.txt')
+def llms_txt():
+    return send_from_directory(app.static_folder, 'llms.txt')
+
+@app.route('/sitemap.xml')
+def sitemap():
+    base_url = "https://codenative.co.in"
+    static_pages = [
+        "/", "/roadmap.html", "/signin.html", "/videos.html", "/compiler.html",
+        "/privacy-policy.html", "/terms-conditions.html", "/cookie-policy.html"
+    ]
+    
+    conn = get_db_connection()
+    topics = execute_query(conn, "SELECT language, topic_slug FROM content").fetchall()
+    release_db_connection(conn)
+    
+    pages = []
+    for page in static_pages:
+        pages.append(f"{base_url}{page}")
+    
+    # Add tutorial topics
+    for topic in topics:
+        lang = topic['language']
+        slug = topic['topic_slug']
+        # Map internal lang codes to page filenames if needed
+        filename = lang if lang.endswith('.html') else f"{lang}.html"
+        pages.append(f"{base_url}/{filename}#{slug}")
+
+    sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    for page in pages:
+        sitemap_xml += f"  <url><loc>{page}</loc><changefreq>weekly</changefreq></url>\n"
+    sitemap_xml += "</urlset>"
+    
+    return Response(sitemap_xml, mimetype='application/xml')
 
 # Initialize database on startup
 init_db()
