@@ -587,6 +587,7 @@ const QuizSystem = {
     callback: null,
     questions: [],
     currentIndex: 0,
+    correctCount: 0,
     answered: false,
 
     show(quizData, onComplete) {
@@ -597,6 +598,7 @@ const QuizSystem = {
         this.questions = quizData;
         this.callback = onComplete;
         this.currentIndex = 0;
+        this.correctCount = 0;
         this.answered = false;
         this.injectModal();
     },
@@ -741,6 +743,7 @@ const QuizSystem = {
         feedbackEl.style.display = 'block';
         
         if (isCorrect) {
+            this.correctCount++;
             feedbackEl.classList.add('correct-msg');
             const messages = [
                 "Arre wah! Correct answer ra! 🥳",
@@ -776,9 +779,15 @@ const QuizSystem = {
                 <div class="feedback-icon-wrapper" style="background: #ecfdf5; color: #10b981; width: 80px; height: 80px; margin: 0 auto 25px; border-radius: 25px; display: flex; align-items: center; justify-content: center; font-size: 32px;">
                     <i class="fas fa-check-circle"></i>
                 </div>
-                <h2 style="font-size: 24px; font-weight: 800; color: #1e293b; margin-bottom: 10px;">Assignment Completed!</h2>
-                <p style="color: #64748b; margin-bottom: 30px;">Great job! You've successfully finished the topic assignment. You can now proceed to the next lesson.</p>
-                <button class="quiz-next-btn" style="width: 100%;" onclick="QuizSystem.close()">Continue to Next Lesson</button>
+                <h2 style="font-size: 24px; font-weight: 800; color: #1e293b; margin-bottom: 5px;">Assignment Complete! 🎉</h2>
+                <div style="font-size: 18px; font-weight: 700; color: #6366f1; margin-bottom: 20px;">
+                    Score: ${this.correctCount} / ${this.questions.length} Correct
+                </div>
+                <p style="color: #64748b; margin-bottom: 30px; font-size: 15px; line-height: 1.6;">
+                    Super ra! Topic assignment finish chesav. <br> 
+                    Ika next lesson ki velli inka nerchuko! 🚀
+                </p>
+                <button class="quiz-next-btn" style="width: 100%; height: 50px; font-size: 16px;" onclick="QuizSystem.close()">Continue to Next Lesson</button>
             </div>
         `;
     },
