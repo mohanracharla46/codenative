@@ -791,7 +791,7 @@ const QuizSystem = {
 
     finish() {
         const modal = document.getElementById('quizModal');
-        const card = modal.querySelector('.quiz-card');
+        const card = document.getElementById('quizMainScreen') || modal.querySelector('.quiz-card');
 
         card.innerHTML = `
             <div style="text-align: center; padding: 20px 0;">
