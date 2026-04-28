@@ -290,8 +290,9 @@
         div.id = 'cn-typing';
         div.innerHTML = `
             <div class="cn-avatar"><i class="${meta.icon}"></i></div>
-            <div class="cn-bubble">
-                <div class="cn-typing-indicator">
+            <div class="cn-bubble" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 12.5px; font-weight: 600; color: #64748b;">Thinking, please wait</span>
+                <div class="cn-typing-indicator" style="padding: 0; margin-top: 4px;">
                     <span></span><span></span><span></span>
                 </div>
             </div>
