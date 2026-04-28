@@ -1052,6 +1052,20 @@ def admin_dashboard():
     elif tw_count > 0:
         growth_rate = 100.0
 
+    # Dynamic metrics
+    engagement_rate = round((dau / users_count) * 100) if users_count > 0 else 0
+    
+    top_lang = "N/A"
+    if lang_counts:
+        max_idx = lang_counts.index(max(lang_counts))
+        top_lang = lang_labels[max_idx]
+        
+    avg_session = 12
+    if wau > 0 and practice_trends:
+        # Assuming 3 mins per practice, avg over WAU
+        total_practice_last_7d = sum(pt['count'] for pt in practice_trends)
+        avg_session = max(5, min(60, round((total_practice_last_7d * 3) / wau)))
+
     analytics = {
         "lang_labels": lang_labels,
         "lang_counts": lang_counts,
@@ -1059,7 +1073,10 @@ def admin_dashboard():
         "practice_trends": [dict(r) for r in practice_trends],
         "user_growth_rate": growth_rate,
         "dau": dau,
-        "wau": wau
+        "wau": wau,
+        "engagement_rate": engagement_rate,
+        "top_lang": top_lang,
+        "avg_session": avg_session
     }
     
     return render_template("admin/dashboard.html", 

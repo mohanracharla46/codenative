@@ -145,17 +145,17 @@
             <div class="analytics-row">
                 <div class="section-card stats-mini-card">
                     <h3>Engagement Rate</h3>
-                    <div class="value">84%</div>
+                    <div class="value">{{ analytics.engagement_rate }}%</div>
                     <p>Users who practice daily</p>
                 </div>
                 <div class="section-card stats-mini-card">
                     <h3>Popular Language</h3>
-                    <div class="value" id="top-lang">Python</div>
+                    <div class="value" id="top-lang">{{ analytics.top_lang }}</div>
                     <p>Based on content volume</p>
                 </div>
                 <div class="section-card stats-mini-card">
                     <h3>Avg. Session</h3>
-                    <div class="value">12m</div>
+                    <div class="value">{{ analytics.avg_session }}m</div>
                     <p>Estimated study time</p>
                 </div>
             </div>
