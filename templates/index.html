@@ -42,17 +42,34 @@
     <script src="{{ url_for('static', filename='theme.js') }}"></script>
     <style>
         @keyframes cursorBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
         }
+
         @keyframes floatContainer {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
+
         .code-showcase-wrapper {
             animation: floatContainer 5s ease-in-out infinite;
             perspective: 1000px;
         }
+
         .code-showcase {
             width: 100%;
             max-width: 500px;
@@ -62,35 +79,43 @@
             margin: 0 auto;
             transform-style: preserve-3d;
         }
+
         @media (max-width: 480px) {
             .code-showcase {
                 min-width: unset;
             }
+
             .terminal-content {
                 padding: 15px;
                 font-size: 13px;
             }
         }
+
         .code-showcase:hover {
             transform: scale(1.04) translateY(-10px) rotateX(2deg);
             box-shadow: 0 40px 80px -15px rgba(99, 102, 241, 0.4) !important;
         }
+
         .terminal-header {
-            background: #2d2d2d; 
-            padding: 12px 18px; 
-            display: flex; 
+            background: #2d2d2d;
+            padding: 12px 18px;
+            display: flex;
             align-items: center;
-            gap: 8px; 
+            gap: 8px;
             border-bottom: 1px solid #3f3f46;
         }
+
         .terminal-dot {
-            width: 12px; height: 12px; border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
         }
+
         .terminal-content {
-            padding: 24px; 
-            font-family: 'JetBrains Mono', Consolas, monospace; 
-            font-size: 15px; 
-            line-height: 1.7; 
+            padding: 24px;
+            font-family: 'JetBrains Mono', Consolas, monospace;
+            font-size: 15px;
+            line-height: 1.7;
             color: #d4d4d4;
             background: #1e1e1e;
         }
@@ -103,7 +128,7 @@
             background: #f8fafc;
             padding: 60px;
             border-radius: 40px;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .animated-demo-container {
@@ -122,12 +147,14 @@
             width: 100%;
             max-width: 650px;
             background: #161b22;
-            border-radius: 24px; /* More curvy */
-            box-shadow: 0 50px 100px rgba(0,0,0,0.4);
+            border-radius: 24px;
+            /* More curvy */
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.4);
             margin-bottom: 60px;
             position: relative;
-            overflow: hidden; /* Ensure children follow the curve */
-            border: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+            /* Ensure children follow the curve */
+            border: 1px solid rgba(255, 255, 255, 0.05);
             animation: windowOrbit 12s infinite ease-in-out;
         }
 
@@ -137,7 +164,7 @@
             height: 24px;
             color: white;
             font-size: 24px;
-            text-shadow: 0 0 20px rgba(99, 102, 241, 0.8), 0 5px 15px rgba(0,0,0,0.5);
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.8), 0 5px 15px rgba(0, 0, 0, 0.5);
             z-index: 9999;
             pointer-events: none;
             animation: cursorMovePro 15s infinite cubic-bezier(0.65, 0, 0.35, 1);
@@ -151,84 +178,532 @@
             padding: 15px 30px;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .demo-dots { display: flex; gap: 8px; }
-        .demo-dots span { width: 10px; height: 10px; border-radius: 50%; }
-        .demo-dots span:nth-child(1) { background: #ff5f56; }
-        .demo-dots span:nth-child(2) { background: #ffbd2e; }
-        .demo-dots span:nth-child(3) { background: #27c93f; }
-
-        .demo-tab { margin-left: 15px; font-size: 13px; color: #f1f5f9; font-weight: 700; }
-        .demo-body { padding: 40px; font-family: 'JetBrains Mono', monospace; font-size: 20px; background: #0d1117; line-height: 2; }
-
-        .code-line-anim { color: #e2e8f0; opacity: 0; animation: codeTypePro 15s infinite; }
-        .code-keyword { color: #f472b6; }
-        .code-string { color: #fbbf24; }
-
-        .demo-execution-sim { display: grid; grid-template-columns: 1fr 1fr; background: #010409; border-top: 1px solid rgba(255,255,255,0.1); }
-        .sim-input-box, .sim-output-box { padding: 25px; }
-        .sim-input-box { border-right: 1px solid rgba(255,255,255,0.1); }
-        .sim-label { font-size: 11px; font-weight: 900; color: #475569; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.1em; }
-
-        .sim-textarea-pro { background: #0d1117; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; height: 90px; padding: 15px; color: #f1f5f9; font-size: 16px; }
-        .typing-stdin-pro { display: inline-block; overflow: hidden; white-space: nowrap; width: 0; animation: stdinTypePro 15s infinite; }
-        .sim-console-pro { background: rgba(0,0,0,0.3); border-radius: 12px; height: 90px; padding: 15px; color: #10b981; font-size: 14px; font-family: monospace; }
-        .sim-console-pro div { opacity: 0; animation: outputShowPro 15s infinite; }
-        .out-line-spinner { color: #94a3b8; font-size: 12px; }
-
-        .sim-footer { padding: 25px; background: #0d1117; display: flex; justify-content: center; border-top: 1px solid rgba(255,255,255,0.05); }
-        .sim-run-btn-pro { background: #6366f1; color: white; font-size: 15px; font-weight: 800; padding: 12px 30px; border-radius: 12px; animation: runBtnWorkflow 15s infinite; }
-
-        .demo-progress-steps { display: flex; gap: 20px; z-index: 10; }
-        .p-step { background: white; padding: 12px 28px; border-radius: 100px; color: #94a3b8; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); transition: all 0.6s ease; opacity: 0.4; }
-        .p-step span { font-size: 16px; font-weight: 800; color: inherit; }
-
-        @keyframes windowOrbit { 0%, 100% { transform: rotateX(5deg) rotateY(-5deg); } 50% { transform: rotateX(2deg) rotateY(5deg); } }
-        @keyframes cursorMovePro { 
-            0% { top: 60px; left: 60px; opacity: 0; } 
-            5% { opacity: 1; } 
-            25% { top: 100px; left: 60px; } 
-            35% { top: 250px; left: 80px; } 
-            55% { top: 280px; left: 180px; } 
-            65% { top: 435px; left: 310px; } /* Centered click */
-            70% { transform: scale(0.8); } 
-            75% { transform: scale(1); top: 435px; left: 310px; opacity: 1; } 
-            85% { opacity: 0; } 
-            100% { top: 60px; left: 60px; opacity: 0; } 
+        .demo-dots {
+            display: flex;
+            gap: 8px;
         }
-        @keyframes codeTypePro { 0%, 5% { opacity: 0; transform: translateY(5px); } 10%, 90% { opacity: 1; transform: translateY(0); } 95%, 100% { opacity: 0; } }
-        @keyframes stdinTypePro { 0%, 45% { width: 0; } 60%, 90% { width: 100%; } 95%, 100% { width: 0; } }
-        @keyframes runBtnWorkflow { 0%, 69% { background: #6366f1; transform: scale(1); } 70% { background: #4f46e5; transform: scale(0.9); } 71%, 85% { background: #10b981; transform: scale(1); } 90%, 100% { background: #6366f1; } }
-        @keyframes outputShowPro { 0%, 72% { opacity: 0; transform: translateY(10px); } 75%, 90% { opacity: 1; transform: translateY(0); } 95%, 100% { opacity: 0; } }
-        @keyframes stepActive1 { 0%, 34% { background: #4f46e5; color: white; opacity: 1; transform: scale(1.05); box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3); } 35%, 100% { background: white; color: #94a3b8; opacity: 0.4; transform: scale(1); } }
-        @keyframes stepActive2 { 0%, 34% { background: white; color: #94a3b8; opacity: 0.4; } 35%, 64% { background: #4f46e5; color: white; opacity: 1; transform: scale(1.05); box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3); } 65%, 100% { background: white; color: #94a3b8; opacity: 0.4; transform: scale(1); } }
-        @keyframes stepActive3 { 0%, 64% { background: white; color: #94a3b8; opacity: 0.4; } 65%, 92% { background: #10b981; color: white; opacity: 1; transform: scale(1.05); box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3); } 93%, 100% { background: white; color: #94a3b8; opacity: 0.4; transform: scale(1); } }
-        .s-1 { animation: stepActive1 15s infinite; }
-        .s-2 { animation: stepActive2 15s infinite; }
-        .s-3 { animation: stepActive3 15s infinite; }
-        .typing-cursor-editor, .typing-cursor-stdin { display: inline-block; width: 2px; height: 1.2em; background: #6366f1; margin-left: 2px; vertical-align: middle; animation: caretBlink 0.8s infinite; }
-        .typing-cursor-editor { animation-delay: 0s; opacity: 0; animation-name: caretBlink, caretShowEditor; animation-duration: 0.8s, 15s; }
-        .typing-cursor-stdin { animation-delay: 0s; opacity: 0; animation-name: caretBlink, caretShowStdin; animation-duration: 0.8s, 15s; }
-        @keyframes caretShowEditor { 0%, 5% { opacity: 0; } 10%, 25% { opacity: 1; } 30%, 100% { opacity: 0; } }
-        @keyframes caretShowStdin { 0%, 40% { opacity: 0; } 45%, 60% { opacity: 1; } 65%, 100% { opacity: 0; } }
+
+        .demo-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .demo-dots span:nth-child(1) {
+            background: #ff5f56;
+        }
+
+        .demo-dots span:nth-child(2) {
+            background: #ffbd2e;
+        }
+
+        .demo-dots span:nth-child(3) {
+            background: #27c93f;
+        }
+
+        .demo-tab {
+            margin-left: 15px;
+            font-size: 13px;
+            color: #f1f5f9;
+            font-weight: 700;
+        }
+
+        .demo-body {
+            padding: 40px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            background: #0d1117;
+            line-height: 2;
+        }
+
+        .code-line-anim {
+            color: #e2e8f0;
+            opacity: 0;
+            animation: codeTypePro 15s infinite;
+        }
+
+        .code-keyword {
+            color: #f472b6;
+        }
+
+        .code-string {
+            color: #fbbf24;
+        }
+
+        .demo-execution-sim {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #010409;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sim-input-box,
+        .sim-output-box {
+            padding: 25px;
+        }
+
+        .sim-input-box {
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sim-label {
+            font-size: 11px;
+            font-weight: 900;
+            color: #475569;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .sim-textarea-pro {
+            background: #0d1117;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            height: 90px;
+            padding: 15px;
+            color: #f1f5f9;
+            font-size: 16px;
+        }
+
+        .typing-stdin-pro {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            width: 0;
+            animation: stdinTypePro 15s infinite;
+        }
+
+        .sim-console-pro {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            height: 90px;
+            padding: 15px;
+            color: #10b981;
+            font-size: 14px;
+            font-family: monospace;
+        }
+
+        .sim-console-pro div {
+            opacity: 0;
+            animation: outputShowPro 15s infinite;
+        }
+
+        .out-line-spinner {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .sim-footer {
+            padding: 25px;
+            background: #0d1117;
+            display: flex;
+            justify-content: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sim-run-btn-pro {
+            background: #6366f1;
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+            padding: 12px 30px;
+            border-radius: 12px;
+            animation: runBtnWorkflow 15s infinite;
+        }
+
+        .demo-progress-steps {
+            display: flex;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .p-step {
+            background: white;
+            padding: 12px 28px;
+            border-radius: 100px;
+            color: #94a3b8;
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.6s ease;
+            opacity: 0.4;
+        }
+
+        .p-step span {
+            font-size: 16px;
+            font-weight: 800;
+            color: inherit;
+        }
+
+        @keyframes windowOrbit {
+
+            0%,
+            100% {
+                transform: rotateX(5deg) rotateY(-5deg);
+            }
+
+            50% {
+                transform: rotateX(2deg) rotateY(5deg);
+            }
+        }
+
+        @keyframes cursorMovePro {
+            0% {
+                top: 60px;
+                left: 60px;
+                opacity: 0;
+            }
+
+            5% {
+                opacity: 1;
+            }
+
+            25% {
+                top: 100px;
+                left: 60px;
+            }
+
+            35% {
+                top: 250px;
+                left: 80px;
+            }
+
+            55% {
+                top: 280px;
+                left: 180px;
+            }
+
+            65% {
+                top: 435px;
+                left: 310px;
+            }
+
+            /* Centered click */
+            70% {
+                transform: scale(0.8);
+            }
+
+            75% {
+                transform: scale(1);
+                top: 435px;
+                left: 310px;
+                opacity: 1;
+            }
+
+            85% {
+                opacity: 0;
+            }
+
+            100% {
+                top: 60px;
+                left: 60px;
+                opacity: 0;
+            }
+        }
+
+        @keyframes codeTypePro {
+
+            0%,
+            5% {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            10%,
+            90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            95%,
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes stdinTypePro {
+
+            0%,
+            45% {
+                width: 0;
+            }
+
+            60%,
+            90% {
+                width: 100%;
+            }
+
+            95%,
+            100% {
+                width: 0;
+            }
+        }
+
+        @keyframes runBtnWorkflow {
+
+            0%,
+            69% {
+                background: #6366f1;
+                transform: scale(1);
+            }
+
+            70% {
+                background: #4f46e5;
+                transform: scale(0.9);
+            }
+
+            71%,
+            85% {
+                background: #10b981;
+                transform: scale(1);
+            }
+
+            90%,
+            100% {
+                background: #6366f1;
+            }
+        }
+
+        @keyframes outputShowPro {
+
+            0%,
+            72% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            75%,
+            90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            95%,
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes stepActive1 {
+
+            0%,
+            34% {
+                background: #4f46e5;
+                color: white;
+                opacity: 1;
+                transform: scale(1.05);
+                box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3);
+            }
+
+            35%,
+            100% {
+                background: white;
+                color: #94a3b8;
+                opacity: 0.4;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes stepActive2 {
+
+            0%,
+            34% {
+                background: white;
+                color: #94a3b8;
+                opacity: 0.4;
+            }
+
+            35%,
+            64% {
+                background: #4f46e5;
+                color: white;
+                opacity: 1;
+                transform: scale(1.05);
+                box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3);
+            }
+
+            65%,
+            100% {
+                background: white;
+                color: #94a3b8;
+                opacity: 0.4;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes stepActive3 {
+
+            0%,
+            64% {
+                background: white;
+                color: #94a3b8;
+                opacity: 0.4;
+            }
+
+            65%,
+            92% {
+                background: #10b981;
+                color: white;
+                opacity: 1;
+                transform: scale(1.05);
+                box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
+            }
+
+            93%,
+            100% {
+                background: white;
+                color: #94a3b8;
+                opacity: 0.4;
+                transform: scale(1);
+            }
+        }
+
+        .s-1 {
+            animation: stepActive1 15s infinite;
+        }
+
+        .s-2 {
+            animation: stepActive2 15s infinite;
+        }
+
+        .s-3 {
+            animation: stepActive3 15s infinite;
+        }
+
+        .typing-cursor-editor,
+        .typing-cursor-stdin {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background: #6366f1;
+            margin-left: 2px;
+            vertical-align: middle;
+            animation: caretBlink 0.8s infinite;
+        }
+
+        .typing-cursor-editor {
+            animation-delay: 0s;
+            opacity: 0;
+            animation-name: caretBlink, caretShowEditor;
+            animation-duration: 0.8s, 15s;
+        }
+
+        .typing-cursor-stdin {
+            animation-delay: 0s;
+            opacity: 0;
+            animation-name: caretBlink, caretShowStdin;
+            animation-duration: 0.8s, 15s;
+        }
+
+        @keyframes caretShowEditor {
+
+            0%,
+            5% {
+                opacity: 0;
+            }
+
+            10%,
+            25% {
+                opacity: 1;
+            }
+
+            30%,
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes caretShowStdin {
+
+            0%,
+            40% {
+                opacity: 0;
+            }
+
+            45%,
+            60% {
+                opacity: 1;
+            }
+
+            65%,
+            100% {
+                opacity: 0;
+            }
+        }
 
         /* Mobile Adjustment for Demo */
         /* Mobile Adjustment for Demo */
         @media (max-width: 768px) {
-            .tutorial-grid { padding: 15px 5px; }
-            .animated-demo-container { height: auto; padding: 5px; perspective: none; }
-            .demo-window-3d { width: 95%; max-width: 100%; transform: none; margin: 0 auto 20px; animation: none; }
-            .simulated-cursor-pro { display: none; }
-            .demo-body { font-size: 13px; padding: 15px 10px; line-height: 1.5; }
-            .demo-execution-sim { grid-template-columns: 1fr; }
-            .sim-input-box, .sim-output-box { padding: 15px; }
-            .sim-textarea-pro, .sim-console-pro { height: 60px; font-size: 13px; }
-            .sim-footer { padding: 10px; }
-            .sim-run-btn-pro { padding: 8px 15px; font-size: 12px; }
-            .demo-progress-steps { flex-direction: column; width: 100%; gap: 6px; }
-            .p-step { width: 100%; padding: 8px 12px; font-size: 12px; }
+            .tutorial-grid {
+                padding: 15px 5px;
+            }
+
+            .animated-demo-container {
+                height: auto;
+                padding: 5px;
+                perspective: none;
+            }
+
+            .demo-window-3d {
+                width: 95%;
+                max-width: 100%;
+                transform: none;
+                margin: 0 auto 20px;
+                animation: none;
+            }
+
+            .simulated-cursor-pro {
+                display: none;
+            }
+
+            .demo-body {
+                font-size: 13px;
+                padding: 15px 10px;
+                line-height: 1.5;
+            }
+
+            .demo-execution-sim {
+                grid-template-columns: 1fr;
+            }
+
+            .sim-input-box,
+            .sim-output-box {
+                padding: 15px;
+            }
+
+            .sim-textarea-pro,
+            .sim-console-pro {
+                height: 60px;
+                font-size: 13px;
+            }
+
+            .sim-footer {
+                padding: 10px;
+            }
+
+            .sim-run-btn-pro {
+                padding: 8px 15px;
+                font-size: 12px;
+            }
+
+            .demo-progress-steps {
+                flex-direction: column;
+                width: 100%;
+                gap: 6px;
+            }
+
+            .p-step {
+                width: 100%;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -239,7 +714,9 @@
         style="position: fixed; top: -150px; right: 20px; z-index: 2000; max-width: calc(100% - 40px); min-width: 280px; transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);">
         <div class="alert-content"
             style="background: #ffffff; color: #1e293b; padding: 16px 20px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1); border: 1px solid #f1f5f9; display: flex; align-items: center; gap: 12px;">
-            <div class="alert-icon" style="width: 40px; height: 40px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">👋</div>
+            <div class="alert-icon"
+                style="width: 40px; height: 40px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                👋</div>
             <div class="alert-message" id="logoutMessage" style="flex: 1; font-size: 14px; font-weight: 700;"></div>
             <button class="alert-close" onclick="closeLogoutAlert()"
                 style="background: #f1f5f9; border: none; color: #64748b; width: 28px; height: 28px; border-radius: 8px; font-size: 16px; cursor: pointer;">&times;</button>
@@ -248,20 +725,24 @@
 
     <header class="header">
         <div class="container header-inner">
-            <a href="/" class="logo"><img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native"></a>
-            
+            <a href="/" class="logo"><img src="{{ url_for('static', filename='images/CodeNative.png') }}"
+                    alt="Code Native"></a>
+
             <!-- Mobile Menu Toggle -->
-            <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle Menu" style="margin-left: auto; margin-right: 15px;">
+            <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle Menu"
+                style="margin-left: auto; margin-right: 15px;">
                 <i class="fas fa-bars"></i>
             </button>
 
             <div class="header-actions" id="headerActions">
                 {% if session.get('is_admin') %}
-                <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock" style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
+                <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock"
+                        style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
                 {% endif %}
-                
+
                 {% if session.get('user_name') %}
-                <a href="/dashboard" class="btn-signup user-btn"><i class="fas fa-user-circle" style="margin-right: 8px; font-size: 16px;"></i>Dashboard</a>
+                <a href="/dashboard" class="btn-signup user-btn"><i class="fas fa-user-circle"
+                        style="margin-right: 8px; font-size: 16px;"></i>Dashboard</a>
                 {% else %}
                 <a href="/signin.html" class="btn-signup">Sign in</a>
                 {% endif %}
@@ -285,23 +766,27 @@
         <div class="container">
             <main class="content">
                 <section class="left-section">
-                    <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 50px; color: var(--primary-color); font-size: 13px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 20px; text-transform: uppercase; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.1);">
-                        <i class="fas fa-medal" style="color: #fbbf24; font-size: 16px;"></i> India's First Telugu Coding Platform
+                    <div
+                        style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 50px; color: var(--primary-color); font-size: 13px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 20px; text-transform: uppercase; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.1);">
+                        <i class="fas fa-medal" style="color: #fbbf24; font-size: 16px;"></i> India's First Telugu
+                        Coding Platform
                     </div>
                     <h1>Learn Coding in <br> <span style="color: var(--primary-color);">Telugu</span></h1>
                     <p class="tagline">
                         <span class="static">Your New key to</span>
-                        <span class="dynamic" aria-live="polite"><span class="dynamic-span" id="typed"></span><span class="caret" aria-hidden="true"></span></span>
+                        <span class="dynamic" aria-live="polite"><span class="dynamic-span" id="typed"></span><span
+                                class="caret" aria-hidden="true"></span></span>
                     </p>
                     <p class="description">
-                        Master programming languages with our comprehensive tutorials and interactive compiler. Start your
+                        Master programming languages with our comprehensive tutorials and interactive compiler. Start
+                        your
                         journey today and build your future in tech.
                     </p>
                     <div class="cta-wrapper">
                         {% if session.get('user_name') %}
-                        <a href="/roadmap.html" class="btn-cta">Start Learning Free 🚀</a>
+                        <a href="/roadmap.html" class="btn-cta">Start Learning Free </a>
                         {% else %}
-                        <a href="/signin.html" class="btn-cta">Start Learning Free 🚀</a>
+                        <a href="/signin.html" class="btn-cta">Start Learning Free </a>
                         {% endif %}
                     </div>
                 </section>
@@ -315,163 +800,215 @@
                 <h2 class="c-head">C Programming</h2>
                 <p class="c-tagline">The Foundation of Every Great Developer.</p>
                 <div class="action-buttons">
-                    <a href="/c.html" class="c-button btn-learn"><i class="fas fa-book-open"></i> Learn C Programming</a>
-                    <a href="/videos.html" class="c-button btn-video"><i class="fas fa-play-circle"></i> Video Tutorial</a>
-                    <a href="/compiler.html?lang=c" class="c-button btn-reference"><i class="fas fa-terminal"></i> C Compiler</a>
+                    <a href="/c.html" class="c-button btn-learn"><i class="fas fa-book-open"></i> Learn C
+                        Programming</a>
+                    <a href="/videos.html" class="c-button btn-video"><i class="fas fa-play-circle"></i> Video
+                        Tutorial</a>
+                    <a href="/compiler.html?lang=c" class="c-button btn-reference"><i class="fas fa-terminal"></i> C
+                        Compiler</a>
                 </div>
             </div>
 
             <div class="c-right-section reveal-right">
                 <div class="code-showcase-wrapper">
-                    <div class="code-showcase" style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 89, 156, 0.3); border: 1px solid #333; position: relative;">
+                    <div class="code-showcase"
+                        style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 89, 156, 0.3); border: 1px solid #333; position: relative;">
                         <div class="terminal-header">
                             <span class="terminal-dot" style="background:#ff5f56;"></span>
                             <span class="terminal-dot" style="background:#ffbd2e;"></span>
                             <span class="terminal-dot" style="background:#27c93f;"></span>
-                            <span style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">main.c</span>
+                            <span
+                                style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">main.c</span>
                         </div>
                         <div class="terminal-content">
-                            <span style="color: #c586c0;">#include</span> <span style="color: #ce9178;">&lt;stdio.h&gt;</span><br><br>
+                            <span style="color: #c586c0;">#include</span> <span
+                                style="color: #ce9178;">&lt;stdio.h&gt;</span><br><br>
                             <span style="color: #569cd6;">int</span> <span style="color: #dcdcaa;">main</span>() {<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #569cd6;">char</span>* ptr = <span style="color: #ce9178;">"Excellence"</span>;<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #dcdcaa;">printf</span>(<span style="color: #ce9178;">"%s begins here.\n"</span>, ptr);<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #c586c0;">return</span> <span style="color: #b5cea8;">0</span>;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #569cd6;">char</span>* ptr = <span
+                                style="color: #ce9178;">"Excellence"</span>;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #dcdcaa;">printf</span>(<span
+                                style="color: #ce9178;">"%s begins here.\n"</span>, ptr);<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #c586c0;">return</span> <span
+                                style="color: #b5cea8;">0</span>;<br>
                             }<br>
-                            <div style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle; margin-top: 5px;"></div>
+                            <div
+                                style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle; margin-top: 5px;">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
- 
+
         <section class="java-container" id="java-course">
             <div class="c-left-section reveal-right">
                 <h2 class="java-head">Java</h2>
                 <p class="java-tagline">Powering the World's Applications.</p>
                 <div class="action-buttons">
                     <a href="/java.html" class="c-button btn-learn"><i class="fas fa-book-open"></i> Learn Java</a>
-                    <a href="/videos.html" class="c-button btn-video"><i class="fas fa-play-circle"></i> Video Tutorial</a>
-                    <a href="/compiler.html?lang=java" class="c-button btn-reference"><i class="fas fa-terminal"></i> Java Compiler</a>
+                    <a href="/videos.html" class="c-button btn-video"><i class="fas fa-play-circle"></i> Video
+                        Tutorial</a>
+                    <a href="/compiler.html?lang=java" class="c-button btn-reference"><i class="fas fa-terminal"></i>
+                        Java Compiler</a>
                 </div>
             </div>
 
             <div class="c-right-section reveal-left">
                 <div class="code-showcase-wrapper" style="animation-duration: 6.5s;">
-                    <div class="code-showcase" style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(237, 139, 0, 0.3); border: 1px solid #333; position: relative;">
+                    <div class="code-showcase"
+                        style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(237, 139, 0, 0.3); border: 1px solid #333; position: relative;">
                         <div class="terminal-header">
                             <span class="terminal-dot" style="background:#ff5f56;"></span>
                             <span class="terminal-dot" style="background:#ffbd2e;"></span>
                             <span class="terminal-dot" style="background:#27c93f;"></span>
-                            <span style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">App.java</span>
+                            <span
+                                style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">App.java</span>
                         </div>
                         <div class="terminal-content">
-                            <span style="color: #c586c0;">public class</span> <span style="color: #4ec9b0;">App</span> {<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #c586c0;">public static void</span> <span style="color: #dcdcaa;">main</span>(String[] args) {<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.out.<span style="color: #dcdcaa;">println</span>(<span style="color: #ce9178;">"Hello, Enterprise!"</span>);<br>
+                            <span style="color: #c586c0;">public class</span> <span style="color: #4ec9b0;">App</span>
+                            {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #c586c0;">public static void</span> <span
+                                style="color: #dcdcaa;">main</span>(String[] args) {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.out.<span
+                                style="color: #dcdcaa;">println</span>(<span style="color: #ce9178;">"Hello,
+                                Enterprise!"</span>);<br>
                             &nbsp;&nbsp;&nbsp;&nbsp;}<br>
                             }<br>
-                            <div style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle; margin-top: 10px;"></div>
+                            <div
+                                style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle; margin-top: 10px;">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
- 
+
         <section class="c-container" id="python-course">
             <div class="c-left-section reveal-left">
                 <h2 class="c-head">Python</h2>
                 <p class="c-tagline">The Language That Powers the Future.</p>
                 <div class="action-buttons">
                     <a href="/python.html" class="c-button btn-learn"><i class="fas fa-book-open"></i> Learn Python</a>
-                    <a href="/videos.html" class="c-button btn-video"><i class="fas fa-play-circle"></i> Video Tutorial</a>
-                    <a href="/compiler.html?lang=python" class="c-button btn-reference"><i class="fas fa-terminal"></i> Python Compiler</a>
+                    <a href="/videos.html" class="c-button btn-video"><i class="fas fa-play-circle"></i> Video
+                        Tutorial</a>
+                    <a href="/compiler.html?lang=python" class="c-button btn-reference"><i class="fas fa-terminal"></i>
+                        Python Compiler</a>
                 </div>
             </div>
 
             <div class="c-right-section reveal-right">
                 <div class="code-showcase-wrapper" style="animation-duration: 6s;">
-                    <div class="code-showcase" style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(55, 118, 171, 0.3); border: 1px solid #333; position: relative;">
+                    <div class="code-showcase"
+                        style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(55, 118, 171, 0.3); border: 1px solid #333; position: relative;">
                         <div class="terminal-header">
                             <span class="terminal-dot" style="background:#ff5f56;"></span>
                             <span class="terminal-dot" style="background:#ffbd2e;"></span>
                             <span class="terminal-dot" style="background:#27c93f;"></span>
-                            <span style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">main.py</span>
+                            <span
+                                style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">main.py</span>
                         </div>
                         <div class="terminal-content">
-                            <span style="color: #c586c0;">def</span> <span style="color: #dcdcaa;">unleash_potential</span>():<br>
+                            <span style="color: #c586c0;">def</span> <span
+                                style="color: #dcdcaa;">unleash_potential</span>():<br>
                             &nbsp;&nbsp;&nbsp;&nbsp;vision = <span style="color: #ce9178;">"Build the future"</span><br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #c586c0;">while</span> <span style="color: #569cd6;">True</span>:<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #dcdcaa;">learn</span>(), <span style="color: #dcdcaa;">code</span>(), <span style="color: #dcdcaa;">deploy</span>()<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #c586c0;">while</span> <span
+                                style="color: #569cd6;">True</span>:<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                                style="color: #dcdcaa;">learn</span>(), <span style="color: #dcdcaa;">code</span>(),
+                            <span style="color: #dcdcaa;">deploy</span>()<br>
                             <span style="color: #6a9955;"># Powered by CodeNative</span><br>
                             <br>
-                            <div style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle;"></div>
+                            <div
+                                style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle;">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
- 
+
         <section class="java-container" id="web-course">
             <div class="c-left-section reveal-right">
                 <h2 class="java-head">HTML & CSS</h2>
                 <p class="java-tagline">Build Beautiful and Responsive Websites.</p>
                 <div class="action-buttons">
                     <a href="/web.html" class="c-button btn-learn"><i class="fas fa-book-open"></i> Learn HTML & CSS</a>
-                    <a href="/videos.html" class="c-button btn-video"><i class="fas fa-play-circle"></i> Video Tutorial</a>
-                    <a href="/web.html#playground" class="c-button btn-reference"><i class="fas fa-terminal"></i> HTML Compiler</a>
+                    <a href="/videos.html" class="c-button btn-video"><i class="fas fa-play-circle"></i> Video
+                        Tutorial</a>
+                    <a href="/web.html#playground" class="c-button btn-reference"><i class="fas fa-terminal"></i> HTML
+                        Compiler</a>
                 </div>
             </div>
 
             <div class="c-right-section reveal-left">
                 <div class="code-showcase-wrapper" style="animation-duration: 5.5s;">
-                    <div class="code-showcase" style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(240, 101, 41, 0.3); border: 1px solid #333; position: relative;">
+                    <div class="code-showcase"
+                        style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(240, 101, 41, 0.3); border: 1px solid #333; position: relative;">
                         <div class="terminal-header">
                             <span class="terminal-dot" style="background:#ff5f56;"></span>
                             <span class="terminal-dot" style="background:#ffbd2e;"></span>
                             <span class="terminal-dot" style="background:#27c93f;"></span>
-                            <span style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">index.html</span>
+                            <span
+                                style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">index.html</span>
                         </div>
                         <div class="terminal-content">
                             <span style="color: #808080;">&lt;!DOCTYPE html&gt;</span><br>
                             <span style="color: #569cd6;">&lt;html&gt;</span><br>
-                            &nbsp;&nbsp;<span style="color: #569cd6;">&lt;body <span style="color: #9cdcfe;">class</span>=<span style="color: #ce9178;">"beautiful"</span>&gt;</span><br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #569cd6;">&lt;h1&gt;</span>Pixels come to life<span style="color: #569cd6;">&lt;/h1&gt;</span><br>
+                            &nbsp;&nbsp;<span style="color: #569cd6;">&lt;body <span
+                                    style="color: #9cdcfe;">class</span>=<span
+                                    style="color: #ce9178;">"beautiful"</span>&gt;</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #569cd6;">&lt;h1&gt;</span>Pixels come to
+                            life<span style="color: #569cd6;">&lt;/h1&gt;</span><br>
                             &nbsp;&nbsp;<span style="color: #569cd6;">&lt;/body&gt;</span><br>
                             <span style="color: #569cd6;">&lt;/html&gt;</span><br>
-                            <div style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle; margin-top: 2px;"></div>
+                            <div
+                                style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle; margin-top: 2px;">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
- 
+
         <section class="c-container" id="js-course">
             <div class="c-left-section reveal-left">
                 <h2 class="c-head">JavaScript</h2>
                 <p class="c-tagline">Make Your Websites Interactive and Dynamic.</p>
                 <div class="action-buttons">
                     <a href="/js.html" class="c-button btn-learn"><i class="fas fa-book-open"></i> Learn JavaScript</a>
-                    <a href="/videos.html" class="c-button btn-video"><i class="fas fa-play-circle"></i> Video Tutorial</a>
-                    <a href="/compiler.html?lang=js" class="c-button btn-reference"><i class="fas fa-terminal"></i> JS Compiler</a>
+                    <a href="/videos.html" class="c-button btn-video"><i class="fas fa-play-circle"></i> Video
+                        Tutorial</a>
+                    <a href="/compiler.html?lang=js" class="c-button btn-reference"><i class="fas fa-terminal"></i> JS
+                        Compiler</a>
                 </div>
             </div>
 
             <div class="c-right-section reveal-right">
                 <div class="code-showcase-wrapper" style="animation-duration: 5s;">
-                    <div class="code-showcase" style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(247, 223, 30, 0.3); border: 1px solid #333; position: relative;">
+                    <div class="code-showcase"
+                        style="border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(247, 223, 30, 0.3); border: 1px solid #333; position: relative;">
                         <div class="terminal-header">
                             <span class="terminal-dot" style="background:#ff5f56;"></span>
                             <span class="terminal-dot" style="background:#ffbd2e;"></span>
                             <span class="terminal-dot" style="background:#27c93f;"></span>
-                            <span style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">script.js</span>
+                            <span
+                                style="margin-left: auto; font-size: 12px; color: #a0a0a0; font-family: monospace;">script.js</span>
                         </div>
                         <div class="terminal-content">
-                            <span style="color: #569cd6;">const</span> createMagic = () <span style="color: #569cd6;">=&gt;</span> {<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #569cd6;">let</span> view = <span style="color: #ce9178;">"Dynamic"</span>;<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #c586c0;">return</span> <span style="color: #dcdcaa;">fetch</span>(<span style="color: #ce9178;">'/future'</span>);<br>
+                            <span style="color: #569cd6;">const</span> createMagic = () <span
+                                style="color: #569cd6;">=&gt;</span> {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #569cd6;">let</span> view = <span
+                                style="color: #ce9178;">"Dynamic"</span>;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #c586c0;">return</span> <span
+                                style="color: #dcdcaa;">fetch</span>(<span
+                                style="color: #ce9178;">'/future'</span>);<br>
                             };<br>
-                            <span style="color: #dcdcaa;">createMagic</span>().<span style="color: #dcdcaa;">then</span>(go <span style="color: #569cd6;">=&gt;</span> go());<br>
-                            <div style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle; margin-top: 10px;"></div>
+                            <span style="color: #dcdcaa;">createMagic</span>().<span
+                                style="color: #dcdcaa;">then</span>(go <span style="color: #569cd6;">=&gt;</span>
+                            go());<br>
+                            <div
+                                style="display:inline-block; animation: cursorBlink 1s step-end infinite; width: 8px; height: 16px; background: #fff; vertical-align: middle; margin-top: 10px;">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -482,40 +1019,47 @@
         <section class="premium-compiler-section reveal-up" id="compiler-demo" style="margin-top: 80px;">
             <div class="section-header" style="text-align: center; margin: 0 auto 40px; max-width: 800px;">
                 <div class="subtitle" style="margin-bottom: 10px; display: inline-block;">Interactive Playground</div>
-                <h2 style="font-size: 42px; font-weight: 800; color: #1e293b; margin-bottom: 20px;">Experience our <span style="color: var(--primary-color);">Premium Compiler</span></h2>
+                <h2 style="font-size: 42px; font-weight: 800; color: #1e293b; margin-bottom: 20px;">Experience our <span
+                        style="color: var(--primary-color);">Premium Compiler</span></h2>
                 <p style="font-size: 18px; color: #64748b; line-height: 1.6;">
-                    Don't just read code—run it. Our state-of-the-art interactive environment lets you practice, debug, and master programming in real-time.
+                    Don't just read code—run it. Our state-of-the-art interactive environment lets you practice, debug,
+                    and master programming in real-time.
                 </p>
             </div>
 
-            <div class="tutorial-grid" style="background: #f8fafc; border: 1px solid rgba(0,0,0,0.05); border-radius: 40px; padding: 60px; margin-bottom: 100px;">
+            <div class="tutorial-grid"
+                style="background: #f8fafc; border: 1px solid rgba(0,0,0,0.05); border-radius: 40px; padding: 60px; margin-bottom: 100px;">
                 <div class="animated-demo-container">
                     <!-- 3D Demo Window -->
                     <div class="demo-window-3d">
                         <div class="simulated-cursor-pro"><i class="fas fa-mouse-pointer"></i></div>
-                        
+
                         <div class="demo-header">
                             <div class="demo-dots"><span></span><span></span><span></span></div>
                             <div class="demo-tab"><i class="fas fa-file-code"></i> playground.py</div>
                         </div>
-                        
+
                         <div class="demo-body">
-                            <div class="code-line-anim">name = <span class="code-keyword">input</span>()<span class="typing-cursor-editor">|</span></div>
-                            <div class="code-line-anim"><span class="code-keyword">print</span>(<span class="code-string">f"Hello, {name}!"</span>)</div>
+                            <div class="code-line-anim">name = <span class="code-keyword">input</span>()<span
+                                    class="typing-cursor-editor">|</span></div>
+                            <div class="code-line-anim"><span class="code-keyword">print</span>(<span
+                                    class="code-string">f"Hello, {name}!"</span>)</div>
                         </div>
 
                         <div class="demo-execution-sim">
                             <div class="sim-input-box">
                                 <div class="sim-label">STDIN</div>
                                 <div class="sim-textarea-pro">
-                                    <span class="typing-stdin-pro">CodeNative</span><span class="typing-cursor-stdin">|</span>
+                                    <span class="typing-stdin-pro">CodeNative</span><span
+                                        class="typing-cursor-stdin">|</span>
                                 </div>
                             </div>
                             <div class="sim-output-box">
                                 <div class="sim-label">CONSOLE</div>
                                 <div class="sim-console-pro">
                                     <div class="out-line-1">> Running...</div>
-                                    <div class="out-line-spinner"><i class="fas fa-spinner fa-spin"></i> Processing...</div>
+                                    <div class="out-line-spinner"><i class="fas fa-spinner fa-spin"></i> Processing...
+                                    </div>
                                     <div class="out-line-2">Hello, CodeNative!</div>
                                 </div>
                             </div>
@@ -535,9 +1079,10 @@
                         <div class="p-step s-3"><span>3</span> Output</div>
                     </div>
                 </div>
-                
+
                 <div style="text-align: center; margin-top: 50px;">
-                    <a href="/compiler.html" class="btn-cta" style="padding: 15px 40px; font-size: 18px; text-decoration: none;">Try the Live Compiler</a>
+                    <a href="/compiler.html" class="btn-cta"
+                        style="padding: 15px 40px; font-size: 18px; text-decoration: none;">Try the Live Compiler</a>
                 </div>
             </div>
         </section>
@@ -547,7 +1092,8 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native" style="height: 48px; margin-bottom: 15px;">
+                    <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native"
+                        style="height: 48px; margin-bottom: 15px;">
                     <p>Empowering the next generation of developers with localized learning.</p>
                 </div>
                 <div class="footer-links">
