@@ -1021,7 +1021,6 @@ def admin_dashboard():
         """).fetchall()
 
     all_users = execute_query(conn, 'SELECT id, name, email, is_admin, created_at FROM users ORDER BY id DESC').fetchall()
-    release_db_connection(conn)
     
     # Calculate Active Users (DAU/WAU)
     if is_pg:
@@ -1042,6 +1041,8 @@ def admin_dashboard():
         this_week = execute_query(conn, "SELECT COUNT(*) as count FROM users WHERE created_at > date('now', '-7 days')").fetchone()
         last_week = execute_query(conn, "SELECT COUNT(*) as count FROM users WHERE created_at BETWEEN date('now', '-14 days') AND date('now', '-7 days')").fetchone()
     
+    release_db_connection(conn)
+
     tw_count = this_week['count'] if this_week and 'count' in dict(this_week) else (this_week[0] if this_week else 0)
     lw_count = last_week['count'] if last_week and 'count' in dict(last_week) else (last_week[0] if last_week else 0)
     
