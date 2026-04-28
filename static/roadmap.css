@@ -215,6 +215,7 @@ body {
     position: relative;
     overflow: hidden;
     z-index: 5;
+    cursor: pointer;
 }
 
 /* Background Step Number */
