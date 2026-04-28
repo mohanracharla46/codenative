@@ -610,9 +610,25 @@ const QuizSystem = {
     injectModal() {
         if (document.getElementById('quizModal')) return;
 
+        const numQuestions = this.questions.length;
         const modalHtml = `
         <div id="quizModal" class="quiz-overlay">
-            <div class="quiz-card">
+            <!-- Start Screen -->
+            <div class="quiz-card" id="quizStartScreen">
+                <div style="text-align: center; padding: 20px 0;">
+                    <div class="feedback-icon-wrapper" style="background: #eef2ff; color: #6366f1; width: 80px; height: 80px; margin: 0 auto 25px; border-radius: 25px; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h2 style="font-size: 24px; font-weight: 800; color: #1e293b; margin-bottom: 10px;">Topic Assignment</h2>
+                    <p style="color: #64748b; margin-bottom: 30px; font-size: 15px; line-height: 1.6;">
+                        Complete this quick quiz (${numQuestions} questions) to save your progress and move to the next lesson!
+                    </p>
+                    <button class="quiz-next-btn" style="width: 100%; height: 50px; font-size: 16px;" onclick="document.getElementById('quizStartScreen').style.display='none'; document.getElementById('quizMainScreen').style.display='block'; QuizSystem.renderQuestion();">Start Quiz</button>
+                </div>
+            </div>
+
+            <!-- Main Quiz Screen -->
+            <div class="quiz-card" id="quizMainScreen" style="display: none;">
                 <div class="quiz-header">
                     <div class="quiz-badge">ASSIGNMENT</div>
                     <h3 id="quizQuestion">Loading question...</h3>
@@ -691,7 +707,6 @@ const QuizSystem = {
         `;
         document.head.appendChild(style);
         document.body.insertAdjacentHTML('beforeend', modalHtml);
-        this.renderQuestion();
     },
 
     renderQuestion() {
