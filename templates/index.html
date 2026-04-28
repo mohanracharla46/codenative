@@ -298,7 +298,11 @@
                         journey today and build your future in tech.
                     </p>
                     <div class="cta-wrapper">
-                        <a href="/roadmap.html" class="btn-cta">Start Learning Now</a>
+                        {% if session.get('user_name') %}
+                        <a href="/roadmap.html" class="btn-cta">Start Learning Free 🚀</a>
+                        {% else %}
+                        <a href="/signin.html" class="btn-cta">Start Learning Free 🚀</a>
+                        {% endif %}
                     </div>
                 </section>
             </main>
