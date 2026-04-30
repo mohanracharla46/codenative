@@ -190,45 +190,71 @@
             <h2 class="section-title"><i class="fas fa-graduation-cap"></i> My Learning Path</h2>
             <div class="course-grid">
                 {% for course in user_courses %}
-                <div class="course-card">
-                    <div class="course-header" style="background: {{ course.header_bg }};">
-                        <span style="font-weight: 800; color: #fff;">{{ course.id | upper }}</span>
-                        <i class="{{ course.icon }}" style="font-size: 24px; color: #fff;"></i>
-                    </div>
-                    <div class="course-body">
-                        <div class="progress-container">
-                            <div class="progress-label">
-                                <span>Course Completion</span>
-                                <span>{{ course.progress }}%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: {{ course.progress }}%; 
-                                    {% if course.id == 'c' %}background: #00599c;
-                                    {% elif course.id == 'java' %}background: #ed8b00;
-                                    {% elif course.id == 'python' %}background: #3776ab;
-                                    {% elif course.id == 'web' %}background: #e34f26;
-                                    {% elif course.id == 'js' %}background: #f7df1e;
-                                    {% endif %}"></div>
-                            </div>
+                {% set is_started   = course.progress > 0 %}
+                {% set is_completed = course.progress >= 100 %}
+
+                <div class="lp-card {% if is_completed %}lp-card--done{% elif is_started %}lp-card--active{% else %}lp-card--new{% endif %}">
+
+                    <!-- Glow accent bar -->
+                    <div class="lp-accent" style="background: {{ course.header_bg }};"></div>
+
+                    <!-- Card top row: icon + badge -->
+                    <div class="lp-top">
+                        <div class="lp-icon-wrap" style="background: {{ course.header_bg }};">
+                            <i class="{{ course.icon }}"></i>
                         </div>
-                        <div class="course-footer">
-                            <span style="font-size: 13px; color: #64748b; font-weight: 600;">Last Topic: {{ course.last_topic }}</span>
-                            <a href="{{ course.link }}" class="btn-resume" style="
-                                {% if course.id == 'c' %}background: #00599c;
-                                {% elif course.id == 'java' %}background: #ed8b00;
-                                {% elif course.id == 'python' %}background: #3776ab;
-                                {% elif course.id == 'web' %}background: #e34f26;
-                                {% elif course.id == 'js' %}background: #f7df1e;
-                                {% endif %}">Resume Course</a>
-                        </div>
+
+                        {% if is_completed %}
+                        <span class="lp-badge lp-badge--done"><i class="fas fa-check-circle"></i> Completed</span>
+                        {% elif is_started %}
+                        <span class="lp-badge lp-badge--active"><i class="fas fa-bolt"></i> In Progress</span>
+                        {% else %}
+                        <span class="lp-badge lp-badge--new"><i class="fas fa-seedling"></i> Not Started</span>
+                        {% endif %}
                     </div>
+
+                    <!-- Course name -->
+                    <h3 class="lp-name">{{ course.name }}</h3>
+
+                    <!-- Last topic -->
+                    <p class="lp-last-topic">
+                        <i class="fas fa-bookmark"></i>
+                        {% if is_started %}{{ course.last_topic }}{% else %}Begin from the very first topic{% endif %}
+                    </p>
+
+                    <!-- Progress bar -->
+                    <div class="lp-progress-wrap">
+                        <div class="lp-progress-track">
+                            <div class="lp-progress-fill" style="width: {{ course.progress }}%; background: {{ course.header_bg }};"></div>
+                        </div>
+                        <span class="lp-pct">{{ course.progress }}%</span>
+                    </div>
+
+                    <!-- CTA button -->
+                    {% if is_completed %}
+                    <a href="{{ course.link }}" class="lp-btn lp-btn--done">
+                        <i class="fas fa-redo-alt"></i> Revisit Course
+                    </a>
+                    {% elif is_started %}
+                    <a href="{{ course.link }}" class="lp-btn lp-btn--active" style="background: {{ course.header_bg }};">
+                        <i class="fas fa-play"></i> Resume {{ course.name.split()[0] }}
+                    </a>
+                    {% else %}
+                    <a href="{{ course.link }}" class="lp-btn lp-btn--new">
+                        <i class="fas fa-rocket"></i> Start {{ course.name.split()[0] }}
+                    </a>
+                    {% endif %}
                 </div>
                 {% endfor %}
+
                 {% if not user_courses %}
-                <div class="course-card" style="grid-column: 1 / -1; padding: 40px; text-align: center;">
-                    <i class="fas fa-book-open" style="font-size: 48px; color: #e2e8f0; margin-bottom: 20px;"></i>
-                    <h3>Start your first course!</h3>
-                    <p>Visit the roadmap to choose a language and begin your journey.</p>
+                <div class="lp-empty">
+                    <div class="lp-empty-icon"><i class="fas fa-map-signs"></i></div>
+                    <h3>No courses yet</h3>
+                    <p>Pick a language from the roadmap and start your journey!</p>
+                    <a href="/roadmap.html" class="lp-btn lp-btn--new" style="display:inline-flex; margin-top:16px;">
+                        <i class="fas fa-rocket"></i> Explore Roadmap
+                    </a>
                 </div>
                 {% endif %}
             </div>

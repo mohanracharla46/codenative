@@ -734,4 +734,215 @@ body.dark-mode .level-0 { background-color: #334155; }
     }
 }
 
+/* ─── Learning Path Cards (Premium Redesign) ─────────────────────────── */
 
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.lp-card {
+    position: relative;
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 28px 26px 24px;
+    border: 1px solid #e8edf4;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: transform 0.28s cubic-bezier(.22,.68,0,1.2),
+                box-shadow 0.28s ease;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+.lp-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 48px -8px rgba(0,0,0,0.12);
+}
+
+.lp-accent {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: 22px 22px 0 0;
+}
+
+.lp-card--new    { border-left: 3px solid #6366f1; }
+.lp-card--active { border-left: 3px solid #f97316; }
+.lp-card--done   { border-left: 3px solid #10b981; }
+
+.lp-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.lp-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.lp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.lp-badge--new    { background: rgba(99,102,241,0.10);  color: #6366f1; }
+.lp-badge--active { background: rgba(249,115,22,0.12);  color: #ea580c; }
+.lp-badge--done   { background: rgba(16,185,129,0.12);  color: #059669; }
+
+.lp-name {
+    font-size: 17px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.lp-last-topic {
+    font-size: 12.5px;
+    color: #94a3b8;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lp-last-topic i { font-size: 11px; flex-shrink: 0; }
+
+.lp-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.lp-progress-track {
+    flex: 1;
+    height: 7px;
+    background: #f1f5f9;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.lp-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.8s cubic-bezier(.4,0,.2,1);
+    min-width: 4px;
+}
+
+.lp-pct {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    min-width: 36px;
+    text-align: right;
+}
+
+.lp-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 13px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.22s ease;
+    margin-top: 4px;
+}
+
+.lp-btn--new {
+    background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+}
+.lp-btn--new:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    box-shadow: 0 6px 20px rgba(99,102,241,0.45);
+    transform: translateY(-2px);
+    color: #fff;
+}
+
+.lp-btn--active { color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+.lp-btn--active:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+    transform: translateY(-2px);
+    color: #fff;
+}
+
+.lp-btn--done {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(16,185,129,0.30);
+}
+.lp-btn--done:hover {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    box-shadow: 0 6px 20px rgba(16,185,129,0.40);
+    transform: translateY(-2px);
+    color: #fff;
+}
+
+.lp-empty {
+    grid-column: 1 / -1;
+    background: #ffffff;
+    border-radius: 22px;
+    border: 2px dashed #e2e8f0;
+    padding: 56px 40px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+.lp-empty-icon {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; color: white;
+    box-shadow: 0 8px 24px rgba(99,102,241,0.30);
+    margin-bottom: 6px;
+}
+.lp-empty h3 { font-size: 20px; font-weight: 800; color: #1e293b; margin: 0; }
+.lp-empty p  { font-size: 14px; color: #64748b; margin: 0; }
+
+/* Dark mode */
+body.dark-mode .lp-card       { background: #1e293b; border-color: rgba(255,255,255,0.06); }
+body.dark-mode .lp-name       { color: #f1f5f9; }
+body.dark-mode .lp-progress-track { background: #334155; }
+body.dark-mode .lp-pct        { color: #94a3b8; }
+body.dark-mode .lp-badge--new    { background: rgba(99,102,241,0.18); }
+body.dark-mode .lp-badge--active { background: rgba(249,115,22,0.18); }
+body.dark-mode .lp-badge--done   { background: rgba(16,185,129,0.18); }
+body.dark-mode .lp-empty      { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+body.dark-mode .lp-empty h3   { color: #f1f5f9; }
+
+@media (max-width: 768px) {
+    .course-grid { grid-template-columns: 1fr; gap: 16px; }
+    .lp-card     { padding: 22px 20px; }
+}
