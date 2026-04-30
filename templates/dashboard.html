@@ -109,37 +109,67 @@
         <!-- Main Content -->
         <main class="dashboard-content">
             <div class="welcome-section">
-                <h1>Welcome back, <span style="background: linear-gradient(to right, #6366f1, #8b5cf6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ session.get('user_name', 'Scholar') }}!</span> 👋</h1>
-                <p>Track your progress and pick up exactly where you left off.</p>
+                <div class="welcome-content">
+                    <span class="welcome-eyebrow">Personal Dashboard</span>
+                    <h1>Hello, <span class="welcome-name">{{ session.get('user_name', 'Scholar') }}</span> <span class="wave">👋</span></h1>
+                    <p>Ready to continue your journey? You're doing great!</p>
+                </div>
             </div>
 
             <!-- Stats Overview -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon icon-blue">
-                        <i class="far fa-clock"></i>
+                    <div class="stat-header">
+                        <div class="stat-icon icon-blue">
+                            <i class="far fa-clock"></i>
+                        </div>
+                        <span class="stat-label">Learning Time</span>
                     </div>
-                    <div class="stat-info">
-                        <h3>Study Hours</h3>
-                        <p>{{ stats['study_hours'] }} hrs</p>
+                    <div class="stat-value">
+                        <span class="num">{{ stats['study_hours'] }}</span>
+                        <span class="unit">hrs</span>
                     </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon icon-purple">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Certificates</h3>
-                        <p>{{ stats['certificates'] }}</p>
+                    <div class="stat-footer">
+                        <span class="trend positive"><i class="fas fa-arrow-up"></i> 12%</span>
+                        <span class="trend-label">this week</span>
                     </div>
                 </div>
+
                 <div class="stat-card">
-                    <div class="stat-icon icon-orange">
-                        <i class="fas fa-fire"></i>
+                    <div class="stat-header">
+                        <div class="stat-icon icon-purple">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <span class="stat-label">Achievements</span>
                     </div>
-                    <div class="stat-info">
-                        <h3>Day Streak</h3>
-                        <p>{{ stats['current_streak'] }} Days</p>
+                    <div class="stat-value">
+                        <span class="num">{{ stats['certificates'] }}</span>
+                        <span class="unit">earned</span>
+                    </div>
+                    <div class="stat-footer">
+                        <span class="trend-label">More features integrating soon</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon icon-orange">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <span class="stat-label">Daily Streak</span>
+                    </div>
+                    <div class="stat-value">
+                        <span class="num">{{ stats['current_streak'] }}</span>
+                        <span class="unit">days</span>
+                    </div>
+                    <div class="stat-footer">
+                        <div class="streak-dots">
+                            <span class="dot active"></span>
+                            <span class="dot active"></span>
+                            <span class="dot active"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
                     </div>
                 </div>
             </div>
