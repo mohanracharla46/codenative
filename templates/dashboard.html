@@ -84,7 +84,12 @@
                         </div>
                         <div class="course-details">
                             <span class="course-name">{{ course.name }}</span>
-                            <span class="course-progress">{{ course.progress }}% Completed</span>
+                            <div class="course-progress-wrapper">
+                                <div class="course-progress-bar">
+                                    <div class="course-progress-fill" style="width: {{ course.progress }}%;"></div>
+                                </div>
+                                <span class="course-progress-text">{{ course.progress }}%</span>
+                            </div>
                         </div>
                     </a>
                     {% endfor %}
@@ -262,16 +267,37 @@
             </div>
             </div>
 
-            <!-- Quick Access Section -->
-            <div class="quick-access-section">
-                <h3>🚀 Practice Makes Perfect</h3>
-                <p>Ready to test your knowledge? Head over to the interactive playground and write some code!</p>
-                <div class="quick-access-actions">
-                    <a href="/compiler.html" class="btn-signup primary">
-                        <i class="fas fa-terminal"></i> Open Playground
+            <!-- Action Banner -->
+            <div class="action-banner">
+                <div class="action-banner__bg"></div>
+
+                <div class="action-banner__left">
+                    <span class="action-banner__eyebrow"><i class="fas fa-bolt"></i> Level Up</span>
+                    <h2 class="action-banner__title">Practice Makes<br>a <span>Perfect</span> Coder</h2>
+                    <p class="action-banner__sub">Apply what you've learned. Write real code, solve problems, and track your growth.</p>
+                </div>
+
+                <div class="action-banner__cards">
+                    <a href="/compiler.html" class="action-card">
+                        <div class="action-card__icon" style="background: linear-gradient(135deg,#6366f1,#818cf8);">
+                            <i class="fas fa-terminal"></i>
+                        </div>
+                        <div class="action-card__text">
+                            <strong>Code Playground</strong>
+                            <span>Write & run code instantly</span>
+                        </div>
+                        <i class="fas fa-arrow-right action-card__arrow"></i>
                     </a>
-                    <a href="/roadmap.html" class="btn-signup secondary">
-                        <i class="fas fa-map"></i> View Roadmap
+
+                    <a href="/roadmap.html" class="action-card">
+                        <div class="action-card__icon" style="background: linear-gradient(135deg,#10b981,#34d399);">
+                            <i class="fas fa-map-signs"></i>
+                        </div>
+                        <div class="action-card__text">
+                            <strong>Learning Roadmap</strong>
+                            <span>Plan your next milestone</span>
+                        </div>
+                        <i class="fas fa-arrow-right action-card__arrow"></i>
                     </a>
                 </div>
             </div>
