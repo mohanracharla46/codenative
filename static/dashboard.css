@@ -777,10 +777,10 @@ body.dark-mode .level-0 { background-color: #334155; }
 /* Large ghost language icon in background */
 .lp-ghost {
     position: absolute;
-    bottom: -16px;
-    right: -12px;
-    font-size: 110px;
-    color: rgba(255,255,255,0.08);
+    bottom: -20px;
+    right: -14px;
+    font-size: 130px;
+    color: rgba(255,255,255,0.18);
     line-height: 1;
     pointer-events: none;
     transition: transform 0.4s ease, opacity 0.4s ease;
@@ -788,7 +788,29 @@ body.dark-mode .level-0 { background-color: #334155; }
 }
 .lp-card:hover .lp-ghost {
     transform: rotate(-8deg) scale(1.12);
-    opacity: 0.14;
+    color: rgba(255,255,255,0.26);
+}
+
+/* Prominent language icon shown above the ring */
+.lp-lang-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(255,255,255,0.30);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #fff;
+    margin-bottom: 14px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    transition: transform 0.3s ease;
+}
+.lp-card:hover .lp-lang-icon {
+    transform: scale(1.08);
 }
 
 /* Top row: status badge aligned right */
@@ -920,13 +942,13 @@ body.dark-mode .level-0 { background-color: #334155; }
     border-color: rgba(255,255,255,0.40);
 }
 
-/* Completed button — green tint */
+/* Completed button — slightly more opaque so it stands out */
 .lp-btn--done {
-    background: rgba(16,185,129,0.35);
-    border-color: rgba(255,255,255,0.30);
+    background: rgba(255,255,255,0.28);
+    border-color: rgba(255,255,255,0.45);
 }
 .lp-btn--done:hover {
-    background: rgba(16,185,129,0.50);
+    background: rgba(255,255,255,0.38);
 }
 
 /* Empty state */
@@ -961,6 +983,20 @@ body.dark-mode .level-0 { background-color: #334155; }
     border-color: transparent;
     box-shadow: 0 4px 16px rgba(99,102,241,0.32);
 }
+
+/* Light-background cards (e.g. JS yellow) — switch everything to dark text */
+.lp-card--light .lp-ghost        { color: rgba(0,0,0,0.12); }
+.lp-card--light:hover .lp-ghost  { color: rgba(0,0,0,0.20); }
+.lp-card--light .lp-lang-icon    { background: rgba(0,0,0,0.12); border-color: rgba(0,0,0,0.18); color: #1a1a1a; }
+.lp-card--light .lp-badge        { background: rgba(0,0,0,0.12); color: #1a1a1a; border-color: rgba(0,0,0,0.15); }
+.lp-card--light .lp-ring-bg      { stroke: rgba(0,0,0,0.12); }
+.lp-card--light .lp-ring-fill    { stroke: rgba(0,0,0,0.75); filter: none; }
+.lp-card--light .lp-ring-pct     { color: #1a1a1a; text-shadow: none; }
+.lp-card--light .lp-name         { color: #1a1a1a; text-shadow: none; }
+.lp-card--light .lp-last-topic   { color: rgba(0,0,0,0.60); }
+.lp-card--light .lp-btn          { background: rgba(0,0,0,0.14); color: #1a1a1a; border-color: rgba(0,0,0,0.20); }
+.lp-card--light .lp-btn:hover    { background: rgba(0,0,0,0.24); color: #1a1a1a; }
+.lp-card--light                  { box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10); }
 
 /* Dark mode */
 body.dark-mode .lp-empty { background: #1e293b; }
@@ -1132,60 +1168,7 @@ body.dark-mode .lp-card { box-shadow: 0 8px 40px rgba(0,0,0,0.40), 0 2px 8px rgb
     text-align: right;
 }
 
-/* CTA buttons — full-width, no border, rounded */
-.lp-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 13px 20px;
-    border-radius: 14px;
-    font-size: 14px;
-    font-weight: 700;
-    text-decoration: none;
-    transition: all 0.22s ease;
-    border: none;
-    cursor: pointer;
-    letter-spacing: 0.2px;
-}
-
-/* Not started → indigo */
-.lp-btn--new {
-    background: linear-gradient(135deg, #6366f1, #818cf8);
-    color: #fff;
-    box-shadow: 0 4px 16px rgba(99,102,241,0.32);
-}
-.lp-btn--new:hover {
-    background: linear-gradient(135deg, #4f46e5, #6366f1);
-    box-shadow: 0 7px 22px rgba(99,102,241,0.44);
-    transform: translateY(-2px);
-    color: #fff;
-}
-
-/* In progress — course gradient (set via inline style on button) */
-.lp-btn--active {
-    color: #fff;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-}
-.lp-btn--active:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 7px 22px rgba(0,0,0,0.24);
-    transform: translateY(-2px);
-    color: #fff;
-}
-
-/* Completed → emerald */
-.lp-btn--done {
-    background: linear-gradient(135deg, #10b981, #34d399);
-    color: #fff;
-    box-shadow: 0 4px 16px rgba(16,185,129,0.28);
-}
-.lp-btn--done:hover {
-    background: linear-gradient(135deg, #059669, #10b981);
-    box-shadow: 0 7px 22px rgba(16,185,129,0.40);
-    transform: translateY(-2px);
-    color: #fff;
-}
+/* Stale duplicate removed — buttons defined above at .lp-btn */
 
 /* Empty state */
 .lp-empty {
