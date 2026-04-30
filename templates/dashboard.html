@@ -184,33 +184,39 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Current Courses -->
+            </div>            <!-- Current Courses -->
             <h2 class="section-title"><i class="fas fa-graduation-cap"></i> My Learning Path</h2>
             <div class="course-grid">
                 {% for course in user_courses %}
                 {% set is_started   = course.progress > 0 %}
                 {% set is_completed = course.progress >= 100 %}
+                {# SVG ring: circumference = 2 * pi * 32 ≈ 201.06 #}
+                {% set dash_offset = (201.06 * (1 - course.progress / 100)) | round(1) %}
 
-                <div class="lp-card {% if is_completed %}lp-card--done{% elif is_started %}lp-card--active{% else %}lp-card--new{% endif %}">
+                <div class="lp-card" style="background: {{ course.header_bg }};">
 
-                    <!-- Glow accent bar -->
-                    <div class="lp-accent" style="background: {{ course.header_bg }};"></div>
+                    <!-- Ghost background icon -->
+                    <div class="lp-ghost"><i class="{{ course.icon }}"></i></div>
 
-                    <!-- Card top row: icon + badge -->
+                    <!-- Status badge -->
                     <div class="lp-top">
-                        <div class="lp-icon-wrap" style="background: {{ course.header_bg }};">
-                            <i class="{{ course.icon }}"></i>
-                        </div>
-
                         {% if is_completed %}
-                        <span class="lp-badge lp-badge--done"><i class="fas fa-check-circle"></i> Completed</span>
+                        <span class="lp-badge"><i class="fas fa-check-circle"></i>&nbsp;Completed</span>
                         {% elif is_started %}
-                        <span class="lp-badge lp-badge--active"><i class="fas fa-bolt"></i> In Progress</span>
+                        <span class="lp-badge"><i class="fas fa-bolt"></i>&nbsp;In Progress</span>
                         {% else %}
-                        <span class="lp-badge lp-badge--new"><i class="fas fa-seedling"></i> Not Started</span>
+                        <span class="lp-badge"><i class="fas fa-seedling"></i>&nbsp;Not Started</span>
                         {% endif %}
+                    </div>
+
+                    <!-- Circular progress ring -->
+                    <div class="lp-ring-wrap">
+                        <svg class="lp-ring" viewBox="0 0 80 80">
+                            <circle class="lp-ring-bg" cx="40" cy="40" r="32"/>
+                            <circle class="lp-ring-fill" cx="40" cy="40" r="32"
+                                style="stroke-dashoffset: {{ dash_offset }};"/>
+                        </svg>
+                        <span class="lp-ring-pct">{{ course.progress }}%</span>
                     </div>
 
                     <!-- Course name -->
@@ -218,30 +224,22 @@
 
                     <!-- Last topic -->
                     <p class="lp-last-topic">
-                        <i class="fas fa-bookmark"></i>
-                        {% if is_started %}{{ course.last_topic }}{% else %}Begin from the very first topic{% endif %}
+                        <i class="fas fa-map-marker-alt"></i>
+                        {% if is_started %}{{ course.last_topic }}{% else %}Begin from the first topic{% endif %}
                     </p>
-
-                    <!-- Progress bar -->
-                    <div class="lp-progress-wrap">
-                        <div class="lp-progress-track">
-                            <div class="lp-progress-fill" style="width: {{ course.progress }}%; background: {{ course.header_bg }};"></div>
-                        </div>
-                        <span class="lp-pct">{{ course.progress }}%</span>
-                    </div>
 
                     <!-- CTA button -->
                     {% if is_completed %}
                     <a href="{{ course.link }}" class="lp-btn lp-btn--done">
-                        <i class="fas fa-redo-alt"></i> Revisit Course
+                        <i class="fas fa-redo-alt"></i>&nbsp;Revisit Course
                     </a>
                     {% elif is_started %}
-                    <a href="{{ course.link }}" class="lp-btn lp-btn--active" style="background: {{ course.header_bg }};">
-                        <i class="fas fa-play"></i> Resume {{ course.name.split()[0] }}
+                    <a href="{{ course.link }}" class="lp-btn lp-btn--active">
+                        <i class="fas fa-play"></i>&nbsp;Resume {{ course.name.split()[0] }}
                     </a>
                     {% else %}
                     <a href="{{ course.link }}" class="lp-btn lp-btn--new">
-                        <i class="fas fa-rocket"></i> Start {{ course.name.split()[0] }}
+                        <i class="fas fa-rocket"></i>&nbsp;Start {{ course.name.split()[0] }}
                     </a>
                     {% endif %}
                 </div>
@@ -252,11 +250,12 @@
                     <div class="lp-empty-icon"><i class="fas fa-map-signs"></i></div>
                     <h3>No courses yet</h3>
                     <p>Pick a language from the roadmap and start your journey!</p>
-                    <a href="/roadmap.html" class="lp-btn lp-btn--new" style="display:inline-flex; margin-top:16px;">
-                        <i class="fas fa-rocket"></i> Explore Roadmap
+                    <a href="/roadmap.html" class="lp-btn">
+                        <i class="fas fa-rocket"></i>&nbsp;Explore Roadmap
                     </a>
                 </div>
                 {% endif %}
+            </div>
             </div>
 
             <!-- Quick Access Section -->
