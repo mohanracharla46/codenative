@@ -144,7 +144,7 @@
                 <div class="activity-header">
                     <h2 class="section-title" style="margin-bottom: 0;"><i class="fas fa-calendar-check"></i> Learning Activity</h2>
                     <div class="streak-badge">
-                        <i class="fas fa-fire"></i> 5 Day Streak
+                        <i class="fas fa-fire"></i> {{ stats['current_streak'] }} Day Streak
                     </div>
                 </div>
                 
@@ -253,44 +253,66 @@
     <script>
         // Real Heatmap Generation mapped from user activity
         const grid = document.getElementById('heatmapGrid');
-        
-        // Parse python injected JSON payload
+
+        // Parse backend JSON payload (activity_date may come as a date object or string)
         const activityData = JSON.parse('{{ activity_data | tojson | safe }}');
         const activityMap = {};
-        
-        // Map dates to practices
+
         activityData.forEach(d => {
-            // Ensure we only use the YYYY-MM-DD part of the date string
-            let dateStr = String(d.activity_date).split(' ')[0];
-            activityMap[dateStr] = d.practice_count;
+            // Handles PostgreSQL date objects (serialised as "YYYY-MM-DD") and
+            // datetime strings ("YYYY-MM-DD HH:MM:SS") or ISO strings.
+            let rawDate = d.activity_date;
+            if (rawDate && typeof rawDate === 'object' && rawDate.__class__) {
+                // Shouldn't happen after tojson, but guard anyway
+                rawDate = String(rawDate);
+            }
+            const dateStr = String(rawDate).substring(0, 10); // Always take first 10 chars
+            if (dateStr && dateStr !== 'null' && dateStr !== 'undefined') {
+                activityMap[dateStr] = (activityMap[dateStr] || 0) + (d.practice_count || 0);
+            }
         });
 
-        const squares = 53 * 7;
+        // Build a 53-week grid (371 squares) ending today
+        const TOTAL_SQUARES = 53 * 7;
         const today = new Date();
-        const startDate = new Date();
-        startDate.setDate(today.getDate() - squares + 1);
-        
-        for (let i = 0; i < squares; i++) {
+
+        // Align start to Sunday so weeks form clean columns
+        const startDate = new Date(today);
+        startDate.setDate(today.getDate() - TOTAL_SQUARES + 1);
+
+        for (let i = 0; i < TOTAL_SQUARES; i++) {
             const sq = document.createElement('div');
             sq.className = 'sq';
-            
+
             const cellDate = new Date(startDate);
             cellDate.setDate(startDate.getDate() + i);
-            const dateString = cellDate.toISOString().split('T')[0];
-            
+
+            // Build YYYY-MM-DD in LOCAL time (avoids UTC-offset shift)
+            const yr  = cellDate.getFullYear();
+            const mo  = String(cellDate.getMonth() + 1).padStart(2, '0');
+            const day = String(cellDate.getDate()).padStart(2, '0');
+            const dateString = `${yr}-${mo}-${day}`;
+
             const count = activityMap[dateString] || 0;
-            
-            // Assign color level mock thresholds based on counts
-            if (count > 8) sq.classList.add('level-4');
+
+            // Colour levels (1 = light, 4 = dark)
+            if      (count > 8) sq.classList.add('level-4');
             else if (count > 5) sq.classList.add('level-3');
             else if (count > 2) sq.classList.add('level-2');
             else if (count > 0) sq.classList.add('level-1');
-            else sq.classList.add('level-0');
-            
-            // Add tooltip mock
-            const dateName = new Array("Sun","Mon","Tue","Wed","Thu","Fri","Sat")[cellDate.getDay()];
-            sq.title = `${dateName}, ${dateString}: ${count} practices`;
-            
+            else                sq.classList.add('level-0');
+
+            // Tooltip: "Mon, 2025-04-30: 3 practices"
+            const dayName = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][cellDate.getDay()];
+            const label   = count === 1 ? '1 practice' : `${count} practices`;
+            sq.title = `${dayName}, ${dateString}: ${label}`;
+
+            // Highlight today
+            if (dateString === `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`) {
+                sq.style.outline = '2px solid #6366f1';
+                sq.style.outlineOffset = '1px';
+            }
+
             grid.appendChild(sq);
         }
 

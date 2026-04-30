@@ -766,9 +766,12 @@ def dashboard():
     
     total_practices = sum([a['practice_count'] for a in activities])
     total_days_active = len(activities)
-    
-    # Quick simple consistency calc assuming 30 days frame
-    consistency = int((total_days_active / 30.0) * 100) if total_days_active <= 30 else 100
+
+    # Consistency = days active / days elapsed this year (Jan 1 → today), capped at 100
+    today_date = datetime.today().date()
+    year_start = today_date.replace(month=1, day=1)
+    days_elapsed = max((today_date - year_start).days + 1, 1)
+    consistency = min(int((total_days_active / days_elapsed) * 100), 100)
     
     activity_data = [dict(a) for a in activities]
     
