@@ -348,7 +348,24 @@
             if (res.status === 401) {
                 const data = await res.json().catch(() => ({}));
                 removeTypingIndicator();
-                addMessage('bot', renderMarkdown(data.reply || '⚠️ Please login to use the AI chatbot. [Sign In](/signin.html)'));
+                // Build signin URL with ?next= so user returns here after login
+                const currentPage = window.location.href;
+                const nextUrl = data.next_url || currentPage;
+                const signinUrl = `/signin.html?next=${encodeURIComponent(nextUrl)}`;
+                const loginMsg = `
+                    <span style="display:block;margin-bottom:10px;">Hey ra 😄! AI chat use cheyali ante <strong>login</strong> avvali.</span>
+                    <a href="${signinUrl}" style="
+                        display:inline-flex;align-items:center;gap:7px;
+                        background:${meta.color};color:#fff;
+                        padding:8px 18px;border-radius:10px;
+                        font-weight:700;font-size:13px;
+                        text-decoration:none;
+                        box-shadow:0 4px 12px ${meta.glow};
+                        transition:opacity .2s;
+                    " onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+                        <i class="fas fa-sign-in-alt"></i> Sign In to Continue
+                    </a>`;
+                addMessage('bot', loginMsg);
                 return;
             }
 

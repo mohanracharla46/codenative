@@ -615,6 +615,8 @@ def login_google():
     session['oauth_state'] = state
     # Store the code verifier for PKCE
     session['code_verifier'] = flow.code_verifier
+    # Store the next URL so we can redirect there after login
+    session['oauth_next'] = request.args.get('next', '')
     return redirect(authorization_url)
 
 @app.route("/login/google/callback")
@@ -694,6 +696,13 @@ def google_callback():
     session['is_admin'] = bool(user['is_admin'])
     
     flash(f"Signed in as {user['name']}", "success")
+    
+    # Redirect to next page if set (e.g. from chatbot login prompt), else dashboard
+    next_url = session.pop('oauth_next', None)
+    if next_url and next_url.startswith('http') and 'codenative' in next_url:
+        return redirect(next_url)
+    elif next_url and next_url.startswith('/'):
+        return redirect(next_url)
     return redirect(url_for('dashboard') if not user['is_admin'] else url_for('admin_dashboard'))
 
 @app.route("/logout")
@@ -1250,8 +1259,11 @@ def ai_chat():
             return jsonify({'reply': 'Please type a question first!'}), 400
 
         if 'user_id' not in session:
+            # Grab the page the user was on (sent as Referer header by the browser)
+            referrer = request.headers.get('Referer', '/')
             return jsonify({
-                'reply': 'Hey ra 😄! AI chat use cheyali ante login avvali. [Ikkada click chesi login avvu ra!](/signin.html)'
+                'reply': 'Hey ra 😄! AI chat use cheyali ante login avvali. Signin cheyyi ra!',
+                'next_url': referrer
             }), 401
 
         gemini_api_key = os.environ.get('GEMINI_API_KEY', '')

@@ -176,7 +176,7 @@
                 </div>
 
                 <div class="social-buttons">
-                    <button type="button" class="btn-social btn-google" onclick="window.location.href='/login/google'">
+                    <button type="button" class="btn-social btn-google" id="googleSigninBtn" onclick="handleGoogleLogin()">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path
                                 d="M19.6 10.227c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 01-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.35z"
@@ -251,7 +251,7 @@
                 </div>
 
                 <div class="social-buttons">
-                    <button type="button" class="btn-social btn-google" onclick="window.location.href='/login/google'">
+                    <button type="button" class="btn-social btn-google" id="googleSignupBtn" onclick="handleGoogleLogin()">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path
                                 d="M19.6 10.227c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 01-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.35z"
@@ -399,11 +399,22 @@
                 });
             }
 
-            // Check for login_required error
+            // Check for login_required error or chatbot redirect
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('error') === 'login_required') {
                 showAlert('Please sign in to access the learning content. 🚀');
+            } else if (urlParams.get('next')) {
+                showAlert('Please sign in to continue 🔐');
             }
+
+            // Google OAuth handler that preserves ?next= param
+            window.handleGoogleLogin = function() {
+                const nextParam = new URLSearchParams(window.location.search).get('next');
+                const googleUrl = nextParam
+                    ? `/login/google?next=${encodeURIComponent(nextParam)}`
+                    : '/login/google';
+                window.location.href = googleUrl;
+            };
 
             // Handle Sign In Form Submission
             document.getElementById('signinForm').addEventListener('submit', async function (e) {
