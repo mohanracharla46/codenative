@@ -562,6 +562,59 @@
                     </table>
                 </div>
             </div>
+
+            <!-- APPLICANTS SECTION -->
+            <div class="section-card" style="margin-top: 30px;">
+                <div class="section-header">
+                    <div>
+                        <h2 style="margin:0;">Career Applications</h2>
+                        <p style="margin:0; font-size:0.8rem; color:var(--admin-text-dim);">Review received job & workshop submissions</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th>Role / Event</th>
+                                <th>Applicant Name</th>
+                                <th>Email</th>
+                                <th>Resume Link</th>
+                                <th>Cover Letter</th>
+                                <th>Applied At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in career_apps %}
+                            <tr>
+                                <td>
+                                    <div style="font-weight: 600;">{{ app.career_title or 'N/A' }}</div>
+                                    <div style="font-size:0.75rem; color:var(--admin-text-dim);">{{ app.career_type | capitalize }}</div>
+                                </td>
+                                <td><div style="font-weight:600;">{{ app.name }}</div></td>
+                                <td>{{ app.email }}</td>
+                                <td>
+                                    {% if app.resume_link %}
+                                    <a href="{{ app.resume_link }}" target="_blank" rel="noopener noreferrer" style="color:#6366f1; text-decoration:underline;">View Resume <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i></a>
+                                    {% else %}
+                                    <span style="color:var(--admin-text-dim);">No Link</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div style="max-width:250px; font-size:0.85rem; color:var(--admin-text-dim); white-space:pre-wrap;">{{ app.cover_letter or 'N/A' }}</div>
+                                </td>
+                                <td><div style="font-size:0.8rem; color:var(--admin-text-dim);">{{ app.applied_at }}</div></td>
+                            </tr>
+                            {% endfor %}
+                            {% if not career_apps %}
+                            <tr>
+                                <td colspan="6" style="text-align:center; padding:2rem; color:var(--admin-text-dim);">No applications received yet.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
     </div>

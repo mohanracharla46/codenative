@@ -202,6 +202,29 @@ def init_db():
         )
     '''
 
+    # SQL for Career Applications Table
+    career_applications_sql = '''
+        CREATE TABLE IF NOT EXISTS career_applications (
+            id SERIAL PRIMARY KEY,
+            career_id INTEGER REFERENCES careers(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            resume_link TEXT,
+            cover_letter TEXT,
+            applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS career_applications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            career_id INTEGER REFERENCES careers(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            resume_link TEXT,
+            cover_letter TEXT,
+            applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         cursor.execute(users_sql)
@@ -211,6 +234,7 @@ def init_db():
         cursor.execute(activity_sql)
         cursor.execute(stats_sql)
         cursor.execute(careers_sql)
+        cursor.execute(career_applications_sql)
         
         # Check and add missing columns to users table
         cols_to_check = {
@@ -236,6 +260,7 @@ def init_db():
         conn.execute(activity_sql)
         conn.execute(stats_sql)
         conn.execute(careers_sql)
+        conn.execute(career_applications_sql)
         
         cursor = conn.execute("PRAGMA table_info(users)")
         existing_cols = [col[1] for col in cursor.fetchall()]

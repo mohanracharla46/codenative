@@ -271,10 +271,10 @@
                 </div>
 
                 <div class="card-footer">
-                    {% if c.link %}
+                    {% if c.link and (c.link.startswith('http://') or c.link.startswith('https://')) %}
                     <a href="{{ c.link }}" class="apply-btn" target="_blank" rel="noopener noreferrer">Apply Now <i class="fas fa-arrow-right"></i></a>
                     {% else %}
-                    <span style="color: #94a3b8; font-size: 13px;"><i class="fas fa-info-circle"></i> Direct contact for apply</span>
+                    <a href="/apply/{{ c.id }}" class="apply-btn">Apply Now <i class="fas fa-arrow-right"></i></a>
                     {% endif %}
                 </div>
             </div>

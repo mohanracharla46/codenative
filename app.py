@@ -256,6 +256,28 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     '''
+    # SQL for Career Applications Table
+    career_applications_sql = '''
+        CREATE TABLE IF NOT EXISTS career_applications (
+            id SERIAL PRIMARY KEY,
+            career_id INTEGER REFERENCES careers(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            resume_link TEXT,
+            cover_letter TEXT,
+            applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS career_applications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            career_id INTEGER REFERENCES careers(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            resume_link TEXT,
+            cover_letter TEXT,
+            applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
 
     if is_pg:
         cursor = conn.cursor()
@@ -266,6 +288,7 @@ def init_db():
         cursor.execute(progress_sql)
         cursor.execute(feedback_sql)
         cursor.execute(careers_sql)
+        cursor.execute(career_applications_sql)
         
         # Check if is_admin column exists (Postgres migration)
         cursor.execute("""
@@ -330,6 +353,7 @@ def init_db():
         conn.execute(progress_sql)
         conn.execute(feedback_sql)
         conn.execute(careers_sql)
+        conn.execute(career_applications_sql)
         
         # Check if is_admin column exists (SQLite migration)
         cursor = conn.execute("PRAGMA table_info(users)")
@@ -955,6 +979,42 @@ def careers_page():
     release_db_connection(conn)
     return render_template("careers.html", careers=careers)
 
+@app.route("/apply/<int:career_id>")
+def apply_page(career_id):
+    conn = get_db_connection()
+    career = execute_query(conn, "SELECT * FROM careers WHERE id = ?", (career_id,)).fetchone()
+    release_db_connection(conn)
+    if not career:
+        return "Career post not found", 404
+    
+    # Prefill user info if logged in
+    user_name = session.get('user_name', '')
+    user_email = session.get('user_email', '')
+    return render_template("apply.html", career=career, user_name=user_name, user_email=user_email)
+
+@app.route("/apply_submit", methods=["POST"])
+def apply_submit():
+    try:
+        career_id = request.form.get('career_id')
+        name = request.form.get('name')
+        email = request.form.get('email')
+        resume_link = request.form.get('resume_link')
+        cover_letter = request.form.get('cover_letter')
+
+        if not career_id or not name or not email:
+            return jsonify({"message": "Career, Name and Email are required"}), 400
+
+        conn = get_db_connection()
+        execute_query(conn, '''
+            INSERT INTO career_applications (career_id, name, email, resume_link, cover_letter)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (career_id, name, email, resume_link, cover_letter))
+        conn.commit()
+        release_db_connection(conn)
+        return jsonify({"message": "Application submitted successfully"}), 200
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
 @app.route("/feedback.html")
 def feedback_page():
     return render_template("feedback.html")
@@ -1088,6 +1148,12 @@ def admin_dashboard():
         last_week = execute_query(conn, "SELECT COUNT(*) as count FROM users WHERE created_at BETWEEN date('now', '-14 days') AND date('now', '-7 days')").fetchone()
     
     careers = execute_query(conn, "SELECT * FROM careers ORDER BY id DESC").fetchall()
+    career_apps = execute_query(conn, """
+        SELECT ca.*, c.title as career_title, c.type as career_type
+        FROM career_applications ca
+        LEFT JOIN careers c ON ca.career_id = c.id
+        ORDER BY ca.id DESC
+    """).fetchall()
     
     release_db_connection(conn)
 
@@ -1132,7 +1198,8 @@ def admin_dashboard():
                            users_count=users_count, 
                            all_users=all_users,
                            analytics=analytics,
-                           careers=careers)
+                           careers=careers,
+                           career_apps=career_apps)
 
 # Admin Careers Add/Update
 @app.route("/admin/add_career", methods=["POST"])

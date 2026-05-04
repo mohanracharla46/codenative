@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include 'analytics.html' %}
+    <title>Apply for {{ career.title }} | Code Native</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+            --bg-color: #0d1117;
+            --text-color: #f8fafc;
+            --card-bg: rgba(22, 27, 34, 0.8);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(13, 17, 23, 0.6);
+            --input-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .apply-container {
+            max-width: 650px;
+            margin: 60px auto;
+            padding: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        .apply-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .apply-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .apply-header p {
+            color: #94a3b8;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .job-details-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            width: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+        }
+
+        .form-control {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            color: var(--text-color);
+            padding: 14px 18px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
+            background: rgba(13, 17, 23, 0.8);
+        }
+
+        textarea.form-control {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .btn-submit {
+            background: var(--primary-gradient);
+            color: #fff;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.45);
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #94a3b8;
+            font-size: 14px;
+            text-decoration: none;
+            margin-bottom: 25px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #f8fafc;
+        }
+
+        @media (max-width: 600px) {
+            .apply-container {
+                margin: 20px;
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="apply-container">
+        <a href="/careers.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Careers</a>
+        
+        <div class="apply-header">
+            <div class="job-details-badge">
+                {% if career.type == 'workshop' %}
+                <i class="fas fa-laptop-code"></i> Workshop Post
+                {% else %}
+                <i class="fas fa-briefcase"></i> Job Opening
+                {% endif %}
+            </div>
+            <h1>Apply for {{ career.title }}</h1>
+            {% if career.company %}
+            <p><i class="fas fa-building"></i> {{ career.company }} &nbsp;|&nbsp; <i class="fas fa-map-marker-alt"></i> {{ career.location or 'Remote' }}</p>
+            {% endif %}
+        </div>
+
+        <div class="success-message" id="successBox">
+            <i class="fas fa-check-circle" style="font-size: 2.5rem; margin-bottom: 12px; display: block;"></i>
+            <h3 style="margin: 0 0 6px 0;">Application Submitted!</h3>
+            <p style="margin: 0;">Thank you for applying. We will review your application and get in touch shortly.</p>
+        </div>
+
+        <form id="applyForm" onsubmit="submitApplication(event)">
+            <input type="hidden" name="career_id" id="career_id" value="{{ career.id }}">
+
+            <div class="form-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" class="form-control" value="{{ user_name }}" required placeholder="John Doe">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" value="{{ user_email }}" required placeholder="john.doe@example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="resume_link">Resume / LinkedIn Profile Link</label>
+                <input type="url" id="resume_link" name="resume_link" class="form-control" required placeholder="https://drive.google.com/... or https://linkedin.com/in/...">
+            </div>
+
+            <div class="form-group">
+                <label for="cover_letter">Cover Letter / Why should we hire you?</label>
+                <textarea id="cover_letter" name="cover_letter" class="form-control" placeholder="A short note about yourself, your skills and relevance..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                Submit Application <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        async function submitApplication(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Submitting... <i class="fas fa-spinner fa-spin"></i>';
+
+            const form = document.getElementById('applyForm');
+            const formData = new FormData(form);
+
+            const res = await fetch('/apply_submit', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (res.ok) {
+                form.style.display = 'none';
+                document.getElementById('successBox').style.display = 'block';
+            } else {
+                const err = await res.json();
+                alert('Submission failed: ' + err.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit Application <i class="fas fa-paper-plane"></i>';
+            }
+        }
+    </script>
+</body>
+</html>
