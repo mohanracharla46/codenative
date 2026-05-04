@@ -1037,25 +1037,11 @@ def apply_submit():
         resume_link = ""
         resume_file = request.files.get('resume')
         if resume_file and resume_file.filename != "":
-            filename = secure_filename(resume_file.filename)
-            filename = f"{int(time.time())}_{filename}"
-            
-            # Try saving locally
-            try:
-                upload_dir = os.path.join('static', 'uploads', 'resumes')
-                os.makedirs(upload_dir, exist_ok=True)
-                filepath = os.path.join(upload_dir, filename)
-                resume_file.save(filepath)
-                resume_link = f"/uploads/resumes/{filename}"
-            except Exception:
-                # Fallback to temp directory if disk is read-only
-                import tempfile
-                upload_dir = os.path.join(tempfile.gettempdir(), 'codenative_resumes')
-                os.makedirs(upload_dir, exist_ok=True)
-                filepath = os.path.join(upload_dir, filename)
-                resume_file.seek(0)
-                resume_file.save(filepath)
-                resume_link = f"/uploads/resumes/{filename}"
+            import base64
+            file_bytes = resume_file.read()
+            encoded = base64.b64encode(file_bytes).decode('utf-8')
+            content_type = resume_file.content_type or 'application/octet-stream'
+            resume_link = f"data:{content_type};base64,{encoded}"
 
         if not career_id or not name or not email:
             return jsonify({"message": "Career, Name and Email are required"}), 400
@@ -1073,16 +1059,40 @@ def apply_submit():
 
 @app.route("/uploads/resumes/<path:filename>")
 def serve_resume(filename):
-    import tempfile
-    local_dir = os.path.join('static', 'uploads', 'resumes')
-    if os.path.exists(os.path.join(local_dir, filename)):
-        return send_from_directory(local_dir, filename)
-    
-    tmp_dir = os.path.join(tempfile.gettempdir(), 'codenative_resumes')
-    if os.path.exists(os.path.join(tmp_dir, filename)):
-        return send_from_directory(tmp_dir, filename)
-    
-    return "File not found", 404
+    import base64
+    conn = get_db_connection()
+    if filename.isdigit():
+        app_data = execute_query(conn, "SELECT resume_link FROM career_applications WHERE id = ?", (int(filename),)).fetchone()
+    else:
+        app_data = execute_query(conn, "SELECT resume_link FROM career_applications WHERE resume_link LIKE ?", (f"%{filename}%",)).fetchone()
+    release_db_connection(conn)
+
+    if not app_data or not app_data['resume_link']:
+        return "File not found", 404
+
+    val = app_data['resume_link']
+    if val.startswith("data:"):
+        try:
+            header, base64_str = val.split(",", 1)
+            content_type = header.split(";")[0].replace("data:", "")
+            file_bytes = base64.b64decode(base64_str)
+            return Response(file_bytes, mimetype=content_type)
+        except Exception as e:
+            return f"Error: {str(e)}", 500
+    elif val.startswith("http://") or val.startswith("https://"):
+        return redirect(val)
+    else:
+        import tempfile
+        clean_name = os.path.basename(val)
+        local_dir = os.path.join('static', 'uploads', 'resumes')
+        if os.path.exists(os.path.join(local_dir, clean_name)):
+            return send_from_directory(local_dir, clean_name)
+        
+        tmp_dir = os.path.join(tempfile.gettempdir(), 'codenative_resumes')
+        if os.path.exists(os.path.join(tmp_dir, clean_name)):
+            return send_from_directory(tmp_dir, clean_name)
+        
+        return "File not found", 404
 
 @app.route("/feedback.html")
 def feedback_page():
