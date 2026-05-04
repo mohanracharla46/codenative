@@ -1001,6 +1001,7 @@ def videos_page():
     return render_template("videos.html")
 
 @app.route("/careers.html")
+@login_required
 def careers_page():
     conn = get_db_connection()
     careers = execute_query(conn, "SELECT * FROM careers ORDER BY id DESC").fetchall()
@@ -1008,6 +1009,7 @@ def careers_page():
     return render_template("careers.html", careers=careers)
 
 @app.route("/apply/<int:career_id>")
+@login_required
 def apply_page(career_id):
     conn = get_db_connection()
     career = execute_query(conn, "SELECT * FROM careers WHERE id = ?", (career_id,)).fetchone()
@@ -1021,6 +1023,7 @@ def apply_page(career_id):
     return render_template("apply.html", career=career, user_name=user_name, user_email=user_email)
 
 @app.route("/apply_submit", methods=["POST"])
+@login_required
 def apply_submit():
     try:
         career_id = request.form.get('career_id')
