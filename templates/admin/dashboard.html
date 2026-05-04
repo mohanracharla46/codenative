@@ -21,6 +21,7 @@
             <li class="active" data-tab="tab-dashboard"><i class="fas fa-chart-line"></i><span>Dashboard</span></li>
             <li data-tab="tab-analytics"><i class="fas fa-chart-pie"></i><span>Analytics</span></li>
             <li data-tab="tab-tutorials"><i class="fas fa-book"></i><span>Tutorials</span></li>
+            <li data-tab="tab-careers"><i class="fas fa-briefcase"></i><span>Careers</span></li>
             <li data-tab="tab-users"><i class="fas fa-users"></i><span>Users</span></li>
             <li onclick="location.href='/admin/feedback'"><i class="fas fa-comments"></i><span>Feedback</span></li>
             <li onclick="location.href='/'"><i class="fas fa-home"></i><span>View Site</span></li>
@@ -503,6 +504,66 @@
             </div>
         </div>
 
+        <!-- CAREERS TAB -->
+        <div id="tab-careers" class="tab-pane">
+            <div class="section-card">
+                <div class="section-header">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div>
+                            <h2 style="margin:0;">Careers Management</h2>
+                            <p style="margin:0; font-size:0.8rem; color:var(--admin-text-dim);">Post and manage Jobs and Workshops</p>
+                        </div>
+                    </div>
+                    <button class="btn-action btn-primary" onclick="openAddCareerModal()">
+                        <i class="fas fa-plus"></i> Add Job / Workshop
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Title</th>
+                                <th>Company / Org</th>
+                                <th>Location</th>
+                                <th>Date / Details</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in careers %}
+                            <tr>
+                                <td>
+                                    {% if c.type == 'workshop' %}
+                                    <span class="badge" style="background:#10b981; color:#fff;">Workshop</span>
+                                    {% else %}
+                                    <span class="badge" style="background:#6366f1; color:#fff;">Job</span>
+                                    {% endif %}
+                                </td>
+                                <td><div style="font-weight: 600;">{{ c.title }}</div></td>
+                                <td>{{ c.company or 'N/A' }}</td>
+                                <td>{{ c.location or 'N/A' }}</td>
+                                <td><div style="font-size:0.85rem; color:var(--admin-text-dim);">{{ c.created_at }}</div></td>
+                                <td>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <button class="btn-action btn-sm btn-edit" onclick="editCareer({{ c.id }})" title="Edit"><i class="fas fa-pen"></i></button>
+                                        <button class="btn-action btn-sm btn-delete" onclick="deleteCareer({{ c.id }})" title="Delete"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not careers %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--admin-text-dim);">No job or workshop posts found.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Add/Edit Modal -->
@@ -582,7 +643,51 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Career Add/Edit Modal -->
+    <div class="modal" id="careerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="careerModalTitle">Add Job / Workshop</h2>
+                <span class="close-modal" onclick="closeCareerModal()"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="modal-body">
+                <form id="careerForm">
+                    <input type="hidden" id="career_id">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="career_type" class="form-control" required>
+                            <option value="job">Job Posting</option>
+                            <option value="workshop">Workshop</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="career_title" class="form-control" placeholder="e.g. Software Engineer Intern" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Company / Organization Name</label>
+                        <input type="text" id="career_company" class="form-control" placeholder="e.g. Code Native Solutions">
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="career_location" class="form-control" placeholder="e.g. Remote / Hyderabad">
+                    </div>
+                    <div class="form-group">
+                        <label>Link / Application URL</label>
+                        <input type="url" id="career_link" class="form-control" placeholder="https://example.com/apply">
+                    </div>
+                    <div class="form-group">
+                        <label>Description & Requirements</label>
+                        <textarea id="career_description" class="form-control" style="height: 120px;" placeholder="Details about the job/workshop..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-action btn-primary" style="width: 100%; justify-content: center;"><i class="fas fa-save"></i> Save Career Post</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Code Snippet Modal -->
     <div class="modal" id="codeModal">
         <div class="modal-content" style="max-width: 600px;">
@@ -644,6 +749,7 @@
                     mainTitle.innerText = btn.querySelector('span') ? btn.querySelector('span').innerText : btn.innerText.trim();
                     if (tabId === 'tab-dashboard') mainTitle.innerText += ' Overview';
                     else if (tabId === 'tab-tutorials') mainTitle.innerText = 'Tutorial Management';
+                    else if (tabId === 'tab-careers') mainTitle.innerText = 'Careers Management';
                     else mainTitle.innerText = 'Users Management';
                 }
             });
@@ -697,6 +803,75 @@
         async function deleteContent(id) {
             if (confirm('Are you sure you want to delete this tutorial?')) {
                 const response = await fetch(`/admin/delete_content/${id}`, { method: 'POST' });
+                if (response.ok) location.reload();
+            }
+        }
+
+        const careerModal = document.getElementById('careerModal');
+        const careerForm = document.getElementById('careerForm');
+
+        function openAddCareerModal() {
+            document.getElementById('careerModalTitle').innerText = 'Add Job / Workshop';
+            careerForm.reset();
+            document.getElementById('career_id').value = '';
+            careerModal.style.display = 'flex';
+            setTimeout(() => careerModal.classList.add('show'), 10);
+        }
+
+        function closeCareerModal() {
+            careerModal.classList.remove('show');
+            setTimeout(() => careerModal.style.display = 'none', 300);
+        }
+
+        careerForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('career_id').value;
+            const data = {
+                id: id ? parseInt(id) : null,
+                type: document.getElementById('career_type').value,
+                title: document.getElementById('career_title').value,
+                company: document.getElementById('career_company').value,
+                location: document.getElementById('career_location').value,
+                link: document.getElementById('career_link').value,
+                description: document.getElementById('career_description').value
+            };
+            const response = await fetch('/admin/add_career', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (response.ok) {
+                alert('✅ Career post saved successfully!');
+                location.reload();
+            } else {
+                const err = await response.json();
+                alert('Error: ' + err.message);
+            }
+        };
+
+        async function editCareer(id) {
+            const res = await fetch(`/api/career/${id}`);
+            if (!res.ok) {
+                alert('Could not load career details.');
+                return;
+            }
+            const item = await res.json();
+            document.getElementById('careerModalTitle').innerText = 'Edit Job / Workshop';
+            document.getElementById('career_id').value = item.id;
+            document.getElementById('career_type').value = item.type;
+            document.getElementById('career_title').value = item.title;
+            document.getElementById('career_company').value = item.company || '';
+            document.getElementById('career_location').value = item.location || '';
+            document.getElementById('career_link').value = item.link || '';
+            document.getElementById('career_description').value = item.description || '';
+            
+            careerModal.style.display = 'flex';
+            setTimeout(() => careerModal.classList.add('show'), 10);
+        }
+
+        async function deleteCareer(id) {
+            if (confirm('Are you sure you want to delete this career item?')) {
+                const response = await fetch(`/admin/delete_career/${id}`, { method: 'POST' });
                 if (response.ok) location.reload();
             }
         }
@@ -766,6 +941,8 @@
             if (event.target == modal) closeModalBtn.onclick();
             const codeModal = document.getElementById('codeModal');
             if (event.target == codeModal) closeCodeModal();
+            const careerModal = document.getElementById('careerModal');
+            if (event.target == careerModal) closeCareerModal();
         };
 
         // ── Language Sub-Tab Logic ─────────────────────────────

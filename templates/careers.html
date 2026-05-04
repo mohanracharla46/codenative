@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include 'analytics.html' %}
+    <title>Careers & Workshops | Code Native</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+            --bg-color: #0d1117;
+            --text-color: #f8fafc;
+            --card-bg: rgba(22, 27, 34, 0.8);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --hover-border: rgba(99, 102, 241, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .careers-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header-section h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .header-section p {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .filter-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Listing Grid */
+        .careers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .career-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+        }
+
+        .career-card:hover {
+            border-color: var(--hover-border);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .card-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            padding: 6px 14px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+
+        .tag-job {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .tag-workshop {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .career-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            color: #f1f5f9;
+        }
+
+        .meta-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .meta-info span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .career-description {
+            font-size: 14px;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .apply-btn {
+            background: var(--primary-gradient);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .apply-btn:hover {
+            opacity: 0.95;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .careers-grid {
+                grid-template-columns: 1fr;
+            }
+            .header-section h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="/" class="logo"><img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native"></a>
+            <div class="header-actions">
+                {% if session.get('is_admin') %}
+                <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock" style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
+                {% endif %}
+
+                {% if session.get('user_name') %}
+                <a href="/dashboard" class="btn-signup user-btn"><i class="fas fa-user-circle" style="margin-right: 8px; font-size: 16px;"></i>Dashboard</a>
+                {% else %}
+                <a href="/signin.html" class="btn-signup">Sign in</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="careers-container">
+        <div class="header-section">
+            <h1>Careers & Workshops</h1>
+            <p>Explore full-time/part-time jobs and interactive technical workshops curated for Code Native students.</p>
+        </div>
+
+        <div class="filter-controls">
+            <button class="filter-btn active" onclick="filterCareers('all')" id="filter-all">
+                <i class="fas fa-th-large"></i> All Posts
+            </button>
+            <button class="filter-btn" onclick="filterCareers('job')" id="filter-job">
+                <i class="fas fa-briefcase"></i> Jobs
+            </button>
+            <button class="filter-btn" onclick="filterCareers('workshop')" id="filter-workshop">
+                <i class="fas fa-laptop-code"></i> Workshops
+            </button>
+        </div>
+
+        <div class="careers-grid" id="careers-grid">
+            {% for c in careers %}
+            <div class="career-card" data-type="{{ c.type }}">
+                <div>
+                    {% if c.type == 'workshop' %}
+                    <span class="card-tag tag-workshop"><i class="fas fa-laptop-code"></i> Workshop</span>
+                    {% else %}
+                    <span class="card-tag tag-job"><i class="fas fa-briefcase"></i> Job</span>
+                    {% endif %}
+
+                    <h3>{{ c.title }}</h3>
+                    
+                    <div class="meta-info">
+                        {% if c.company %}
+                        <span><i class="fas fa-building"></i> {{ c.company }}</span>
+                        {% endif %}
+                        {% if c.location %}
+                        <span><i class="fas fa-map-marker-alt"></i> {{ c.location }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="career-description">
+                        {{ c.description }}
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    {% if c.link %}
+                    <a href="{{ c.link }}" class="apply-btn" target="_blank" rel="noopener noreferrer">Apply Now <i class="fas fa-arrow-right"></i></a>
+                    {% else %}
+                    <span style="color: #94a3b8; font-size: 13px;"><i class="fas fa-info-circle"></i> Direct contact for apply</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% if not careers %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #94a3b8;">
+                <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p style="margin: 0; font-size: 1.1rem;">No careers or workshops listed yet. Stay tuned!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function filterCareers(type) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('filter-' + type).classList.add('active');
+
+            const cards = document.querySelectorAll('.career-card');
+            cards.forEach(card => {
+                if (type === 'all' || card.getAttribute('data-type') === type) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

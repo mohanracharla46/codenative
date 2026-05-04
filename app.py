@@ -232,6 +232,31 @@ def init_db():
         )
     '''
 
+    # SQL for Careers Table (Jobs & Workshops)
+    careers_sql = '''
+        CREATE TABLE IF NOT EXISTS careers (
+            id SERIAL PRIMARY KEY,
+            type TEXT NOT NULL, -- e.g. job, workshop
+            title TEXT NOT NULL,
+            company TEXT,
+            location TEXT,
+            description TEXT,
+            link TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS careers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            type TEXT NOT NULL, -- e.g. job, workshop
+            title TEXT NOT NULL,
+            company TEXT,
+            location TEXT,
+            description TEXT,
+            link TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         cursor.execute(users_sql)
@@ -240,6 +265,7 @@ def init_db():
         cursor.execute(activity_sql)
         cursor.execute(progress_sql)
         cursor.execute(feedback_sql)
+        cursor.execute(careers_sql)
         
         # Check if is_admin column exists (Postgres migration)
         cursor.execute("""
@@ -303,6 +329,7 @@ def init_db():
         conn.execute(activity_sql)
         conn.execute(progress_sql)
         conn.execute(feedback_sql)
+        conn.execute(careers_sql)
         
         # Check if is_admin column exists (SQLite migration)
         cursor = conn.execute("PRAGMA table_info(users)")
@@ -921,6 +948,13 @@ def js_page():
 def videos_page():
     return render_template("videos.html")
 
+@app.route("/careers.html")
+def careers_page():
+    conn = get_db_connection()
+    careers = execute_query(conn, "SELECT * FROM careers ORDER BY id DESC").fetchall()
+    release_db_connection(conn)
+    return render_template("careers.html", careers=careers)
+
 @app.route("/feedback.html")
 def feedback_page():
     return render_template("feedback.html")
@@ -1053,6 +1087,8 @@ def admin_dashboard():
         this_week = execute_query(conn, "SELECT COUNT(*) as count FROM users WHERE created_at > date('now', '-7 days')").fetchone()
         last_week = execute_query(conn, "SELECT COUNT(*) as count FROM users WHERE created_at BETWEEN date('now', '-14 days') AND date('now', '-7 days')").fetchone()
     
+    careers = execute_query(conn, "SELECT * FROM careers ORDER BY id DESC").fetchall()
+    
     release_db_connection(conn)
 
     tw_count = this_week['count'] if this_week and 'count' in dict(this_week) else (this_week[0] if this_week else 0)
@@ -1095,7 +1131,64 @@ def admin_dashboard():
                            contents=contents, 
                            users_count=users_count, 
                            all_users=all_users,
-                           analytics=analytics)
+                           analytics=analytics,
+                           careers=careers)
+
+# Admin Careers Add/Update
+@app.route("/admin/add_career", methods=["POST"])
+@admin_required
+def add_career():
+    try:
+        data = request.get_json()
+        career_id = data.get('id')
+        type_ = data.get('type')
+        title = data.get('title')
+        company = data.get('company')
+        location = data.get('location')
+        description = data.get('description')
+        link = data.get('link')
+
+        if not type_ or not title:
+            return jsonify({"message": "Type and Title are required"}), 400
+
+        conn = get_db_connection()
+        if career_id:
+            execute_query(conn, '''
+                UPDATE careers SET type = ?, title = ?, company = ?, location = ?, description = ?, link = ? WHERE id = ?
+            ''', (type_, title, company, location, description, link, career_id))
+        else:
+            execute_query(conn, '''
+                INSERT INTO careers (type, title, company, location, description, link)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (type_, title, company, location, description, link))
+        conn.commit()
+        release_db_connection(conn)
+        return jsonify({"message": "Career item added/updated successfully"}), 200
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+# Admin Careers Delete
+@app.route("/admin/delete_career/<int:id>", methods=["POST"])
+@admin_required
+def delete_career(id):
+    try:
+        conn = get_db_connection()
+        execute_query(conn, 'DELETE FROM careers WHERE id = ?', (id,))
+        conn.commit()
+        release_db_connection(conn)
+        return jsonify({"message": "Career item deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+# API endpoint to fetch a specific career (useful for editing)
+@app.route("/api/career/<int:id>")
+def get_career(id):
+    conn = get_db_connection()
+    career = execute_query(conn, "SELECT * FROM careers WHERE id = ?", (id,)).fetchone()
+    release_db_connection(conn)
+    if career:
+        return jsonify(dict(career))
+    return jsonify({"message": "Career not found"}), 404
 
 @app.route("/admin/add_content", methods=["POST"])
 @admin_required

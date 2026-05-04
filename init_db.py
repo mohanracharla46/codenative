@@ -177,6 +177,31 @@ def init_db():
         )
     '''
 
+    # SQL for Careers Table (Jobs & Workshops)
+    careers_sql = '''
+        CREATE TABLE IF NOT EXISTS careers (
+            id SERIAL PRIMARY KEY,
+            type TEXT NOT NULL,
+            title TEXT NOT NULL,
+            company TEXT,
+            location TEXT,
+            description TEXT,
+            link TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS careers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            type TEXT NOT NULL,
+            title TEXT NOT NULL,
+            company TEXT,
+            location TEXT,
+            description TEXT,
+            link TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         cursor.execute(users_sql)
@@ -185,6 +210,7 @@ def init_db():
         cursor.execute(progress_sql)
         cursor.execute(activity_sql)
         cursor.execute(stats_sql)
+        cursor.execute(careers_sql)
         
         # Check and add missing columns to users table
         cols_to_check = {
@@ -209,6 +235,7 @@ def init_db():
         conn.execute(progress_sql)
         conn.execute(activity_sql)
         conn.execute(stats_sql)
+        conn.execute(careers_sql)
         
         cursor = conn.execute("PRAGMA table_info(users)")
         existing_cols = [col[1] for col in cursor.fetchall()]
