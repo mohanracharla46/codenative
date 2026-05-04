@@ -263,6 +263,9 @@ def init_db():
             career_id INTEGER REFERENCES careers(id) ON DELETE CASCADE,
             name TEXT NOT NULL,
             email TEXT NOT NULL,
+            whatsapp TEXT,
+            college TEXT,
+            passout_year TEXT,
             resume_link TEXT,
             cover_letter TEXT,
             applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -273,6 +276,9 @@ def init_db():
             career_id INTEGER REFERENCES careers(id) ON DELETE CASCADE,
             name TEXT NOT NULL,
             email TEXT NOT NULL,
+            whatsapp TEXT,
+            college TEXT,
+            passout_year TEXT,
             resume_link TEXT,
             cover_letter TEXT,
             applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -343,6 +349,17 @@ def init_db():
         if not cursor.fetchone():
             cursor.execute("ALTER TABLE content ADD COLUMN custom_js TEXT")
 
+        # Check if career_applications columns exist (Postgres migration)
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='career_applications' AND column_name='whatsapp'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE career_applications ADD COLUMN whatsapp TEXT")
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='career_applications' AND column_name='college'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE career_applications ADD COLUMN college TEXT")
+        cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name='career_applications' AND column_name='passout_year'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE career_applications ADD COLUMN passout_year TEXT")
+
         conn.commit()
     else:
         # SQLite
@@ -381,6 +398,16 @@ def init_db():
             conn.execute("ALTER TABLE content ADD COLUMN custom_js TEXT")
         if 'quiz_json' not in columns:
             conn.execute("ALTER TABLE content ADD COLUMN quiz_json TEXT")
+
+        # Check if career_applications columns exist (SQLite migration)
+        cursor = conn.execute("PRAGMA table_info(career_applications)")
+        ca_cols = [col[1] for col in cursor.fetchall()]
+        if 'whatsapp' not in ca_cols:
+            conn.execute("ALTER TABLE career_applications ADD COLUMN whatsapp TEXT")
+        if 'college' not in ca_cols:
+            conn.execute("ALTER TABLE career_applications ADD COLUMN college TEXT")
+        if 'passout_year' not in ca_cols:
+            conn.execute("ALTER TABLE career_applications ADD COLUMN passout_year TEXT")
         
         conn.commit()
     
@@ -998,6 +1025,9 @@ def apply_submit():
         career_id = request.form.get('career_id')
         name = request.form.get('name')
         email = request.form.get('email')
+        whatsapp = request.form.get('whatsapp')
+        college = request.form.get('college')
+        passout_year = request.form.get('passout_year')
         resume_link = request.form.get('resume_link')
         cover_letter = request.form.get('cover_letter')
 
@@ -1006,9 +1036,9 @@ def apply_submit():
 
         conn = get_db_connection()
         execute_query(conn, '''
-            INSERT INTO career_applications (career_id, name, email, resume_link, cover_letter)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (career_id, name, email, resume_link, cover_letter))
+            INSERT INTO career_applications (career_id, name, email, whatsapp, college, passout_year, resume_link, cover_letter)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (career_id, name, email, whatsapp, college, passout_year, resume_link, cover_letter))
         conn.commit()
         release_db_connection(conn)
         return jsonify({"message": "Application submitted successfully"}), 200

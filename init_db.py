@@ -209,6 +209,9 @@ def init_db():
             career_id INTEGER REFERENCES careers(id) ON DELETE CASCADE,
             name TEXT NOT NULL,
             email TEXT NOT NULL,
+            whatsapp TEXT,
+            college TEXT,
+            passout_year TEXT,
             resume_link TEXT,
             cover_letter TEXT,
             applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -219,6 +222,9 @@ def init_db():
             career_id INTEGER REFERENCES careers(id) ON DELETE CASCADE,
             name TEXT NOT NULL,
             email TEXT NOT NULL,
+            whatsapp TEXT,
+            college TEXT,
+            passout_year TEXT,
             resume_link TEXT,
             cover_letter TEXT,
             applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

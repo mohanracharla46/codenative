@@ -108,6 +108,11 @@
             background: rgba(13, 17, 23, 0.8);
         }
 
+        select.form-control option {
+            background: #161b22;
+            color: #f8fafc;
+        }
+
         textarea.form-control {
             height: 120px;
             resize: vertical;
@@ -199,7 +204,7 @@
             <input type="hidden" name="career_id" id="career_id" value="{{ career.id }}">
 
             <div class="form-group">
-                <label for="name">Your Name</label>
+                <label for="name">Full Name</label>
                 <input type="text" id="name" name="name" class="form-control" value="{{ user_name }}" required placeholder="John Doe">
             </div>
 
@@ -209,13 +214,33 @@
             </div>
 
             <div class="form-group">
+                <label for="whatsapp">WhatsApp Number</label>
+                <input type="tel" id="whatsapp" name="whatsapp" class="form-control" required placeholder="+91 98765 43210">
+            </div>
+
+            <div class="form-group">
+                <label for="college">College Name</label>
+                <input type="text" id="college" name="college" class="form-control" required placeholder="University / Institute Name">
+            </div>
+
+            <div class="form-group">
+                <label for="passout_year">Passout Year</label>
+                <select id="passout_year" name="passout_year" class="form-control" required>
+                    <option value="" disabled selected>Select Passout Year</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label for="resume_link">Resume / LinkedIn Profile Link</label>
                 <input type="url" id="resume_link" name="resume_link" class="form-control" required placeholder="https://drive.google.com/... or https://linkedin.com/in/...">
             </div>
 
             <div class="form-group">
-                <label for="cover_letter">Cover Letter / Why should we hire you?</label>
-                <textarea id="cover_letter" name="cover_letter" class="form-control" placeholder="A short note about yourself, your skills and relevance..."></textarea>
+                <label for="cover_letter">Cover Letter / Additional Information</label>
+                <textarea id="cover_letter" name="cover_letter" class="form-control" placeholder="A short note about yourself, your skills or relevance..."></textarea>
             </div>
 
             <button type="submit" class="btn-submit" id="submitBtn">
