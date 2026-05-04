@@ -1034,7 +1034,7 @@ def apply_submit():
         passout_year = request.form.get('passout_year')
         cover_letter = request.form.get('cover_letter')
 
-        resume_link = ""
+        resume_link = request.form.get('resume_link') or ""
         resume_file = request.files.get('resume')
         if resume_file and resume_file.filename != "":
             import base64
@@ -1042,6 +1042,9 @@ def apply_submit():
             encoded = base64.b64encode(file_bytes).decode('utf-8')
             content_type = resume_file.content_type or 'application/octet-stream'
             resume_link = f"data:{content_type};base64,{encoded}"
+
+        if not resume_link:
+            return jsonify({"message": "Please upload a resume file or provide a public link."}), 400
 
         if not career_id or not name or not email:
             return jsonify({"message": "Career, Name and Email are required"}), 400
