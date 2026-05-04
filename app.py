@@ -1039,11 +1039,23 @@ def apply_submit():
         if resume_file and resume_file.filename != "":
             filename = secure_filename(resume_file.filename)
             filename = f"{int(time.time())}_{filename}"
-            upload_dir = os.path.join('static', 'uploads', 'resumes')
-            os.makedirs(upload_dir, exist_ok=True)
-            filepath = os.path.join(upload_dir, filename)
-            resume_file.save(filepath)
-            resume_link = f"/static/uploads/resumes/{filename}"
+            
+            # Try saving locally
+            try:
+                upload_dir = os.path.join('static', 'uploads', 'resumes')
+                os.makedirs(upload_dir, exist_ok=True)
+                filepath = os.path.join(upload_dir, filename)
+                resume_file.save(filepath)
+                resume_link = f"/uploads/resumes/{filename}"
+            except Exception:
+                # Fallback to temp directory if disk is read-only
+                import tempfile
+                upload_dir = os.path.join(tempfile.gettempdir(), 'codenative_resumes')
+                os.makedirs(upload_dir, exist_ok=True)
+                filepath = os.path.join(upload_dir, filename)
+                resume_file.seek(0)
+                resume_file.save(filepath)
+                resume_link = f"/uploads/resumes/{filename}"
 
         if not career_id or not name or not email:
             return jsonify({"message": "Career, Name and Email are required"}), 400
@@ -1058,6 +1070,19 @@ def apply_submit():
         return jsonify({"message": "Application submitted successfully"}), 200
     except Exception as e:
         return jsonify({"message": str(e)}), 500
+
+@app.route("/uploads/resumes/<path:filename>")
+def serve_resume(filename):
+    import tempfile
+    local_dir = os.path.join('static', 'uploads', 'resumes')
+    if os.path.exists(os.path.join(local_dir, filename)):
+        return send_from_directory(local_dir, filename)
+    
+    tmp_dir = os.path.join(tempfile.gettempdir(), 'codenative_resumes')
+    if os.path.exists(os.path.join(tmp_dir, filename)):
+        return send_from_directory(tmp_dir, filename)
+    
+    return "File not found", 404
 
 @app.route("/feedback.html")
 def feedback_page():
