@@ -200,7 +200,7 @@
             <p style="margin: 0;">Thank you for applying. We will review your application and get in touch shortly.</p>
         </div>
 
-        <form id="applyForm" onsubmit="submitApplication(event)">
+        <form id="applyForm" onsubmit="submitApplication(event)" enctype="multipart/form-data">
             <input type="hidden" name="career_id" id="career_id" value="{{ career.id }}">
 
             <div class="form-group">
@@ -234,8 +234,8 @@
             </div>
 
             <div class="form-group">
-                <label for="resume_link">Resume / LinkedIn Profile Link</label>
-                <input type="url" id="resume_link" name="resume_link" class="form-control" required placeholder="https://drive.google.com/... or https://linkedin.com/in/...">
+                <label for="resume">Upload Resume</label>
+                <input type="file" id="resume" name="resume" class="form-control" accept=".pdf,.doc,.docx" required>
             </div>
 
             <div class="form-group">

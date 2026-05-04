@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for, flash, Response, send_from_directory
+from werkzeug.utils import secure_filename
 import requests
 import time
 import sqlite3
@@ -1028,8 +1029,18 @@ def apply_submit():
         whatsapp = request.form.get('whatsapp')
         college = request.form.get('college')
         passout_year = request.form.get('passout_year')
-        resume_link = request.form.get('resume_link')
         cover_letter = request.form.get('cover_letter')
+
+        resume_link = ""
+        resume_file = request.files.get('resume')
+        if resume_file and resume_file.filename != "":
+            filename = secure_filename(resume_file.filename)
+            filename = f"{int(time.time())}_{filename}"
+            upload_dir = os.path.join('static', 'uploads', 'resumes')
+            os.makedirs(upload_dir, exist_ok=True)
+            filepath = os.path.join(upload_dir, filename)
+            resume_file.save(filepath)
+            resume_link = f"/static/uploads/resumes/{filename}"
 
         if not career_id or not name or not email:
             return jsonify({"message": "Career, Name and Email are required"}), 400
