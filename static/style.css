@@ -1215,19 +1215,16 @@ h1 {
 
 /* Responsive */
 @media (max-width: 1024px) {
-    .content {
-        padding: 40px 20px;
-        min-height: auto;
-        text-align: center;
-        flex-direction: column-reverse;
+    .hero-main {
+        gap: 30px;
     }
-
-    .left-section {
-        margin-top: 40px;
+    
+    .hero-content h1 {
+        font-size: 52px;
     }
-
-    .right-section {
-        display: none;
+    
+    .main-girl-img {
+        max-width: 380px;
     }
 
     .c-container, .java-container {
@@ -1258,26 +1255,71 @@ h1 {
 }
 
 @media (max-width: 768px) {
-    .hero h1 {
+    .hero {
+        padding: 40px 0 60px;
+    }
+
+    .hero-main {
+        flex-direction: column;
+        text-align: left;
+    }
+
+    .hero-content h1 {
         font-size: 42px;
-        line-height: 1.2;
+        margin-bottom: 16px;
     }
 
-    .tagline {
-        font-size: 24px;
-    }
-    .dynamic {
-        width: 160px;
+    .hero-content .tagline {
+        font-size: 20px;
+        flex-wrap: wrap;
     }
 
-    .description {
+    .hero-content .description {
+        font-size: 15px;
+        margin-bottom: 24px;
+    }
+
+    .hero-visual {
+        margin-top: 40px;
+        width: 100%;
+    }
+
+    .main-girl-img {
+        max-width: 320px;
+    }
+
+    .floating-card {
+        padding: 8px 12px;
+        border-radius: 12px;
+    }
+
+    .floating-card .icon {
+        width: 24px;
+        height: 24px;
         font-size: 16px;
-        max-width: 100%;
     }
 
-    h1 {
-        font-size: 38px !important;
-        letter-spacing: -1px;
+    .floating-card .name {
+        font-size: 12px;
+    }
+
+    .social-proof {
+        gap: 16px;
+    }
+
+    .proof-card {
+        padding: 8px 12px;
+        gap: 10px;
+    }
+
+    .card-icon-box {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .card-details .value {
+        font-size: 16px;
     }
 
     .c-container, .java-container {
@@ -1309,19 +1351,43 @@ h1 {
 }
 
 @media (max-width: 480px) {
-    .hero h1 {
+    .hero-content h1 {
         font-size: 34px;
     }
 
-    .tagline {
-        font-size: 20px;
-    }
-    .dynamic {
-        width: 140px;
+    .hero-content .tagline {
+        font-size: 18px;
     }
 
-    .btn-cta {
+    .hero-content .dynamic {
+        min-width: 120px;
+    }
+
+    .btn-trial {
         width: 100%;
+        justify-content: center;
+        padding: 14px 20px;
+        font-size: 16px;
+    }
+
+    .social-proof {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .proof-card {
+        width: 100%;
+    }
+
+    .hero-visual {
+        transform: scale(0.9);
+    }
+    
+    .hero-bottom-features {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
         padding: 16px 30px;
         font-size: 18px;
     }
