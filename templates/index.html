@@ -755,42 +755,100 @@
             <div class="shape shape-1"></div>
             <div class="shape shape-2"></div>
             <div class="shape shape-3"></div>
-            <!-- Floating Tech Logos -->
-            <div class="floating-logo logo-python"><i class="fab fa-python"></i></div>
-            <div class="floating-logo logo-js"><i class="fab fa-js"></i></div>
-            <div class="floating-logo logo-java"><i class="fab fa-java"></i></div>
-            <div class="floating-logo logo-cpp"><i class="fas fa-code"></i></div>
-            <div class="floating-logo logo-html"><i class="fab fa-html5"></i></div>
-            <div class="floating-logo logo-css"><i class="fab fa-css3-alt"></i></div>
         </div>
         <div class="container">
-            <main class="content">
-                <section class="left-section">
-                    <div
-                        style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 50px; color: var(--primary-color); font-size: 13px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 20px; text-transform: uppercase; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.1);">
-                        <i class="fas fa-medal" style="color: #fbbf24; font-size: 16px;"></i> India's First Telugu
-                        Coding Platform
+            <div class="hero-main">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-bullhorn"></i> INDIA'S FIRST TELUGU CODING PLATFORM
                     </div>
-                    <h1>Learn Coding in <br> <span style="color: var(--primary-color);">Telugu</span></h1>
+                    <h1>Learn Coding in <span class="highlight">Telugu</span></h1>
                     <p class="tagline">
                         <span class="static">Your New key to</span>
-                        <span class="dynamic" aria-live="polite"><span class="dynamic-span" id="typed"></span><span
-                                class="caret" aria-hidden="true"></span></span>
+                        <span class="dynamic" aria-live="polite">
+                            <span class="dynamic-span" id="typed" style="color: #38bdf8;"></span><span class="caret" aria-hidden="true" style="display: inline-block; width: 3px; height: 0.9em; background-color: #38bdf8; margin-left: 4px; border-radius: 4px; animation: cursorBlink 1s step-end infinite;"></span>
+                        </span>
                     </p>
                     <p class="description">
-                        Master programming languages with our comprehensive tutorials and interactive compiler. Start
-                        your
-                        journey today and build your future in tech.
+                        Master programming languages with our comprehensive tutorials and interactive compiler. Start your journey today and build your future in tech.
                     </p>
-                    <div class="cta-wrapper">
-                        {% if session.get('user_name') %}
-                        <a href="/roadmap.html" class="btn-cta">Start Learning Free </a>
-                        {% else %}
-                        <a href="/signin.html" class="btn-cta">Start Learning Free </a>
-                        {% endif %}
+                    
+                    <a href="/roadmap.html" class="btn-trial">
+                        Start Learning for Free <i class="fas fa-arrow-right"></i>
+                    </a>
+
+                    <div class="social-proof">
+                        <div class="proof-card">
+                            <div class="card-icon-box orange">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="card-details">
+                                <span class="label">AVERAGE RATING</span>
+                                <span class="value">4.8 / 5.0</span>
+                            </div>
+                        </div>
+                        <div class="proof-card">
+                            <div class="card-icon-box green">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="card-details">
+                                <span class="label">USER SATISFACTION</span>
+                                <span class="value">96.0%</span>
+                            </div>
+                        </div>
                     </div>
-                </section>
-            </main>
+                </div>
+
+                <div class="hero-visual">
+                    <img src="{{ url_for('static', filename='images/hero-girl.png') }}" alt="CodeNative Student" class="main-girl-img">
+                    
+                    <!-- Floating Cards -->
+                    <div class="floating-card card-python">
+                        <div class="icon" style="color: #3776ab;"><i class="fab fa-python"></i></div>
+                        <div class="name">Python</div>
+                    </div>
+                    <div class="floating-card card-js">
+                        <div class="icon" style="color: #f7df1e;"><i class="fab fa-js"></i></div>
+                        <div class="name">JS</div>
+                    </div>
+                    <div class="floating-card card-java">
+                        <div class="icon" style="color: #e76f00;"><i class="fab fa-java"></i></div>
+                        <div class="name">Java</div>
+                    </div>
+                    <div class="floating-card card-css">
+                        <div class="icon" style="color: #1572b6;"><i class="fab fa-css3-alt"></i></div>
+                        <div class="name">CSS</div>
+                    </div>
+                    <div class="floating-card card-html">
+                        <div class="icon" style="color: #e34f26;"><i class="fab fa-html5"></i></div>
+                        <div class="name">HTML</div>
+                    </div>
+                    <div class="floating-card card-coding">
+                        <div class="icon" style="color: #6366f1;"><i class="fas fa-terminal"></i></div>
+                        <div class="name">Coding</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Features -->
+            <div class="hero-bottom-features">
+                <div class="feature-card">
+                    <div class="icon-box"><i class="fas fa-laptop-code"></i></div>
+                    <p>Access 100+ coding tutorials in Telugu</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box"><i class="fas fa-house-user"></i></div>
+                    <p>Practice with an integrated Telugu compiler</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box"><i class="fas fa-wand-magic-sparkles"></i></div>
+                    <p>Build a tech career with our path guidelines</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-box"><i class="fas fa-calendar-check"></i></div>
+                    <p>Join a thriving local developer community</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1156,13 +1214,13 @@
         });
         {% endif %}
 
-        // Only the last word changes. Edit the array below to change ending words.
-        const words = ["Success.", "Growth.", "Innovation.", "Opportunity.", "Confidence."];
+        // Typing Animation
+        const words = ["Growth.", "Success.", "Innovation.", "Opportunity.", "Confidence."];
         const typedEl = document.getElementById('typed');
 
-        const TYPING_SPEED = 80; // ms per character
-        const DELETING_SPEED = 40; // ms per character when deleting
-        const HOLD_DELAY = 1400; // ms to keep a word displayed before deleting
+        const TYPING_SPEED = 80;
+        const DELETING_SPEED = 40;
+        const HOLD_DELAY = 1400;
 
         let wordIndex = 0;
         let charIndex = 0;
@@ -1171,7 +1229,6 @@
         function type() {
             const current = words[wordIndex];
             if (typing) {
-                // add character
                 if (charIndex < current.length) {
                     typedEl.textContent += current.charAt(charIndex);
                     charIndex++;
@@ -1181,13 +1238,11 @@
                     setTimeout(type, HOLD_DELAY);
                 }
             } else {
-                // delete character
                 if (charIndex > 0) {
                     typedEl.textContent = current.substring(0, charIndex - 1);
                     charIndex--;
                     setTimeout(type, DELETING_SPEED);
                 } else {
-                    // move to next word
                     typing = true;
                     wordIndex = (wordIndex + 1) % words.length;
                     setTimeout(type, TYPING_SPEED);
@@ -1195,17 +1250,7 @@
             }
         }
 
-        // Start after a short delay so the page feels smooth
         setTimeout(type, 500);
-
-        // Optional: pause typing when page is not visible to save CPU
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                // noop: letting timers run is fine; for advanced control, you'd clear timers here
-            }
-        });
-
-
 
         // Scroll Reveal Animation
         const revealElements = document.querySelectorAll('.reveal-left, .reveal-right, .reveal-up');
