@@ -12,7 +12,7 @@ body {
 
 /* Sidebar - Python Scholar Style */
 .tutorial-sidebar {
-    width: 300px; /* Slightly wider for better breathing room */
+    width: 280px;
     background: #ffffff;
     border-right: 1px solid #e2e8f0;
     position: fixed;
@@ -25,15 +25,27 @@ body {
     flex-direction: column;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
-    box-shadow: 10px 0 30px rgba(0,0,0,0.02);
 }
 
 .sidebar-menu {
     flex: 1;
     overflow-y: auto;
-    padding: 10px 16px; /* Adjusted horizontal padding */
+    padding: 20px 16px;
     list-style: none;
     margin: 0;
+    position: relative;
+}
+
+/* Vertical Progress Line */
+.sidebar-menu::before {
+    content: '';
+    position: absolute;
+    left: 34px;
+    top: 40px;
+    bottom: 40px;
+    width: 2px;
+    background: #f1f5f9;
+    z-index: 0;
 }
 
 .sidebar-menu::-webkit-scrollbar {
@@ -45,50 +57,61 @@ body {
     border-radius: 10px;
 }
 
-.tutorial-sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
+/* Topic Items */
 
-.tutorial-sidebar ul li {
-    padding: 12px 20px; /* Increased left padding for text */
-    margin-bottom: 8px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #64748b;
+.topic {
     display: flex;
     align-items: center;
-    gap: 12px;
+    padding: 12px 16px;
+    margin: 4px 8px;
+    border-radius: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
-    transition: all 0.2s ease;
     position: relative;
-    border: 1px solid transparent;
+    z-index: 1;
+    background: transparent;
+    color: #64748b;
+    font-weight: 500;
+    gap: 12px;
 }
 
-.tutorial-sidebar ul li:hover {
-    color: #4f46e5;
+.topic:hover:not(.active) {
     background: #f8fafc;
-    border-color: #eef2ff;
-    transform: translateX(4px);
+    color: #4f46e5;
 }
 
-.tutorial-sidebar ul li.active {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+.topic.active {
+    background: #6366f1;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.topic i {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.topic.completed i {
+    color: #10b981;
+}
+
+.topic.active i {
     color: #ffffff;
-    box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
-    border-color: rgba(255,255,255,0.1);
 }
 
-.tutorial-sidebar ul li.active::before {
-    content: '';
-    position: absolute;
-    left: 8px;
-    width: 4px;
-    height: 16px;
-    background: white;
-    border-radius: 4px;
+.topic.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.topic-title {
+    font-size: 15px;
+    flex: 1;
+}
+
+.topic.active .topic-title {
+    font-weight: 600;
 }
 
 .sidebar-footer-nav {
@@ -222,31 +245,44 @@ body {
 
 /* Content Wrapper */
 .tutorial-content {
-    margin-left: 300px;
-    margin-top: 80px; /* Offset for fixed header */
-    padding: 60px 80px; /* Increased side padding for better reading */
-    max-width: 1200px;
-    line-height: 1.8;
+    margin-left: 280px;
+    margin-top: 80px;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f9fafb;
+}
+
+.content-wrapper {
+    width: 100%;
+    max-width: 1100px;
+}
+
+.main-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 #topicContent {
-    font-size: 16px;
+    font-size: 17px;
     color: #334155;
-    display: flow-root; /* Block formatting context to contain floats/margins */
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    line-height: 1.7;
 }
 
 #topicContent h1, #topicContent h2, #topicContent h3 {
     color: #0f172a;
-    margin-top: 1.5em;
-    margin-bottom: 0.5em;
-    line-height: 1.3;
+    margin-top: 2em;
+    margin-bottom: 0.8em;
+    line-height: 1.2;
+    font-weight: 700;
 }
 
 #topicContent p {
-    margin-bottom: 1.25em;
-    text-align: left;
+    margin-bottom: 1.5em;
 }
 
 #topicContent ul, #topicContent ol {
@@ -284,25 +320,212 @@ body {
     color: #6366f1;
 }
 
-#topicContent pre {
-    background: #0f172a;
-    color: #f8fafc;
-    padding: 20px;
-    border-radius: 12px;
-    overflow-x: auto;
-    margin: 20px 0;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
+/* Callout Boxes (Telugu Content) */
+.intro, .callout {
+    background: #f5f3ff; /* Very light purple */
+    border-radius: 8px;
+    padding: 24px 32px;
+    margin: 32px 0;
+    border-left: 4px solid #6366f1; /* Thick purple bar */
+    position: relative;
 }
 
-.breadcrumb-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #64748b;
-    margin-bottom: 24px;
+.intro::before, .callout::before {
+    content: '\f1ab'; /* FontAwesome Translate Icon */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    left: -40px;
+    top: 24px;
+    color: #6366f1;
+    font-size: 20px;
+    display: none; /* Keep it clean for now, or use header */
+}
+
+.intro-header, .callout-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    color: #4f46e5;
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+.intro h2, .callout h2 {
+    font-size: 18px;
+    color: #4338ca;
+    margin: 0 !important;
+    font-weight: 800;
+}
+
+.intro p, .callout p {
+    color: #1e1b4b !important;
+    font-size: 16px !important;
+    margin-bottom: 0 !important;
+    font-style: italic;
+    font-family: 'Inter', 'Noto Sans Telugu', sans-serif;
+    line-height: 1.8 !important;
+}
+
+/* Lesson Meta Header */
+.lesson-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #6366f1;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+}
+
+.lesson-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+}
+
+.social-proof {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.avatar-stack {
+    display: flex;
+    align-items: center;
+}
+
+.avatar-stack img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    margin-right: -8px;
+    background: #e2e8f0;
+}
+
+.student-count {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Code Snippets - Premium Developer Look */
+.code-block-container {
+    background: #0f172a;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 32px 0;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.code-header {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.code-dots {
+    display: flex;
+    gap: 6px;
+}
+
+.code-dots span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.code-dots .red { background: #ff5f56; }
+.code-dots .yellow { background: #ffbd2e; }
+.code-dots .green { background: #27c93f; }
+
+.lang-badge {
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    background: rgba(255,255,255,0.05);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.copy-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #94a3b8;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.copy-btn:hover {
+    background: rgba(255,255,255,0.05);
+    color: #ffffff;
+    border-color: rgba(255,255,255,0.2);
+}
+
+.code-block {
+    display: flex;
+    padding: 20px 0;
+    font-family: 'Fira Code', 'JetBrains Mono', 'Menlo', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: auto;
+}
+
+.line-numbers {
+    padding: 0 16px 0 20px;
+    color: #475569;
+    text-align: right;
+    user-select: none;
+    border-right: 1px solid rgba(255,255,255,0.05);
+    min-width: 50px;
+}
+
+.code-content {
+    padding: 0 24px;
+    color: #e2e8f0;
+    white-space: pre;
+    flex: 1;
+}
+
+/* Basic Syntax Highlighting Classes */
+.code-content .keyword { color: #f472b6; }
+.code-content .string { color: #34d399; }
+.code-content .comment { color: #64748b; font-style: italic; }
+.code-content .function { color: #60a5fa; }
+.code-content .number { color: #fbbf24; }
+
+.breadcrumb-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #94a3b8;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .bc-item {
@@ -394,52 +617,55 @@ body {
 
 /* Coming Up Next footer */
 .next-lesson-section {
-    margin-top: 100px;
-    padding: 32px 48px;
-    background: white;
-    border-radius: 40px;
-    border: 1px solid #f1f5f9;
+    margin-top: 60px;
+    padding: 24px 32px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.next-lesson-section:hover {
+    border-color: #4f46e5;
+    background: #f8faff;
+    transform: translateY(-2px);
 }
 
 .next-lesson-meta span {
     font-size: 11px;
-    color: #94a3b8;
+    color: #4f46e5;
     text-transform: uppercase;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
 }
 
 .next-lesson-meta h3 {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
-    margin: 8px 0 0;
+    margin: 4px 0 0;
     color: #0f172a;
 }
 
 .next-lesson-btn {
-    width: 56px;
-    height: 56px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    width: 44px;
+    height: 44px;
+    background: #4f46e5;
+    border: none;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    color: #64748b;
-    cursor: pointer;
+    font-size: 16px;
+    color: #ffffff;
     transition: all 0.3s ease;
 }
 
-.next-lesson-btn:hover {
-    background: #6366f1;
-    color: #ffffff;
-    border-color: #6366f1;
-    transform: translateX(6px);
+.next-lesson-section:hover .next-lesson-btn {
+    transform: translateX(4px);
 }
 
 /* Menu Toggle Button */
@@ -577,48 +803,4 @@ body {
 }
 .sidebar-header { padding: 32px 24px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 16px; margin-bottom: 12px; } .sidebar-header i { font-size: 38px; color: #6366f1; filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.15)); } .sidebar-header h2 { font-size: 19px; font-weight: 800; margin: 0; color: #0f172a; letter-spacing: -0.02em; } .sidebar-header p { font-size: 11px; margin: 0; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
 
-.topic {
-    display: flex;
-    align-items: center;
-    padding: 12px 20px;
-    margin-bottom: 8px;
-    border-radius: 12px;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.topic-title {
-    flex: 1;
-    font-size: 15px;
-    font-weight: 500;
-    color: #334155; /* Light black / Dark slate color */
-}
-
-/* Completed Topic Styling - Matching latest feedback */
-.topic.completed:not(.active) .topic-title {
-    color: #334155; /* Keep it light black */
-    font-weight: 500;
-}
-
-.completion-mark {
-    color: #10b981; /* Success green */
-    font-size: 12px;
-    margin-right: 8px;
-}
-
-.topic.active {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);
-    border-left: 4px solid white;
-    transform: translateX(4px);
-}
-
-.topic.active .topic-title {
-    color: #ffffff; /* Pure white text when active */
-    font-weight: 700;
-}
-
-.topic:hover:not(.active):not(.completed) {
-    background: #f8fafc;
-    transform: translateX(4px);
-}
+/* End of stylesheet */

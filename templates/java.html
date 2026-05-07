@@ -30,7 +30,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/c.css">
     <link rel="stylesheet" href="/static/compiler.css">
     <link rel="stylesheet" href="/static/style.css">
@@ -119,13 +119,17 @@
 
 
     <div class="tutorial-content">
-        <div class="breadcrumb-label">Module 01 • Java Fundamentals</div>
-        
-        <div class="main-box" id="topicContent">
-            <!-- Content from database will be loaded here -->
-            <div style="padding: 100px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <i class="fab fa-java fa-beat-fade" style="font-size: 54px; color: #ed8b00; margin-bottom: 20px;"></i>
-                <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Compiling Java Lesson...</p>
+        <div class="content-wrapper">
+            <div class="breadcrumb-label">Module 01 • Java Fundamentals</div>
+            
+            <div class="main-card">
+                <div class="main-box" id="topicContent">
+                    <!-- Content from database will be loaded here -->
+                    <div style="padding: 100px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <i class="fab fa-java fa-beat-fade" style="font-size: 54px; color: #ed8b00; margin-bottom: 20px;"></i>
+                        <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Compiling Java Lesson...</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -199,15 +203,15 @@
         <div class="next-lesson-section" id="nextLessonBar">
             <div class="next-lesson-meta">
                 <span>Coming up next</span>
-                <h3>Objects & Classes</h3>
+                <h3>Variables & Data Types</h3>
             </div>
             <button class="next-lesson-btn" id="nextLessonBtn">
                 <i class="fas fa-arrow-right"></i>
             </button>
         </div>
-    </div>
+    </div> <!-- content-wrapper -->
+</div> <!-- tutorial-content -->
 
-    </div>
     <script src="/static/tutorial.js"></script>
     <script>
         // Initialize Ace Editor

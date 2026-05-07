@@ -1402,9 +1402,16 @@ def get_language_content(language):
 def get_topic_content(language, topic_slug):
     conn = get_db_connection()
     topic = execute_query(conn, 'SELECT id, language, topic_slug, topic_title, content_html, quiz_json, custom_css, custom_js, order_index, created_at FROM content WHERE language = ? AND topic_slug = ?', (language.lower(), topic_slug)).fetchone()
+    
+    # Get student count who completed this topic
+    student_count_res = execute_query(conn, 'SELECT COUNT(*) as count FROM user_progress WHERE language = ? AND topic_slug = ?', (language.lower(), topic_slug)).fetchone()
+    student_count = student_count_res['count'] if student_count_res else 0
+    
     release_db_connection(conn)
     if topic:
-        return jsonify(dict(topic))
+        data = dict(topic)
+        data['student_count'] = student_count
+        return jsonify(data)
     return jsonify({"message": "Not found"}), 404
 
 @app.route("/run", methods=["POST"])

@@ -133,7 +133,9 @@ const TutorialLoader = {
         // 1. Show cached topics immediately
         if (cachedTopics) {
             try {
-                this.renderTopics(JSON.parse(cachedTopics));
+                const parsedTopics = JSON.parse(cachedTopics);
+                this.config.topics = parsedTopics;
+                this.renderTopics(parsedTopics);
             } catch (e) {
                 localStorage.removeItem(cacheKey);
             }
@@ -149,6 +151,7 @@ const TutorialLoader = {
 
             const topics = await res.json();
             if (topics && Array.isArray(topics) && topics.length > 0) {
+                this.config.topics = topics;
                 localStorage.setItem(cacheKey, JSON.stringify(topics));
                 this.renderTopics(topics);
             } else if (topics && Array.isArray(topics) && topics.length === 0) {
@@ -202,24 +205,25 @@ const TutorialLoader = {
         sidebarTopics.innerHTML = '';
         topics.forEach((topic, index) => {
             const li = document.createElement('li');
-            li.className = `topic ${topic.completed ? 'completed' : ''}`;
+            const isLocked = !isLoggedIn && index > 0;
+            li.className = `topic ${topic.completed ? 'completed' : ''} ${isLocked ? 'locked' : ''}`;
             li.dataset.topic = topic.topic_slug;
             li.dataset.index = index;
 
-            let lockIcon = '';
-            if (!isLoggedIn && index > 0) {
-                lockIcon = '<i class="fas fa-lock" style="margin-right: 8px; font-size: 11px; opacity: 0.5;"></i>';
+            let statusIcon = '<i class="far fa-circle status-icon"></i>'; // Default upcoming
+            if (topic.completed) {
+                statusIcon = '<i class="fas fa-check-circle status-icon"></i>';
+            } else if (isLocked) {
+                statusIcon = '<i class="fas fa-lock status-icon"></i>';
             }
 
             li.innerHTML = `
-                ${topic.completed ? '<i class="fas fa-check-circle completion-mark"></i>' : ''}
-                <div class="topic-indicator"></div>
-                ${lockIcon}
+                ${statusIcon}
                 <span class="topic-title">${topic.topic_title}</span>
             `;
 
             li.onclick = () => {
-                if (!isLoggedIn && index > 0) {
+                if (isLocked) {
                     window.location.href = `/signin.html?next=${encodeURIComponent(window.location.pathname)}&error=login_required`;
                     return;
                 }
@@ -288,6 +292,7 @@ const TutorialLoader = {
 
             if (data.content_html) {
                 contentBox.innerHTML = data.content_html;
+                this.postProcessContent(contentBox, slug, this.config.topics, data);
             }
 
             // Apply custom styles/scripts if any
@@ -328,8 +333,11 @@ const TutorialLoader = {
 
             if (res.ok && el) {
                 el.classList.add('completed');
-                if (!el.querySelector('.completion-mark')) {
-                    el.insertAdjacentHTML('afterbegin', '<i class="fas fa-check-circle completion-mark"></i>');
+                
+                // Update icon to checkmark
+                const icon = el.querySelector('.status-icon');
+                if (icon) {
+                    icon.className = 'fas fa-check-circle status-icon';
                 }
 
                 // Trigger feedback popup if 1st or 2nd lesson
@@ -411,6 +419,105 @@ const TutorialLoader = {
                 <p style="font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; font-size: 13px;">Linking Lesson...</p>
             </div>
         `;
+    },
+
+    postProcessContent(container, slug, topics, data) {
+        const topicIndex = topics ? topics.findIndex(t => t.topic_slug === slug) : 0;
+        const topic = topics ? topics[topicIndex] : { topic_title: 'Introduction' };
+
+        // 1. Inject Premium Header
+        const studentCount = data.student_count || 0;
+        const headerHtml = `
+            <div class="lesson-label">Lesson 1.${topicIndex + 1}</div>
+            <h1 class="lesson-title">${topic.topic_title}</h1>
+            <div class="social-proof">
+                <div class="avatar-stack">
+                    <img src="/static/images/avatar1.png" alt="Student">
+                    <img src="/static/images/avatar2.png" alt="Student">
+                    <img src="/static/images/avatar3.png" alt="Student">
+                </div>
+                <div class="student-count">${studentCount} students completed this lesson</div>
+            </div>
+        `;
+        container.insertAdjacentHTML('afterbegin', headerHtml);
+
+        // 2. Transform .intro into Key Concept Summaries
+        const intros = container.querySelectorAll('.intro');
+        intros.forEach(intro => {
+            const header = document.createElement('div');
+            header.className = 'intro-header';
+            header.innerHTML = '<i class="fas fa-language"></i> Key Concept Summary (Telugu)';
+            intro.prepend(header);
+        });
+
+        // 3. Transform <pre> into professional code blocks
+        const preTags = container.querySelectorAll('pre');
+        preTags.forEach(pre => {
+            const code = pre.innerText.trim();
+            const lines = code.split('\n');
+            const lineNumbers = lines.map((_, i) => i + 1).join('\n');
+
+            // Robust Single-Pass Syntax Highlighting
+            const rules = [
+                { name: 'comment', regex: /\/\/.*/ },
+                { name: 'string', regex: /"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/ },
+                { name: 'keyword', regex: /\b(const|let|var|function|return|if|else|for|while|import|export|from|class|extends|public|private|static|void|int|float|double|char|string|struct|include|using|namespace|std|cout|cin|endl|printf|scanf|main|return|if|else|while|for|break|continue|switch|case|default|enum|sizeof|typedef|volatile|extern|register|long|short|unsigned|signed)\b/ },
+                { name: 'number', regex: /\b\d+\b/ }
+            ];
+
+            const bigRegex = new RegExp(rules.map(r => `(${r.regex.source})`).join('|'), 'g');
+            const highlighted = code.replace(bigRegex, (match, ...groups) => {
+                const groupIndex = groups.findIndex(g => g === match);
+                if (groupIndex !== -1 && rules[groupIndex]) {
+                    return `<span class="${rules[groupIndex].name}">${match}</span>`;
+                }
+                return match;
+            });
+
+            const containerDiv = document.createElement('div');
+            containerDiv.className = 'code-block-container';
+            const lang = this.config ? (this.config.lang || 'code') : 'code';
+
+            containerDiv.innerHTML = `
+                <div class="code-header">
+                    <div class="header-left">
+                        <div class="code-dots">
+                            <span class="red"></span>
+                            <span class="yellow"></span>
+                            <span class="green"></span>
+                        </div>
+                        <span class="lang-badge">${lang}</span>
+                    </div>
+                    <button class="copy-btn" onclick="TutorialLoader.copyCode(this)">
+                        <i class="far fa-copy"></i> Copy
+                    </button>
+                </div>
+                <div class="code-block">
+                    <div class="line-numbers">${lineNumbers}</div>
+                    <div class="code-content">${highlighted}</div>
+                </div>
+            `;
+
+            pre.parentNode.replaceChild(containerDiv, pre);
+        });
+    },
+
+    copyCode(btn) {
+        const container = btn.closest('.code-block-container');
+        const code = container.querySelector('.code-content').innerText;
+
+        navigator.clipboard.writeText(code).then(() => {
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            btn.style.borderColor = '#10b981';
+            btn.style.color = '#10b981';
+
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.borderColor = '#4d4d4d';
+                btn.style.color = '#a6a6a6';
+            }, 2000);
+        });
     }
 };
 
