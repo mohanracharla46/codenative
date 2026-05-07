@@ -1407,10 +1407,18 @@ def get_topic_content(language, topic_slug):
     student_count_res = execute_query(conn, 'SELECT COUNT(*) as count FROM user_progress WHERE language = ? AND topic_slug = ?', (language.lower(), topic_slug)).fetchone()
     student_count = student_count_res['count'] if student_count_res else 0
     
+    # Check if user has already given feedback
+    user_id = session.get('user_id')
+    has_given_feedback = False
+    if user_id:
+        feedback_res = execute_query(conn, 'SELECT id FROM feedback WHERE user_id = ? LIMIT 1', (user_id,)).fetchone()
+        has_given_feedback = bool(feedback_res)
+
     release_db_connection(conn)
     if topic:
         data = dict(topic)
         data['student_count'] = student_count
+        data['has_given_feedback'] = has_given_feedback
         return jsonify(data)
     return jsonify({"message": "Not found"}), 404
 

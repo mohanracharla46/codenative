@@ -293,6 +293,11 @@ const TutorialLoader = {
             if (data.content_html) {
                 contentBox.innerHTML = data.content_html;
                 this.postProcessContent(contentBox, slug, this.config.topics, data);
+                
+                // Sync feedback status from server
+                if (data.has_given_feedback) {
+                    localStorage.setItem('feedback_submitted', 'true');
+                }
             }
 
             // Apply custom styles/scripts if any
