@@ -769,7 +769,11 @@
                         Master programming languages with our comprehensive tutorials and interactive compiler. Start your journey today and build your future in tech.
                     </p>
                     
+                    {% if session.get('user_name') %}
                     <a href="/roadmap.html" class="btn-trial">
+                    {% else %}
+                    <a href="/signin.html" class="btn-trial">
+                    {% endif %}
                         Start Learning for Free <i class="fas fa-arrow-right"></i>
                     </a>
 
