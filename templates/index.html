@@ -32,7 +32,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.3">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="{{ url_for('static', filename='theme.js') }}"></script>
@@ -1157,6 +1157,62 @@
                 <div style="text-align: center; margin-top: 50px;">
                     <a href="/compiler.html" class="btn-cta"
                         style="padding: 15px 40px; font-size: 18px; text-decoration: none;">Try the Live Compiler</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reviews / Testimonials Section -->
+        <section class="reviews-section reveal-up">
+            <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+                <div class="subtitle" style="margin-bottom: 10px; display: inline-block;">Wall of Love</div>
+                <h2 style="font-size: 36px; font-weight: 800; color: #1e293b;">What Our <span style="color: var(--primary-color);">Students Say</span></h2>
+            </div>
+
+            <div class="reviews-marquee">
+                <div class="marquee-content">
+                    {% for review in reviews %}
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="user-info">
+                                <div class="user-avatar">{{ review.initial }}</div>
+                                <div class="user-meta">
+                                    <div class="user-name">{{ review.name }}</div>
+                                    <div class="user-role">{{ review.role }}</div>
+                                </div>
+                            </div>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>{{ review.rating }}</span>
+                            </div>
+                        </div>
+                        <p class="review-text">"{{ review.message }}"</p>
+                        <div class="review-footer">
+                            <span class="review-date">{{ review.date }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <!-- Duplicate reviews for seamless looping -->
+                    {% for review in reviews %}
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="user-info">
+                                <div class="user-avatar">{{ review.initial }}</div>
+                                <div class="user-meta">
+                                    <div class="user-name">{{ review.name }}</div>
+                                    <div class="user-role">{{ review.role }}</div>
+                                </div>
+                            </div>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>{{ review.rating }}</span>
+                            </div>
+                        </div>
+                        <p class="review-text">"{{ review.message }}"</p>
+                        <div class="review-footer">
+                            <span class="review-date">{{ review.date }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </section>

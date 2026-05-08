@@ -963,8 +963,108 @@ def index():
         res = execute_query(conn, 'SELECT COUNT(DISTINCT user_id) as count FROM user_progress WHERE language = ?', (lang,)).fetchone()
         counts[lang] = res['count'] if res else 0
     release_db_connection(conn)
+
+    # Student Reviews (Transcribed from user images)
+    reviews = [
+        {
+            "name": "Sagar",
+            "rating": 5,
+            "message": "Great platform for learning coding in Telugu! Clear tutorials, interactive compiler, and covers all major languages. Highly recommended for beginners!",
+            "role": "Independent Scholar",
+            "date": "2026-05-05",
+            "initial": "S"
+        },
+        {
+            "name": "Kanna Vemula",
+            "rating": 5,
+            "message": "I like the interface and it's good platform to learn java or any other language from scratch in Telugu! 😊",
+            "role": "Sree Chaitanya Institute of Tech",
+            "date": "2026-05-04",
+            "initial": "K"
+        },
+        {
+            "name": "Shivateja",
+            "rating": 5,
+            "message": "Great innovative work by the CodeNative team! Wishing you all more success and growth ahead. 🔥",
+            "role": "Independent Scholar",
+            "date": "2026-05-04",
+            "initial": "S"
+        },
+        {
+            "name": "Deva",
+            "rating": 5,
+            "message": "Good Web for beginners, such good idea it is. Content is in Telugu, and the AI is next level asalu! Good Initiative.",
+            "role": "Independent Scholar",
+            "date": "2026-05-04",
+            "initial": "D"
+        },
+        {
+            "name": "Srikar Manchala",
+            "rating": 5,
+            "message": "Very useful platform for native speakers. Everything is explained clearly in Telugu. 🚀",
+            "role": "Bharath Institute of Higher Ed",
+            "date": "2026-05-04",
+            "initial": "S"
+        },
+        {
+            "name": "PapaRao Rapuri",
+            "rating": 5,
+            "message": "CodeNative is very helpful for beginners. The step-by-step approach makes learning programming easy to follow. Highly recommended!",
+            "role": "Independent Scholar",
+            "date": "2026-05-01",
+            "initial": "P"
+        },
+        {
+            "name": "Tutorial User",
+            "rating": 5,
+            "message": "Oh chala useful and simply understanding. Best platform for Telugu students. 😊",
+            "role": "Independent Scholar",
+            "date": "2026-04-25",
+            "initial": "T"
+        },
+        {
+            "name": "Venkatesh",
+            "rating": 5,
+            "message": "All good, UI is good. The platform is consistent and easy to navigate. Keep it up!",
+            "role": "MLRIT",
+            "date": "2026-05-04",
+            "initial": "V"
+        },
+        {
+            "name": "Vaishu",
+            "rating": 5,
+            "message": "Excellent Platform. Friendly Content and very easy to understand for beginners. 🌟",
+            "role": "Independent Scholar",
+            "date": "2026-05-04",
+            "initial": "V"
+        },
+        {
+            "name": "Ajay Patel Boppa",
+            "rating": 5,
+            "message": "Such a good website to prepare for courses in Telugu easily. Concepts are explained very well.",
+            "role": "Jyothismathi Institute of Tech",
+            "date": "2026-05-04",
+            "initial": "A"
+        },
+        {
+            "name": "Zuck",
+            "rating": 5,
+            "message": "This initiative is impactful because it removes language barriers in tech education. Teaching programming in Telugu helps thousands build real skills.",
+            "role": "CBIT",
+            "date": "2026-05-04",
+            "initial": "Z"
+        },
+        {
+            "name": "Tutorial User",
+            "rating": 5,
+            "message": "Ui is Good, Easy understanding content. Very helpful for beginners.",
+            "role": "Independent Scholar",
+            "date": "2026-04-26",
+            "initial": "T"
+        }
+    ]
     
-    return render_template("index.html", logout_message=logout_msg, course_counts=counts)
+    return render_template("index.html", logout_message=logout_msg, course_counts=counts, reviews=reviews)
 
 @app.route("/c.html")
 def c_page():
