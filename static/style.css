@@ -650,9 +650,9 @@ body {
 /* Bottom Feature Cards */
 .hero-bottom-features {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 24px;
-    margin-top: 60px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 28px;
     position: relative;
     z-index: 5;
 }
@@ -660,14 +660,14 @@ body {
 .feature-card {
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
-    padding: 20px 24px;
-    border-radius: 20px;
+    padding: 12px 14px;
+    border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
 }
 
 .feature-card:hover {
@@ -678,14 +678,14 @@ body {
 }
 
 .feature-card .icon-box {
-    width: 40px;
-    height: 40px;
+    width: 24px;
+    height: 24px;
     background: #f5f3ff;
-    border-radius: 12px;
+    border-radius: 7px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 12px;
     color: #6366f1;
     transition: all 0.3s ease;
 }
@@ -697,10 +697,10 @@ body {
 }
 
 .feature-card p {
-    font-size: 14px;
+    font-size: 11px;
     color: #475569;
-    font-weight: 600;
-    line-height: 1.5;
+    font-weight: 400;
+    line-height: 1.4;
     margin: 0;
 }
 
