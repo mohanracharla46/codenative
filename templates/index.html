@@ -32,7 +32,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.2">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="{{ url_for('static', filename='theme.js') }}"></script>
@@ -861,6 +861,10 @@
                     <a href="/compiler.html?lang=c" class="c-button btn-reference"><i class="fas fa-terminal"></i> C
                         Compiler</a>
                 </div>
+                <div class="started-badge">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>{{ course_counts.get('c', 0) }} students started this course</span>
+                </div>
             </div>
 
             <div class="c-right-section reveal-right">
@@ -905,6 +909,10 @@
                     <a href="/compiler.html?lang=java" class="c-button btn-reference"><i class="fas fa-terminal"></i>
                         Java Compiler</a>
                 </div>
+                <div class="started-badge">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>{{ course_counts.get('java', 0) }} students started this course</span>
+                </div>
             </div>
 
             <div class="c-right-section reveal-left">
@@ -947,6 +955,10 @@
                         Tutorial</a>
                     <a href="/compiler.html?lang=python" class="c-button btn-reference"><i class="fas fa-terminal"></i>
                         Python Compiler</a>
+                </div>
+                <div class="started-badge">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>{{ course_counts.get('python', 0) }} students started this course</span>
                 </div>
             </div>
 
@@ -992,6 +1004,10 @@
                     <a href="/web.html#playground" class="c-button btn-reference"><i class="fas fa-terminal"></i> HTML
                         Compiler</a>
                 </div>
+                <div class="started-badge">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>{{ course_counts.get('web', 0) }} students started this course</span>
+                </div>
             </div>
 
             <div class="c-right-section reveal-left">
@@ -1034,6 +1050,10 @@
                         Tutorial</a>
                     <a href="/compiler.html?lang=js" class="c-button btn-reference"><i class="fas fa-terminal"></i> JS
                         Compiler</a>
+                </div>
+                <div class="started-badge">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>{{ course_counts.get('js', 0) }} students started this course</span>
                 </div>
             </div>
 

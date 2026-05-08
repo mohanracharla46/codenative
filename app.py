@@ -954,7 +954,17 @@ def log_study():
 def index():
     # Get logout message if it exists
     logout_msg = session.pop('logout_message', None)
-    return render_template("index.html", logout_message=logout_msg)
+    
+    # Fetch started counts for all courses to show social proof on home page
+    conn = get_db_connection()
+    counts = {}
+    langs = ['c', 'java', 'python', 'web', 'js']
+    for lang in langs:
+        res = execute_query(conn, 'SELECT COUNT(DISTINCT user_id) as count FROM user_progress WHERE language = ?', (lang,)).fetchone()
+        counts[lang] = res['count'] if res else 0
+    release_db_connection(conn)
+    
+    return render_template("index.html", logout_message=logout_msg, course_counts=counts)
 
 @app.route("/c.html")
 def c_page():
@@ -1406,7 +1416,11 @@ def get_topic_content(language, topic_slug):
     # Get student count who completed this topic
     student_count_res = execute_query(conn, 'SELECT COUNT(*) as count FROM user_progress WHERE language = ? AND topic_slug = ?', (language.lower(), topic_slug)).fetchone()
     student_count = student_count_res['count'] if student_count_res else 0
-    
+
+    # Get started count — distinct users who have started any lesson in this language
+    started_count_res = execute_query(conn, 'SELECT COUNT(DISTINCT user_id) as count FROM user_progress WHERE language = ?', (language.lower(),)).fetchone()
+    started_count = started_count_res['count'] if started_count_res else 0
+
     # Check if user has already given feedback
     user_id = session.get('user_id')
     has_given_feedback = False
@@ -1418,6 +1432,7 @@ def get_topic_content(language, topic_slug):
     if topic:
         data = dict(topic)
         data['student_count'] = student_count
+        data['started_count'] = started_count
         data['has_given_feedback'] = has_given_feedback
         return jsonify(data)
     return jsonify({"message": "Not found"}), 404

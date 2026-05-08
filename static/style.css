@@ -1502,4 +1502,42 @@ h1 {
     .main-girl-img {
         max-width: 260px;
     }
+}
+
+/* Course Started Badge */
+.started-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: #eff6ff;
+    border-radius: 50px;
+    border: 1px solid #dbeafe;
+    margin-top: 24px;
+    margin-bottom: 0;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.05);
+    transition: all 0.3s ease;
+}
+
+.started-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.1);
+    background: #e0e7ff;
+}
+
+.started-badge i {
+    color: #6366f1;
+    font-size: 14px;
+}
+
+.started-badge span {
+    font-size: 12px;
+    font-weight: 700;
+    color: #4f46e5;
+}
+
+@media (max-width: 768px) {
+    .started-badge {
+        margin-bottom: 20px;
+    }
 }
