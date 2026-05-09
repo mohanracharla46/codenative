@@ -3,7 +3,8 @@ from werkzeug.utils import secure_filename
 import requests
 import time
 import sqlite3
-import hashlib
+import hashlib  # kept for migrating existing SHA-256 hashed passwords
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import subprocess
 import tempfile
@@ -83,8 +84,8 @@ def execute_query(conn, query, params=None):
     return cursor
 
 def hash_password(password):
-    """Hash a password using SHA-256"""
-    return hashlib.sha256(password.encode()).hexdigest()
+    """Hash a password using pbkdf2:sha256 (salted, industry standard)."""
+    return generate_password_hash(password, method='pbkdf2:sha256')
 
 def init_db():
     """Initialize the database with users and content tables"""
@@ -434,8 +435,8 @@ def signup():
         if not name or not email or not password:
             return jsonify({"message": "All fields are required"}), 400
 
-        # Hash the password
-        hashed_password = hash_password(password)
+        # Hash with pbkdf2:sha256 (salted, secure)
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
 
         # Insert user into database
         conn = get_db_connection()
@@ -466,15 +467,38 @@ def signin():
         if not email or not password:
             return jsonify({"message": "Email and password are required"}), 400
 
-        # Hash the password
-        hashed_password = hash_password(password)
-
-        # Check credentials
+        # Fetch user by email only (password checked in Python, not SQL)
         conn = get_db_connection()
         user = execute_query(conn,
-            'SELECT * FROM users WHERE email = ? AND password = ?',
-            (email, hashed_password)
+            'SELECT * FROM users WHERE email = ?',
+            (email,)
         ).fetchone()
+
+        if not user or not user['password']:
+            release_db_connection(conn)
+            return jsonify({"message": "Invalid email or password"}), 401
+
+        stored_password = user['password']
+        password_valid = False
+
+        # Migration: detect old SHA-256 hashes (64 hex chars, no $ prefix)
+        old_sha256 = hashlib.sha256(password.encode()).hexdigest()
+        if stored_password == old_sha256:
+            # Existing user with old hash — verify OK, silently upgrade to pbkdf2:sha256
+            password_valid = True
+            new_hash = generate_password_hash(password, method='pbkdf2:sha256')
+            execute_query(conn, 'UPDATE users SET password = ? WHERE email = ?', (new_hash, email))
+            conn.commit()
+        elif check_password_hash(stored_password, password):
+            # New user with pbkdf2:sha256 hash
+            password_valid = True
+
+        if not password_valid:
+            release_db_connection(conn)
+            return jsonify({"message": "Invalid email or password"}), 401
+
+        # Re-fetch user in case hash was just updated
+        user = execute_query(conn, 'SELECT * FROM users WHERE email = ?', (email,)).fetchone()
         release_db_connection(conn)
 
         if user:
@@ -620,7 +644,7 @@ def reset_password():
             db_expiry = datetime.strptime(db_expiry, '%Y-%m-%dT%H:%M:%S')
 
     if db_otp == otp and datetime.now() < db_expiry:
-        hashed_pw = hash_password(new_password)
+        hashed_pw = generate_password_hash(new_password, method='pbkdf2:sha256')
         execute_query(conn, "UPDATE users SET password = ?, otp_code = NULL, otp_expiry = NULL WHERE email = ?", (hashed_pw, email))
         conn.commit()
         release_db_connection(conn)
