@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 from functools import wraps
 import psycopg2
 import psycopg2.extras
-from psycopg2 import pool
 from dotenv import load_dotenv
 import smtplib
 import random
@@ -39,59 +38,34 @@ if not os.environ.get('DATABASE_URL') or '127.0.0.1' in os.environ.get('GOOGLE_R
 
 # Database configuration
 DATABASE = 'users.db'
-db_pool = None
-
-def init_db_pool():
-    global db_pool
-    db_url = os.environ.get('DATABASE_URL')
-    if db_url and not db_pool:
-        try:
-            if db_url.startswith("postgres://"):
-                db_url = db_url.replace("postgres://", "postgresql://", 1)
-            
-            # Use SimpleConnectionPool for serverless (more stable)
-            db_pool = pool.SimpleConnectionPool(1, 10, db_url)
-            print("INFO: PostgreSQL connection pool initialized.")
-        except Exception as e:
-            print(f"ERROR: Failed to initialize connection pool: {e}")
 
 def get_db_connection():
-    """Get a connection from the pool (PostgreSQL) or create new (SQLite)"""
+    """Open one fresh connection per request — correct pattern for Vercel serverless.
+    Supabase Free allows only 2 simultaneous direct connections; no pool needed."""
     db_url = os.environ.get('DATABASE_URL')
     if db_url:
         try:
-            if not db_pool:
-                init_db_pool()
-            
-            if db_pool:
-                conn = db_pool.getconn()
-                # Ensure connection is valid
-                if conn:
-                    # Set row factory for dict-like access
-                    conn.cursor_factory = psycopg2.extras.RealDictCursor
-                    return conn
+            if db_url.startswith("postgres://"):
+                db_url = db_url.replace("postgres://", "postgresql://", 1)
+            conn = psycopg2.connect(db_url)
+            conn.cursor_factory = psycopg2.extras.RealDictCursor
+            return conn
         except Exception as e:
             print(f"CRITICAL: DB connection failed: {e}")
-            if os.environ.get('RENDER'):
-                raise Exception(f"Failed to connect to Supabase: {e}")
-    
-    # Fallback to SQLite
+            raise Exception(f"Failed to connect to Supabase: {e}")
+
+    # Fallback to SQLite (local dev)
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
 
 def release_db_connection(conn):
-    """Release a connection back to the pool if it's a PostgreSQL connection"""
-    if db_pool and hasattr(conn, 'cursor_factory') and not isinstance(conn, sqlite3.Connection):
-        db_pool.putconn(conn)
-    else:
-        # SQLite connections are closed manually
-        if isinstance(conn, sqlite3.Connection):
+    """Close the connection — called at the end of every request."""
+    if conn:
+        try:
             conn.close()
-
-# Initialize pool on startup (Commented out for Vercel stability - will init on demand)
-# with app.app_context():
-#     init_db_pool()
+        except Exception:
+            pass
 
 def execute_query(conn, query, params=None):
     """Abstraction layer to handle different SQL placeholders (?, %s)"""
@@ -1707,13 +1681,9 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
         # Use a session for better performance
         session_req = requests.Session()
         
-        # Models to try in order of preference
-        # gemini-flash-latest usually points to the best stable/latest flash model
+        # Models to try in order of preference (limited to 2 for Vercel 10s timeout)
         models_to_try = [
-            "gemini-flash-latest",
-            "gemini-2.5-flash",
             "gemini-2.0-flash",
-            "gemini-2.0-flash-lite",
             "gemini-1.5-flash"
         ]
         
@@ -1723,8 +1693,8 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
         for model_name in models_to_try:
             current_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_api_key}"
             try:
-                # Reduced timeout to 12s per attempt to keep overall response time reasonable
-                temp_resp = session_req.post(current_url, json=payload, headers=headers, timeout=12)
+                # 7s timeout per attempt to stay within Vercel's 10s function limit
+                temp_resp = session_req.post(current_url, json=payload, headers=headers, timeout=7)
                 
                 # If we get a successful response or a safety/empty response, we're done
                 if temp_resp.status_code == 200:
