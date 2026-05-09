@@ -17,6 +17,8 @@ import smtplib
 import random
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 # Google OAuth imports
 from google_auth_oauthlib.flow import Flow
@@ -28,6 +30,15 @@ load_dotenv() # Load variables from .env
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = os.environ.get('SECRET_KEY', 'codenative_fallback_secret_key_secure_12345')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+
+# Rate limiting — memory:// works on Vercel serverless (stateless per invocation)
+# Upgrade to storage_uri=REDIS_URL for persistent limits across invocations
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["500 per day", "100 per hour"],
+    storage_uri="memory://"
+)
 
 @app.context_processor
 def inject_ga():
@@ -423,6 +434,7 @@ def signin_page():
     return render_template("signin.html")
 
 @app.route("/signup", methods=["POST"])
+@limiter.limit("5 per hour")
 def signup():
     """Handle user registration"""
     try:
@@ -456,6 +468,7 @@ def signup():
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
 @app.route("/signin", methods=["POST"])
+@limiter.limit("10 per minute")
 def signin():
     """Handle user login"""
     try:
@@ -564,6 +577,7 @@ def send_email(to_email, subject, body):
         return False
 
 @app.route("/forgot-password", methods=["POST"])
+@limiter.limit("3 per hour")
 def forgot_password():
     data = request.get_json()
     email = data.get("email")
@@ -622,6 +636,7 @@ def verify_otp():
         return jsonify({"message": "Invalid or expired OTP"}), 400
 
 @app.route("/reset-password", methods=["POST"])
+@limiter.limit("3 per hour")
 def reset_password():
     data = request.get_json()
     email = data.get("email")
@@ -1536,6 +1551,7 @@ def get_topic_content(language, topic_slug):
     return jsonify({"message": "Not found"}), 404
 
 @app.route("/run", methods=["POST"])
+@limiter.limit("10 per minute")
 def run():
     try:
         data = request.get_json()
@@ -1618,6 +1634,7 @@ def run():
 #  AI CHATBOT ENDPOINT  (Gemini 2.0 Flash)
 # ──────────────────────────────────────────────────────────────
 @app.route('/api/chat', methods=['POST'])
+@limiter.limit("20 per minute")
 def ai_chat():
     """AI chatbot powered by Gemini. Context-aware for the current language."""
     try:
@@ -1820,6 +1837,14 @@ def sitemap():
     sitemap_xml += "</urlset>"
     
     return Response(sitemap_xml, mimetype='application/xml')
+
+@app.errorhandler(429)
+def rate_limit_exceeded(e):
+    """Handle rate limit exceeded errors with a friendly JSON response."""
+    return jsonify({
+        'error': 'Too many requests. Please wait a moment and try again.',
+        'status': 429
+    }), 429
 
 # Initialize database on startup
 init_db()
