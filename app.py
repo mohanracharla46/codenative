@@ -1681,10 +1681,16 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
         # Use a session for better performance
         session_req = requests.Session()
         
-        # Models to try in order of preference (limited to 2 for Vercel 10s timeout)
+        # Models tried in order — each has its own quota bucket on the free tier.
+        # If one is exhausted (429), the next is tried automatically.
+        # All models below are confirmed available via ListModels API (May 2026).
+        # Total worst-case time: 5 models × 6s = 30s (fits Vercel Pro 60s limit).
         models_to_try = [
-            "gemini-2.0-flash",
-            "gemini-1.5-flash"
+            "gemini-2.0-flash",       # Primary: fast, capable
+            "gemini-2.5-flash",       # Fallback 1: newer generation, separate quota
+            "gemini-2.0-flash-lite",  # Fallback 2: lighter, often has quota when flash is exhausted
+            "gemini-2.5-flash-lite",  # Fallback 3: newest lite, separate quota bucket
+            "gemini-flash-latest",    # Fallback 4: alias, may resolve to a different quota pool
         ]
         
         resp = None
@@ -1693,8 +1699,8 @@ You: Oye 😅 tension padaku ra… code share cheyyi, manam kalisi debug cheddam
         for model_name in models_to_try:
             current_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_api_key}"
             try:
-                # 7s timeout per attempt to stay within Vercel's 10s function limit
-                temp_resp = session_req.post(current_url, json=payload, headers=headers, timeout=7)
+                # 6s timeout per model — 5 models × 6s = 30s max, within Vercel Pro 60s limit
+                temp_resp = session_req.post(current_url, json=payload, headers=headers, timeout=6)
                 
                 # If we get a successful response or a safety/empty response, we're done
                 if temp_resp.status_code == 200:

@@ -371,7 +371,7 @@
 
             if (res.status === 429) {
                 removeTypingIndicator();
-                addMessage('bot', '⏳ Daily limit reached. Please try again tomorrow!');
+                addMessage('bot', '⏳ AI quota limit reach ayindi ra! Free tier daily limit aipoyindi. Roju reset avutundi, reppati varaku wait cheyyi ra. 😊');
                 return;
             }
 
