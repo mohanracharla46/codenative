@@ -469,6 +469,16 @@ const TutorialLoader = {
             const lines = code.split('\n');
             const lineNumbers = lines.map((_, i) => i + 1).join('\n');
 
+            // Helper to escape HTML characters to prevent rendering them inside code blocks
+            const escapeHTML = (str) => {
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+            };
+
+            const escapedCode = escapeHTML(code);
+
             // Robust Single-Pass Syntax Highlighting
             const rules = [
                 { name: 'comment', regex: /\/\/.*/ },
@@ -478,7 +488,7 @@ const TutorialLoader = {
             ];
 
             const bigRegex = new RegExp(rules.map(r => `(${r.regex.source})`).join('|'), 'g');
-            const highlighted = code.replace(bigRegex, (match, ...groups) => {
+            const highlighted = escapedCode.replace(bigRegex, (match, ...groups) => {
                 const groupIndex = groups.findIndex(g => g === match);
                 if (groupIndex !== -1 && rules[groupIndex]) {
                     return `<span class="${rules[groupIndex].name}">${match}</span>`;
