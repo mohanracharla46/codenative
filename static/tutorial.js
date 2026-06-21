@@ -431,8 +431,6 @@ const TutorialLoader = {
         const topic = topics ? topics[topicIndex] : { topic_title: 'Introduction' };
 
         // 1. Inject Premium Header
-        const studentCount = data.student_count || 0;
-        const startedCount = data.started_count || 0;
         const headerHtml = `
             <div class="lesson-label">Lesson 1.${topicIndex + 1}</div>
             <h1 class="lesson-title">${topic.topic_title}</h1>
@@ -443,11 +441,11 @@ const TutorialLoader = {
                         <img src="/static/images/avatar2.png" alt="Student">
                         <img src="/static/images/avatar3.png" alt="Student">
                     </div>
-                    <div class="student-count">${studentCount} students completed this lesson</div>
+                    <div class="student-count">500+ students completed this lesson</div>
                 </div>
                 <div class="started-count-row">
                     <i class="fas fa-graduation-cap" style="color: #6366f1; font-size: 13px; margin-right: 6px;"></i>
-                    <span class="started-count-text">${startedCount} students started this course</span>
+                    <span class="started-count-text">500+ students started this course</span>
                 </div>
             </div>
         `;
