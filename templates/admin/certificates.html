@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Generator | Code Native Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&family=Playfair+Display:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .admin-header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(to right, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s, background-color 0.2s;
+            background: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+            background-color: #f1f5f9;
+        }
+
+        /* Two Column Layout */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1200px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card styles */
+        .panel-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-main);
+        }
+
+        .panel-title i {
+            color: var(--primary);
+        }
+
+        /* Form styling */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            color: #334155;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            background-color: #f8fafc;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+            background-color: #fff;
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.25rem;
+            padding-right: 2.5rem;
+        }
+
+        /* User search & selection table */
+        .search-box {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-box .form-control {
+            padding-left: 2.5rem;
+        }
+
+        .user-list-wrapper {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            background: #f8fafc;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        .user-table th {
+            background: #f1f5f9;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .user-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .user-table tbody tr {
+            transition: background-color 0.15s;
+        }
+
+        .user-table tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        .text-dim {
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .btn-select {
+            background-color: #fff;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-select:hover {
+            background-color: var(--primary);
+            color: #fff;
+        }
+
+        /* Checkbox styling */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.75rem;
+            background: #e0e7ff33;
+            border-radius: 12px;
+            border: 1px dashed #c7d2fe;
+        }
+
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #312e81;
+        }
+
+        /* Action Buttons */
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary-action {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: #fff;
+            border: none;
+            padding: 0.9rem 1.5rem;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2), 0 2px 4px -2px rgba(79, 70, 229, 0.2);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+            background: linear-gradient(135deg, var(--primary-hover), #4f46e5);
+        }
+
+        .btn-primary-action:active {
+            transform: translateY(0);
+        }
+
+        /* Live Preview Styles */
+        .preview-sticky {
+            position: sticky;
+            top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Certificate Renders */
+        .print-wrapper {
+            background-color: #f1f5f9;
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .certificate-container {
+            width: 800px;
+            height: 600px;
+            padding: 40px;
+            border: 20px solid #5d46e2; /* Brand Color */
+            background: #ffffff;
+            position: relative;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            color: #1e293b;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #64748b;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .student-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #5d46e2;
+            border-bottom: 2px solid #5d46e2;
+            display: inline-block;
+            padding: 0 30px 5px 30px;
+            margin-bottom: 15px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .award-text {
+            font-size: 16px;
+            color: #475569;
+            margin-top: 25px;
+        }
+
+        .program-title {
+            font-family: 'Playfair Display', serif;
+            color: #0f172a;
+            font-size: 28px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .award-date {
+            font-size: 15px;
+            color: #64748b;
+        }
+
+        .footer-section {
+            margin-top: 45px;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+        }
+
+        .signature-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .signature-line {
+            border-top: 1px solid #94a3b8;
+            width: 180px;
+            margin-top: 40px;
+            margin-bottom: 8px;
+        }
+
+        .signature-group p {
+            margin: 0;
+            font-size: 14px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        /* Certificate Badge watermark decoration */
+        .cert-watermark {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.08;
+            font-size: 120px;
+            color: #5d46e2;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* PRINT MEDIA STYLES */
+        @media print {
+            body {
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* Hide everything that is NOT the print wrapper */
+            body > :not(.workspace-grid),
+            .workspace-grid > :not(.preview-sticky),
+            .preview-sticky > :not(.print-wrapper) {
+                display: none !important;
+            }
+
+            .workspace-grid {
+                display: block !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .preview-sticky {
+                position: relative !important;
+                top: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .print-wrapper {
+                background: transparent !important;
+                padding: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+                display: block !important;
+            }
+
+            .certificate-container {
+                border: 20px solid #5d46e2 !important;
+                box-shadow: none !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                margin: 0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <div>
+                <h1>Certificate Management</h1>
+                <p style="color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 0;">Issue and print dynamic achievement certificates for scholars.</p>
+            </div>
+            <a href="/admin" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        </div>
+
+        <div class="workspace-grid">
+            <!-- Settings & Search (Left Column) -->
+            <div class="panel-card">
+                <h2 class="panel-title"><i class="fas fa-sliders-h"></i> Configuration Panel</h2>
+                
+                <!-- Student Lookup -->
+                <div class="form-group" style="margin-bottom: 0.5rem;">
+                    <label>Quick Student Lookup</label>
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="userSearch" placeholder="Search by name or email..." class="form-control">
+                    </div>
+                </div>
+
+                <div class="user-list-wrapper">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Email</th>
+                                <th>Certs</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userListBody">
+                            {% for u in users %}
+                            <tr data-id="{{ u.id }}" data-name="{{ u.name }}" data-email="{{ u.email }}" class="user-row">
+                                <td class="font-semibold">{{ u.name }}</td>
+                                <td class="text-dim">{{ u.email }}</td>
+                                <td><span class="badge">{{ u.certificates }}</span></td>
+                                <td><button type="button" class="btn-select" onclick="selectUser({{ u.id }}, '{{ u.name }}')">Select</button></td>
+                            </tr>
+                            {% endfor %}
+                            {% if not users %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No registered students found.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Editor Form -->
+                <form onsubmit="event.preventDefault(); printCertificate();">
+                    <div class="form-group">
+                        <label for="certStudentName">Student Name</label>
+                        <input type="text" id="certStudentName" class="form-control" placeholder="e.g. Mohan Racharla" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="certProgramName">Program / Course Name</label>
+                        <select id="certProgramName" class="form-control">
+                            <option value="Full-Stack Developer Program">Full-Stack Developer Program</option>
+                            <option value="Python Core Lesson Suite">Python Core Lesson Suite</option>
+                            <option value="C Architecture Suite">C Architecture Suite</option>
+                            <option value="Java Masterclass">Java Masterclass</option>
+                            <option value="Web Development Basics">Web Development Basics</option>
+                            <option value="JavaScript Expert Roadmap">JavaScript Expert Roadmap</option>
+                            <option value="custom">-- Custom Program Title --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="customProgramGroup" style="display: none;">
+                        <label for="certCustomProgramName">Custom Program Title</label>
+                        <input type="text" id="certCustomProgramName" class="form-control" placeholder="e.g. Advanced AI Integration Program">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="certDate">Issue Date</label>
+                        <input type="text" id="certDate" class="form-control" placeholder="e.g. June 21, 2026" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="certDirectorName">Director Name & Title</label>
+                        <input type="text" id="certDirectorName" class="form-control" value="Director, CodeNative" required>
+                    </div>
+
+                    <!-- DB Increment Checkbox -->
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="dbRecordCheckbox" checked>
+                        <label id="dbRecordLabel" for="dbRecordCheckbox">Record in DB & Increment Count</label>
+                    </div>
+
+                    <div class="action-bar">
+                        <button type="submit" class="btn-primary-action">
+                            <i class="fas fa-print"></i> Print / Save PDF
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Live Preview (Right Column) -->
+            <div class="preview-sticky">
+                <h2 class="panel-title" style="align-self: flex-start;"><i class="fas fa-eye"></i> Certificate Preview</h2>
+                
+                <div class="print-wrapper">
+                    <div class="certificate-container" id="printableCertificate">
+                        <!-- Watermark -->
+                        <div class="cert-watermark"><i class="fas fa-graduation-cap"></i></div>
+                        
+                        <h1 class="title">Certificate of Achievement</h1>
+                        <p class="subtitle">This is to certify that</p>
+                        
+                        <div class="student-name" id="previewStudentName">Student Name Here</div>
+                        
+                        <p class="award-text">has successfully completed the</p>
+                        <h2 class="program-title" id="previewProgramName">Full-Stack Developer Program</h2>
+                        <p class="award-date">Awarded by CodeNative on <span id="previewDate">June 21, 2026</span></p>
+
+                        <div class="footer-section">
+                            <div class="signature-group">
+                                <div class="signature-line"></div>
+                                <p id="previewDateSignature">June 21, 2026</p>
+                                <p style="font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-top: 2px;">Date</p>
+                            </div>
+                            <div class="signature-group">
+                                <div class="signature-line"></div>
+                                <p id="previewDirectorName">Director, CodeNative</p>
+                                <p style="font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-top: 2px;">Authorized Signature</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Store selected user ID
+        let selectedUserId = null;
+
+        // Elements
+        const inputName = document.getElementById('certStudentName');
+        const inputProgram = document.getElementById('certProgramName');
+        const inputCustomProgram = document.getElementById('certCustomProgramName');
+        const customProgramGroup = document.getElementById('customProgramGroup');
+        const inputDate = document.getElementById('certDate');
+        const inputDirector = document.getElementById('certDirectorName');
+
+        const previewName = document.getElementById('previewStudentName');
+        const previewProgram = document.getElementById('previewProgramName');
+        const previewDate = document.getElementById('previewDate');
+        const previewDateSignature = document.getElementById('previewDateSignature');
+        const previewDirector = document.getElementById('previewDirectorName');
+
+        // Setup Date Default
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const today = new Date();
+        const formattedDate = today.toLocaleDateString('en-US', options);
+        inputDate.value = formattedDate;
+
+        // Sync inputs with preview
+        function updatePreview() {
+            previewName.textContent = inputName.value || 'Student Name Here';
+            
+            if (inputProgram.value === 'custom') {
+                customProgramGroup.style.display = 'block';
+                previewProgram.textContent = inputCustomProgram.value || 'Custom Training Program';
+            } else {
+                customProgramGroup.style.display = 'none';
+                previewProgram.textContent = inputProgram.value;
+            }
+            
+            previewDate.textContent = inputDate.value || formattedDate;
+            previewDateSignature.textContent = inputDate.value || formattedDate;
+            previewDirector.textContent = inputDirector.value || 'Director, CodeNative';
+        }
+
+        // Add listeners
+        inputName.addEventListener('input', updatePreview);
+        inputProgram.addEventListener('change', updatePreview);
+        inputCustomProgram.addEventListener('input', updatePreview);
+        inputDate.addEventListener('input', updatePreview);
+        inputDirector.addEventListener('input', updatePreview);
+
+        // Initial preview call
+        updatePreview();
+
+        // Search feature
+        document.getElementById('userSearch').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.user-row');
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name').toLowerCase();
+                const email = row.getAttribute('data-email').toLowerCase();
+                if (name.includes(query) || email.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // User Selection
+        window.selectUser = function(id, name) {
+            selectedUserId = id;
+            inputName.value = name;
+            document.getElementById('dbRecordCheckbox').checked = true;
+            document.getElementById('dbRecordLabel').textContent = `Record in DB & Increment Count for ${name}`;
+            updatePreview();
+        };
+
+        // Print Action
+        window.printCertificate = function() {
+            const recordInDb = document.getElementById('dbRecordCheckbox').checked;
+            
+            if (recordInDb && selectedUserId) {
+                // Background increment call
+                fetch('/admin/increment_certificate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_id: selectedUserId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Database recorded successfully:', data);
+                    // Update user table badge locally
+                    const row = document.querySelector(`.user-row[data-id="${selectedUserId}"]`);
+                    if (row) {
+                        const badge = row.querySelector('.badge');
+                        if (badge) {
+                            badge.textContent = parseInt(badge.textContent || 0) + 1;
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Error reporting certificate to DB:', err);
+                });
+            }
+            
+            // Print actual frame
+            window.print();
+        };
+    </script>
+</body>
+</html>

@@ -1311,6 +1311,41 @@ def admin_feedback():
     
     return render_template("admin/feedback.html", feedbacks=feedbacks, stats=stats)
 
+# Admin Certificates Route
+@app.route("/admin/certificates")
+@admin_required
+def admin_certificates():
+    conn = get_db_connection()
+    users_with_stats = execute_query(conn, """
+        SELECT u.id, u.name, u.email, COALESCE(s.certificates, 0) as certificates 
+        FROM users u 
+        LEFT JOIN user_stats s ON u.id = s.user_id 
+        ORDER BY u.name ASC
+    """).fetchall()
+    release_db_connection(conn)
+    return render_template("admin/certificates.html", users=users_with_stats)
+
+@app.route("/admin/increment_certificate", methods=["POST"])
+@admin_required
+def admin_increment_certificate():
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        if not user_id:
+            return jsonify({"message": "User ID is required"}), 400
+        
+        conn = get_db_connection()
+        stats = execute_query(conn, "SELECT * FROM user_stats WHERE user_id = ?", (user_id,)).fetchone()
+        if not stats:
+            execute_query(conn, "INSERT INTO user_stats (user_id, study_minutes, certificates, current_streak, max_streak) VALUES (?, 0, 1, 0, 0)", (user_id,))
+        else:
+            execute_query(conn, "UPDATE user_stats SET certificates = certificates + 1 WHERE user_id = ?", (user_id,))
+        conn.commit()
+        release_db_connection(conn)
+        return jsonify({"message": "Certificate count incremented successfully"}), 200
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
 # Admin Routes
 @app.route("/admin")
 @admin_required
