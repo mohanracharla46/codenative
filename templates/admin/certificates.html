@@ -416,14 +416,21 @@
         /* Certificate Badge watermark decoration */
         .cert-watermark {
             position: absolute;
-            bottom: 30px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            opacity: 0.08;
-            font-size: 120px;
-            color: #5d46e2;
+            transform: translate(-50%, -50%);
+            opacity: 0.06;
+            width: 320px;
             pointer-events: none;
             z-index: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cert-watermark img {
+            width: 100%;
+            height: auto;
         }
 
         /* PRINT MEDIA STYLES */
@@ -586,7 +593,9 @@
                 <div class="print-wrapper">
                     <div class="certificate-container" id="printableCertificate">
                         <!-- Watermark -->
-                        <div class="cert-watermark"><i class="fas fa-graduation-cap"></i></div>
+                        <div class="cert-watermark">
+                            <img src="/static/images/CodeNative.png" alt="CodeNative Logo Watermark">
+                        </div>
                         
                         <h1 class="title">Certificate of Achievement</h1>
                         <p class="subtitle">This is to certify that</p>
