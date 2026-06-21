@@ -1235,6 +1235,27 @@ def submit_feedback():
         message = data.get('message')
         user_id = session.get('user_id')
 
+        # If user is logged in, auto-populate name and email if default/empty
+        if user_id:
+            sess_name = session.get('user_name')
+            sess_email = session.get('user_email')
+            if not sess_name or not sess_email:
+                conn = get_db_connection()
+                try:
+                    user_row = execute_query(conn, "SELECT name, email FROM users WHERE id = ?", (user_id,)).fetchone()
+                    if user_row:
+                        sess_name = user_row['name']
+                        sess_email = user_row['email']
+                except Exception as e:
+                    print(f"Error querying user info for feedback: {e}")
+                finally:
+                    release_db_connection(conn)
+            
+            if not name or name == 'Tutorial User':
+                name = sess_name or name
+            if not email:
+                email = sess_email or email
+
         if not message and not rating:
             return jsonify({"message": "Either a rating or a message is required"}), 400
 
