@@ -1074,6 +1074,14 @@ def index():
             "role": "Independent Scholar",
             "date": "2026-04-26",
             "initial": "T"
+        },
+        {
+            "name": "Sri Harshitha K",
+            "rating": 5,
+            "message": "Your website is really impressive and beginner-friendly, especially because you are teaching programming in Telugu, which makes learning much easier and more comfortable for Telugu learners. The explanations, examples, and code snippets are really well done, and I truly feel this platform can help learners grow from zero to hero in programming.",
+            "role": "Woxsen University",
+            "date": "2026-05-19",
+            "initial": "S"
         }
     ]
     
