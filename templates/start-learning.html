@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include 'analytics.html' %}
+    <title>Code Native | Start Learning - Choose Your Coding Course</title>
+    <meta name="title" content="Code Native | Start Learning - Choose Your Coding Course">
+    <meta name="description" content="Select your programming course and start learning in Telugu (Tenglish) with interactive lessons and live compiler support.">
+    <meta name="robots" content="index, follow">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/static/theme.js"></script>
+
+    <style>
+        /* Modern Light Mode & Professional Clean Layout */
+        body {
+            background-color: #f8fafc !important;
+            color: #1e293b !important;
+        }
+
+        .sl-page-wrapper {
+            background-color: #f8fafc;
+            min-height: 100vh;
+            padding-bottom: 100px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sl-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+
+        .sl-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .sl-header h1 {
+            font-family: 'Outfit', 'Inter', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        .sl-header h1 span.highlight {
+            color: #6366f1;
+            background: none;
+            -webkit-text-fill-color: initial;
+        }
+
+        .sl-header p {
+            font-size: 18px;
+            color: #64748b;
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Course Grid - 2 Column Layout */
+        .sl-course-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .sl-course-card {
+            background: #ffffff;
+            border-radius: 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            padding: 38px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            height: 100%;
+        }
+
+        .sl-course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 35px rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        /* Card Header Row */
+        .sl-card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .sl-card-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+            transition: transform 0.3s ease;
+        }
+
+        .sl-course-card:hover .sl-card-icon {
+            transform: scale(1.05);
+        }
+
+        .sl-telugu-badge {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.2px;
+        }
+
+        /* Course Meta Items */
+        .sl-course-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .sl-course-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sl-course-meta i {
+            font-size: 13px;
+        }
+
+        /* Card Title & Content */
+        .sl-course-card h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .sl-card-body {
+            margin-bottom: 26px;
+        }
+
+        .sl-desc-en {
+            font-size: 15px;
+            color: #334155;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .sl-desc-te {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 400;
+            line-height: 1.6;
+            margin-bottom: 22px;
+        }
+
+        .sl-topics-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .sl-topics-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .sl-topic-tag {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 11.5px;
+            color: #475569;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .sl-course-card:hover .sl-topic-tag {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        /* Card CTA Button */
+        .sl-cta-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 14.5px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .sl-cta-btn i {
+            transition: transform 0.2s ease;
+        }
+
+        .sl-cta-btn:hover i {
+            transform: translateX(4px);
+        }
+
+        /* Styling for each card using custom prefixed classes */
+        /* C Programming */
+        .sl-card-c .sl-card-icon {
+            background: #f0f9ff;
+            color: #0284c7;
+        }
+        .sl-card-c .sl-course-meta i {
+            color: #0284c7;
+        }
+        .sl-card-c .sl-cta-btn {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+        .sl-card-c .sl-cta-btn:hover {
+            background: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.15);
+        }
+
+        /* Java */
+        .sl-card-java .sl-card-icon {
+            background: #fff7ed;
+            color: #ea580c;
+        }
+        .sl-card-java .sl-course-meta i {
+            color: #ea580c;
+        }
+        .sl-card-java .sl-cta-btn {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+        .sl-card-java .sl-cta-btn:hover {
+            background: #ea580c;
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(234, 88, 12, 0.15);
+        }
+
+        /* Python */
+        .sl-card-python .sl-card-icon {
+            background: #f0fdfa;
+            color: #0f766e;
+        }
+        .sl-card-python .sl-course-meta i {
+            color: #0f766e;
+        }
+        .sl-card-python .sl-cta-btn {
+            background: #ccfbf1;
+            color: #0f766e;
+        }
+        .sl-card-python .sl-cta-btn:hover {
+            background: #0f766e;
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(15, 118, 110, 0.15);
+        }
+
+        /* Web Dev */
+        .sl-card-web .sl-card-icon {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        .sl-card-web .sl-course-meta i {
+            color: #dc2626;
+        }
+        .sl-card-web .sl-cta-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .sl-card-web .sl-cta-btn:hover {
+            background: #dc2626;
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.15);
+        }
+
+        /* JavaScript */
+        .sl-card-js .sl-card-icon {
+            background: #fefce8;
+            color: #854d0e;
+        }
+        .sl-card-js .sl-course-meta i {
+            color: #854d0e;
+        }
+        .sl-card-js .sl-cta-btn {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+        .sl-card-js .sl-cta-btn:hover {
+            background: #eab308;
+            color: #451a03;
+            box-shadow: 0 8px 20px rgba(234, 179, 8, 0.15);
+        }
+
+        /* Special Spanning/Layout for JavaScript Card on Desktop (Min 901px) */
+        @media (min-width: 901px) {
+            .sl-card-js {
+                grid-column: span 2;
+                display: grid;
+                grid-template-columns: 1.1fr 1.9fr;
+                gap: 40px;
+                align-items: center;
+            }
+
+            .sl-card-js-left {
+                border-right: 1px solid #e2e8f0;
+                padding-right: 40px;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .sl-card-js-right {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                height: 100%;
+            }
+        }
+
+        /* Roadmap Banner Section */
+        .roadmap-banner {
+            background: #0f172a;
+            border-radius: 24px;
+            padding: 40px 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .rb-content h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .rb-content p {
+            color: #94a3b8;
+            font-size: 14.5px;
+            max-width: 650px;
+            line-height: 1.5;
+        }
+
+        .rb-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14.5px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+            white-space: nowrap;
+        }
+
+        .rb-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Standardize existing header and footer styles */
+        .header {
+            background: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        .footer {
+            background: #f8fafc !important;
+            border-top: 1px solid #e2e8f0 !important;
+        }
+
+        @media (max-width: 900px) {
+            .sl-course-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sl-header h1 {
+                font-size: 36px;
+            }
+            .sl-header p {
+                font-size: 15px;
+            }
+            .roadmap-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 24px;
+                padding: 30px 20px;
+            }
+            .rb-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Alert for Logout Message -->
+    <div class="custom-alert" id="logoutAlert"
+        style="position: fixed; top: -150px; right: 20px; z-index: 2000; max-width: calc(100% - 40px); min-width: 280px; transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);">
+        <div class="alert-content"
+            style="background: #ffffff; color: #1e293b; padding: 16px 20px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1); border: 1px solid #f1f5f9; display: flex; align-items: center; gap: 12px;">
+            <div class="alert-icon"
+                style="width: 40px; height: 40px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                👋</div>
+            <div class="alert-message" id="logoutMessage" style="flex: 1; font-size: 14px; font-weight: 700;"></div>
+            <button class="alert-close" onclick="closeLogoutAlert()"
+                style="background: #f1f5f9; border: none; color: #64748b; width: 28px; height: 28px; border-radius: 8px; font-size: 16px; cursor: pointer;">&times;</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo"><a href="/"><img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native"></a></div>
+            
+            <!-- Mobile Menu Toggle -->
+            <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle Menu"
+                style="margin-left: auto; margin-right: 15px;">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="header-actions" id="headerActions">
+                {% if session.get('is_admin') %}
+                <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock" style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
+                {% endif %}
+                
+                {% if session.get('user_name') %}
+                <a href="/dashboard" class="btn-signup user-btn"><i class="fas fa-user-circle" style="margin-right: 8px; font-size: 16px;"></i>Dashboard</a>
+                {% else %}
+                <a href="/signin.html" class="btn-signup">Sign in</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="sl-page-wrapper">
+        <div class="sl-container">
+
+            <header class="sl-header">
+                <h1>Choose Your <span class="highlight">Coding Language</span></h1>
+                <p>Telugu script lo easy ga coding learn cheyyandi. Select a course below to start learning coding step-by-step in Telugu for free.</p>
+            </header>
+
+            <div class="sl-course-grid">
+                <!-- C Card -->
+                <div class="sl-course-card sl-card-c">
+                    <div>
+                        <div class="sl-card-header-row">
+                            <div class="sl-card-icon">
+                                <i class="fas fa-terminal"></i>
+                            </div>
+                            <span class="sl-telugu-badge">Basics build cheyyandi</span>
+                        </div>
+                        <h2>C Programming</h2>
+                        <div class="sl-course-meta">
+                            <span><i class="far fa-clock"></i> 10+ Hours</span>
+                            <span><i class="far fa-play-circle"></i> 15 Topics</span>
+                            <span><i class="fas fa-signal"></i> Foundation</span>
+                            <span><i class="fas fa-users"></i> 500+ Students</span>
+                        </div>
+                        <div class="sl-card-body">
+                            <p class="sl-desc-en">C Programming tho standard coding basics start cheyyandi.</p>
+                            <p class="sl-desc-te">Variables, loops, arrays and pointers concepts complete simple structures tho nerchukondi.</p>
+                            
+                            <div class="sl-topics-title">Topics Covered</div>
+                            <div class="sl-topics-list">
+                                <span class="sl-topic-tag">Control Flow</span>
+                                <span class="sl-topic-tag">Functions</span>
+                                <span class="sl-topic-tag">Arrays & Strings</span>
+                                <span class="sl-topic-tag">Pointers</span>
+                                <span class="sl-topic-tag">Structures</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/c.html" class="sl-cta-btn course-link">
+                        C Learning Start Cheyyandi <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Java Card -->
+                <div class="sl-course-card sl-card-java">
+                    <div>
+                        <div class="sl-card-header-row">
+                            <div class="sl-card-icon">
+                                <i class="fab fa-java"></i>
+                            </div>
+                            <span class="sl-telugu-badge">OOPs concepts master cheyyandi</span>
+                        </div>
+                        <h2>Java</h2>
+                        <div class="sl-course-meta">
+                            <span><i class="far fa-clock"></i> 15+ Hours</span>
+                            <span><i class="far fa-play-circle"></i> 18 Topics</span>
+                            <span><i class="fas fa-signal"></i> Core OOPs</span>
+                            <span><i class="fas fa-users"></i> 500+ Students</span>
+                        </div>
+                        <div class="sl-card-body">
+                            <p class="sl-desc-en">Java tho enterprise software build cheyyadam learn cheyyandi.</p>
+                            <p class="sl-desc-te">OOPs concepts, classes, inheritance & collection lists clear ga master cheyyandi.</p>
+                            
+                            <div class="sl-topics-title">Topics Covered</div>
+                            <div class="sl-topics-list">
+                                <span class="sl-topic-tag">OOP Concepts</span>
+                                <span class="sl-topic-tag">Inheritance</span>
+                                <span class="sl-topic-tag">Exceptions</span>
+                                <span class="sl-topic-tag">Collections</span>
+                                <span class="sl-topic-tag">Multithreading</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/java.html" class="sl-cta-btn course-link">
+                        Java Learning Start Cheyyandi <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Python Card -->
+                <div class="sl-course-card sl-card-python">
+                    <div>
+                        <div class="sl-card-header-row">
+                            <div class="sl-card-icon">
+                                <i class="fab fa-python"></i>
+                            </div>
+                            <span class="sl-telugu-badge">Easy logic & AI fundamentals</span>
+                        </div>
+                        <h2>Python</h2>
+                        <div class="sl-course-meta">
+                            <span><i class="far fa-clock"></i> 12+ Hours</span>
+                            <span><i class="far fa-play-circle"></i> 14 Topics</span>
+                            <span><i class="fas fa-signal"></i> Intermediate</span>
+                            <span><i class="fas fa-users"></i> 500+ Students</span>
+                        </div>
+                        <div class="sl-card-body">
+                            <p class="sl-desc-en">Python tho coding logic dynamically create cheyyandi.</p>
+                            <p class="sl-desc-te">Code automation, calculations & logic structures build cheyyadam easy ga nerchukondi.</p>
+                            
+                            <div class="sl-topics-title">Topics Covered</div>
+                            <div class="sl-topics-list">
+                                <span class="sl-topic-tag">Syntax Basics</span>
+                                <span class="sl-topic-tag">Lists & Dicts</span>
+                                <span class="sl-topic-tag">Modules</span>
+                                <span class="sl-topic-tag">OOP in Python</span>
+                                <span class="sl-topic-tag">File Handling</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/python.html" class="sl-cta-btn course-link">
+                        Python Learning Start Cheyyandi <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Web Dev Card -->
+                <div class="sl-course-card sl-card-web">
+                    <div>
+                        <div class="sl-card-header-row">
+                            <div class="sl-card-icon">
+                                <i class="fas fa-file-code"></i>
+                            </div>
+                            <span class="sl-telugu-badge">Front-end structures design cheyyandi</span>
+                        </div>
+                        <h2>HTML & CSS</h2>
+                        <div class="sl-course-meta">
+                            <span><i class="far fa-clock"></i> 8+ Hours</span>
+                            <span><i class="far fa-play-circle"></i> 12 Topics</span>
+                            <span><i class="fas fa-signal"></i> Web Layouts</span>
+                            <span><i class="fas fa-users"></i> 500+ Students</span>
+                        </div>
+                        <div class="sl-card-body">
+                            <p class="sl-desc-en">HTML & CSS tho multi-device web design nerchukondi.</p>
+                            <p class="sl-desc-te">Responsive layouts, structural headers, sections, details design build cheyyandi.</p>
+                            
+                            <div class="sl-topics-title">Topics Covered</div>
+                            <div class="sl-topics-list">
+                                <span class="sl-topic-tag">HTML5 Tags</span>
+                                <span class="sl-topic-tag">CSS Flexbox</span>
+                                <span class="sl-topic-tag">Grid Layout</span>
+                                <span class="sl-topic-tag">Media Queries</span>
+                                <span class="sl-topic-tag">CSS Animations</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/web.html" class="sl-cta-btn course-link">
+                        Web Dev Learning Start Cheyyandi <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- JS Card (Asymmetric 2-column layout on Desktop) -->
+                <div class="sl-course-card sl-card-js">
+                    <div class="sl-card-js-left">
+                        <div class="sl-card-header-row">
+                            <div class="sl-card-icon">
+                                <i class="fab fa-js"></i>
+                            </div>
+                            <span class="sl-telugu-badge">Interactive features integrate cheyyandi</span>
+                        </div>
+                        <h2>JavaScript</h2>
+                        <div class="sl-course-meta">
+                            <span><i class="far fa-clock"></i> 14+ Hours</span>
+                            <span><i class="far fa-play-circle"></i> 16 Topics</span>
+                            <span><i class="fas fa-signal"></i> Front-End logic</span>
+                            <span><i class="fas fa-users"></i> 500+ Students</span>
+                        </div>
+                    </div>
+                    <div class="sl-card-js-right">
+                        <div class="sl-card-body">
+                            <p class="sl-desc-en">JavaScript use chesi interactive features logic integrate cheyyandi.</p>
+                            <p class="sl-desc-te">Dynamic page actions, browser events, promises & API calls core ga develop cheyyandi.</p>
+                            
+                            <div class="sl-topics-title">Topics Covered</div>
+                            <div class="sl-topics-list">
+                                <span class="sl-topic-tag">DOM Actions</span>
+                                <span class="sl-topic-tag">ES6+ Features</span>
+                                <span class="sl-topic-tag">Async/Await</span>
+                                <span class="sl-topic-tag">Fetch APIs</span>
+                                <span class="sl-topic-tag">Error Handling</span>
+                            </div>
+                        </div>
+                        <a href="/js.html" class="sl-cta-btn course-link">
+                            JS Learning Start Cheyyandi <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roadmap Call to Action Banner -->
+            <div class="roadmap-banner">
+                <div class="rb-content">
+                    <h3>Developer Roadmaps</h3>
+                    <p>Courses ni ey order lo complete cheyyalo visual roadmap mapping check cheyyandi. Developer roles and paths structured logic check cheyyochu.</p>
+                </div>
+                <a href="/roadmap.html" class="rb-btn">
+                    View Learning Roadmap <i class="fas fa-route"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Required Modal -->
+    <div id="loginRequiredModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.65); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); z-index:9999; align-items:center; justify-content:center;">
+        <div id="loginModalCard" style="background:#ffffff; width:100%; max-width:420px; margin:20px; padding:44px 40px; border-radius:28px; box-shadow:0 30px 60px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; text-align:center; position:relative; color: #1e293b;">
+            <button onclick="closeLoginModal()" style="position:absolute; top:18px; right:18px; background:#f1f5f9; border:none; width:32px; height:32px; border-radius:10px; font-size:18px; color:#64748b; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">&times;</button>
+            <div style="width:72px; height:72px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:22px; display:flex; align-items:center; justify-content:center; font-size:30px; margin:0 auto 24px; color:#fff; box-shadow:0 10px 25px rgba(99,102,241,0.35);">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2 style="font-size:24px; font-weight:800; color:#0f172a; margin-bottom:10px;">Login Required</h2>
+            <p style="font-size:15px; color:#64748b; line-height:1.6; margin-bottom:28px;">Course access cheyyడానికి account sign-in enable cheyyandi and study progress track start cheyyandi.</p>
+            <a id="loginModalBtn" href="/signin.html" style="display:block; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:14px 24px; border-radius:14px; font-size:15px; font-weight:700; text-decoration:none; margin-bottom:14px; transition:0.3s; box-shadow:0 8px 20px rgba(99,102,241,0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 28px rgba(99,102,241,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(99,102,241,0.3)'">
+                <i class="fas fa-sign-in-alt" style="margin-right:8px;"></i>Sign In to Continue
+            </a>
+            <a href="/signup.html" style="display:block; color:#6366f1; font-size:14px; font-weight:600; text-decoration:none; padding:8px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                Don't have an account? <strong>Sign Up Free</strong>
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native"
+                        style="height: 48px; margin-bottom: 15px;">
+                    <p>Empowering the next generation of developers with localized learning.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Explore</h3>
+                    <ul>
+                        <li><a href="/c.html">C Programming</a></li>
+                        <li><a href="/java.html">Java</a></li>
+                        <li><a href="/python.html">Python</a></li>
+                        <li><a href="/roadmap.html">Roadmap</a></li>
+                        <li><a href="/feedback.html">Give Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="/terms-conditions.html">Terms & Conditions</a></li>
+                        <li><a href="/cookie-policy.html">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Connect</h3>
+                    <div class="social-icons">
+                        <a href="https://www.linkedin.com/company/codenative-edu" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.instagram.com/codenative8" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Code Native. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        const IS_LOGGED_IN = {{ 'true' if session.get('user_name') else 'false' }};
+
+        // Intercept "Start Learning" buttons if not logged in
+        document.querySelectorAll('.course-link').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!IS_LOGGED_IN) {
+                    e.preventDefault();
+                    const dest = this.getAttribute('href');
+                    document.getElementById('loginModalBtn').href = `/signin.html?next=${encodeURIComponent(dest)}`;
+                    showLoginModal();
+                }
+            });
+        });
+
+        function showLoginModal() {
+            const modal = document.getElementById('loginRequiredModal');
+            modal.style.display = 'flex';
+            // Close on background click
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeLoginModal();
+            }, { once: true });
+        }
+
+        function closeLoginModal() {
+            const modal = document.getElementById('loginRequiredModal');
+            modal.style.display = 'none';
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeLoginModal();
+        });
+
+        // Mobile menu toggle
+        const toggleBtn = document.getElementById('mobileMenuToggle');
+        const actionsMenu = document.getElementById('headerActions');
+        if (toggleBtn && actionsMenu) {
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                actionsMenu.classList.toggle('active');
+                const icon = actionsMenu.classList.contains('active') ? 'fa-times' : 'fa-bars';
+                toggleBtn.querySelector('i').className = `fas ${icon}`;
+            });
+
+            document.addEventListener('click', (e) => {
+                if (actionsMenu.classList.contains('active')) {
+                    if (!actionsMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
+                        actionsMenu.classList.remove('active');
+                        toggleBtn.querySelector('i').className = 'fas fa-bars';
+                    }
+                }
+            });
+        }
+    </script>
+    <script src="/static/chatbot.js" defer></script>
+</body>
+</html>

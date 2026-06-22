@@ -1088,14 +1088,17 @@ def index():
     return render_template("index.html", logout_message=logout_msg, course_counts=counts, reviews=reviews)
 
 @app.route("/c.html")
+@login_required
 def c_page():
     return render_template("c.html")
 
 @app.route("/java.html")
+@login_required
 def java_page():
     return render_template("java.html")
 
 @app.route("/python.html")
+@login_required
 def python_page():
     return render_template("python.html")
 
@@ -1106,6 +1109,18 @@ def compiler_page():
 @app.route("/roadmap.html")
 def roadmap_page():
     return render_template("roadmap.html")
+
+@app.route("/start-learning.html")
+def start_learning_page():
+    # Fetch started counts for all courses to show on the start learning page
+    conn = get_db_connection()
+    counts = {}
+    langs = ['c', 'java', 'python', 'web', 'js']
+    for lang in langs:
+        res = execute_query(conn, 'SELECT COUNT(DISTINCT user_id) as count FROM user_progress WHERE language = ?', (lang,)).fetchone()
+        counts[lang] = res['count'] if res else 0
+    release_db_connection(conn)
+    return render_template("start-learning.html", course_counts=counts)
 
 @app.route("/terms-conditions.html")
 def terms_conditions():
@@ -1120,10 +1135,12 @@ def cookie_policy():
     return render_template("cookie-policy.html")
 
 @app.route("/web.html")
+@login_required
 def web_page():
     return render_template("web.html")
 
 @app.route("/js.html")
+@login_required
 def js_page():
     return render_template("js.html")
 
