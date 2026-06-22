@@ -442,7 +442,8 @@
             }
 
             /* Hide everything that is NOT the print wrapper */
-            body > :not(.workspace-grid),
+            body > :not(.admin-container),
+            .admin-container > :not(.workspace-grid),
             .workspace-grid > :not(.preview-sticky),
             .preview-sticky > :not(.print-wrapper) {
                 display: none !important;

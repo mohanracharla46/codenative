@@ -18,6 +18,7 @@ coverage.xml
 
 # Database
 users.db
+database.db
 *.sqlite3
 
 # OS binary files
