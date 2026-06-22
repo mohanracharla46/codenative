@@ -6,6 +6,7 @@
     <title>Certificate Generator | Code Native Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Great+Vibes&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary: #4f46e5;
@@ -721,7 +722,10 @@
                         <label id="dbRecordLabel" for="dbRecordCheckbox">Record in DB & Increment Count</label>
                     </div>
 
-                    <div class="action-bar">
+                    <div class="action-bar" style="display: flex; gap: 1rem;">
+                        <button type="button" class="btn-primary-action" onclick="downloadCertificate()" style="background: linear-gradient(135deg, var(--success), #059669); box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);">
+                            <i class="fas fa-download"></i> Download Certificate
+                        </button>
                         <button type="submit" class="btn-primary-action">
                             <i class="fas fa-print"></i> Print / Save PDF
                         </button>
@@ -891,6 +895,58 @@
             
             // Print actual frame
             window.print();
+        };
+
+        // Download Action (Capture only the certificate container)
+        window.downloadCertificate = function() {
+            const element = document.getElementById('printableCertificate');
+            if (!element) return;
+
+            const recordInDb = document.getElementById('dbRecordCheckbox').checked;
+            
+            if (recordInDb && selectedUserId) {
+                // Background increment call
+                fetch('/admin/increment_certificate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_id: selectedUserId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Database recorded successfully:', data);
+                    // Update user table badge locally
+                    const row = document.querySelector(`.user-row[data-id="${selectedUserId}"]`);
+                    if (row) {
+                        const badge = row.querySelector('.badge');
+                        if (badge) {
+                            badge.textContent = parseInt(badge.textContent || 0) + 1;
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Error reporting certificate to DB:', err);
+                });
+            }
+            
+            // Render element using html2canvas
+            // Use scale: 3 for high-resolution print quality download
+            html2canvas(element, {
+                scale: 3, 
+                useCORS: true,
+                backgroundColor: null,
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                const filename = (inputName.value || 'Student').replace(/[^a-zA-Z0-9]/g, '_') + '_Certificate.png';
+                link.download = filename;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                console.error('Error generating image:', err);
+                alert('Failed to generate download. Please use Print / Save PDF instead.');
+            });
         };
     </script>
 </body>
