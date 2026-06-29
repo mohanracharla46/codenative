@@ -242,6 +242,11 @@ def init_db():
         cursor.execute(careers_sql)
         cursor.execute(career_applications_sql)
         
+        # Create indexes
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_career_applications_career_id ON career_applications(career_id)")
+        
         # Check and add missing columns to users table
         cols_to_check = {
             'is_admin': 'INTEGER DEFAULT 0',
@@ -267,6 +272,11 @@ def init_db():
         conn.execute(stats_sql)
         conn.execute(careers_sql)
         conn.execute(career_applications_sql)
+        
+        # Create indexes
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_career_applications_career_id ON career_applications(career_id)")
         
         cursor = conn.execute("PRAGMA table_info(users)")
         existing_cols = [col[1] for col in cursor.fetchall()]

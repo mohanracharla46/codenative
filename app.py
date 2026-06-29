@@ -283,6 +283,11 @@ def init_db():
         cursor.execute(careers_sql)
         cursor.execute(career_applications_sql)
         
+        # Create indexes
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_career_applications_career_id ON career_applications(career_id)")
+        
         # Check if is_admin column exists (Postgres migration)
         cursor.execute("""
             SELECT column_name 
@@ -358,6 +363,11 @@ def init_db():
         conn.execute(feedback_sql)
         conn.execute(careers_sql)
         conn.execute(career_applications_sql)
+        
+        # Create indexes
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_career_applications_career_id ON career_applications(career_id)")
         
         # Check if is_admin column exists (SQLite migration)
         cursor = conn.execute("PRAGMA table_info(users)")
@@ -813,7 +823,7 @@ def dashboard():
     user_id = session.get('user_id')
     conn = get_db_connection()
     stats = execute_query(conn, "SELECT * FROM user_stats WHERE user_id = ?", (user_id,)).fetchone()
-    
+    stats_existed = stats is not None
     if stats:
         stats = dict(stats)
         stats['study_hours'] = round(stats['study_minutes'] / 60, 1)
@@ -829,7 +839,7 @@ def dashboard():
     # Calculate consistency & total practices
     activities = execute_query(conn, "SELECT activity_date, practice_count FROM user_activity WHERE user_id = ? ORDER BY activity_date ASC", (user_id,)).fetchall()
     
-    # Calculate Real Course Progress
+    # Calculate Real Course Progress using optimized queries
     courses = [
         {'id': 'python', 'name': 'Python Core', 'icon': 'fab fa-python', 'bg': 'python-bg', 'header_bg': '#3776ab', 'link': '/python.html'},
         {'id': 'c', 'name': 'C Architecture', 'icon': 'fas fa-code-branch', 'bg': 'c-bg', 'header_bg': '#00599c', 'link': '/c.html'},
@@ -838,29 +848,33 @@ def dashboard():
         {'id': 'js', 'name': 'JavaScript Expert', 'icon': 'fab fa-js', 'bg': 'js-bg', 'header_bg': '#f7df1e', 'link': '/js.html'}
     ]
     
+    # Bulk query statistics to avoid N+1 queries
+    total_topics_rows = execute_query(conn, "SELECT language, COUNT(*) as count FROM content GROUP BY language").fetchall()
+    total_topics_map = {row['language']: row['count'] for row in total_topics_rows}
+
+    completed_topics_rows = execute_query(conn, "SELECT language, COUNT(*) as count FROM user_progress WHERE user_id = ? GROUP BY language", (user_id,)).fetchall()
+    completed_topics_map = {row['language']: row['count'] for row in completed_topics_rows}
+
+    last_topic_rows = execute_query(conn, """
+        WITH ranked_progress AS (
+            SELECT p.language, c.topic_title,
+                   ROW_NUMBER() OVER (PARTITION BY p.language ORDER BY p.completed_at DESC) as rn
+            FROM user_progress p
+            JOIN content c ON p.topic_slug = c.topic_slug AND p.language = c.language
+            WHERE p.user_id = ?
+        )
+        SELECT language, topic_title FROM ranked_progress WHERE rn = 1
+    """, (user_id,)).fetchall()
+    last_topic_map = {row['language']: row['topic_title'] for row in last_topic_rows}
+
     user_courses = []
     for course in courses:
-        # Total topics in this language
-        total_topics = execute_query(conn, "SELECT COUNT(*) as count FROM content WHERE language = ?", (course['id'],)).fetchone()
-        total_topics = total_topics['count'] if total_topics else 0
-        
+        total_topics = total_topics_map.get(course['id'], 0)
         if total_topics > 0:
-            # Topics completed by user
-            completed = execute_query(conn, "SELECT COUNT(*) as count FROM user_progress WHERE user_id = ? AND language = ?", (user_id, course['id'])).fetchone()
-            completed_count = completed['count'] if completed else 0
-            
-            # Last completed topic
-            last_topic = execute_query(conn, """
-                SELECT c.topic_title 
-                FROM user_progress p 
-                JOIN content c ON p.topic_slug = c.topic_slug AND p.language = c.language
-                WHERE p.user_id = ? AND p.language = ?
-                ORDER BY p.completed_at DESC LIMIT 1
-            """, (user_id, course['id'])).fetchone()
-            
+            completed_count = completed_topics_map.get(course['id'], 0)
             course_data = course.copy()
-            course_data['progress'] = int((completed_count / total_topics) * 100) if total_topics > 0 else 0
-            course_data['last_topic'] = last_topic['topic_title'] if last_topic else "Not started yet"
+            course_data['progress'] = int((completed_count / total_topics) * 100)
+            course_data['last_topic'] = last_topic_map.get(course['id'], "Not started yet")
             user_courses.append(course_data)
 
     # Dynamic update of certificates earned based on 100% course completions
@@ -868,8 +882,7 @@ def dashboard():
     stats['certificates'] = completed_certs
     
     # Save the updated count to the DB
-    has_stats_row = execute_query(conn, "SELECT 1 FROM user_stats WHERE user_id = ?", (user_id,)).fetchone()
-    if has_stats_row:
+    if stats_existed:
         execute_query(conn, "UPDATE user_stats SET certificates = ? WHERE user_id = ?", (completed_certs, user_id))
     else:
         execute_query(conn, "INSERT INTO user_stats (user_id, study_minutes, certificates, current_streak, max_streak) VALUES (?, 0, ?, 0, 0)", (user_id, completed_certs))
@@ -980,13 +993,13 @@ def index():
     # Get logout message if it exists
     logout_msg = session.pop('logout_message', None)
     
-    # Fetch started counts for all courses to show social proof on home page
+    # Fetch started counts for all courses using a single query to avoid N+1 overhead
     conn = get_db_connection()
-    counts = {}
-    langs = ['c', 'java', 'python', 'web', 'js']
-    for lang in langs:
-        res = execute_query(conn, 'SELECT COUNT(DISTINCT user_id) as count FROM user_progress WHERE language = ?', (lang,)).fetchone()
-        counts[lang] = res['count'] if res else 0
+    counts = {l: 0 for l in ['c', 'java', 'python', 'web', 'js']}
+    res = execute_query(conn, 'SELECT language, COUNT(DISTINCT user_id) as count FROM user_progress GROUP BY language').fetchall()
+    for row in res:
+        if row['language'] in counts:
+            counts[row['language']] = row['count']
     release_db_connection(conn)
 
     # Student Reviews (Transcribed from user images)
@@ -1124,13 +1137,13 @@ def roadmap_page():
 
 @app.route("/start-learning.html")
 def start_learning_page():
-    # Fetch started counts for all courses to show on the start learning page
+    # Fetch started counts for all courses using a single query to avoid N+1 overhead
     conn = get_db_connection()
-    counts = {}
-    langs = ['c', 'java', 'python', 'web', 'js']
-    for lang in langs:
-        res = execute_query(conn, 'SELECT COUNT(DISTINCT user_id) as count FROM user_progress WHERE language = ?', (lang,)).fetchone()
-        counts[lang] = res['count'] if res else 0
+    counts = {l: 0 for l in ['c', 'java', 'python', 'web', 'js']}
+    res = execute_query(conn, 'SELECT language, COUNT(DISTINCT user_id) as count FROM user_progress GROUP BY language').fetchall()
+    for row in res:
+        if row['language'] in counts:
+            counts[row['language']] = row['count']
     release_db_connection(conn)
     return render_template("start-learning.html", course_counts=counts)
 
