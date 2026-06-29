@@ -36,6 +36,15 @@ class TestCertificatesAPI(unittest.TestCase):
             
             # Ensure stats clean state
             execute_query(conn, "DELETE FROM user_stats WHERE user_id = ?", (self.normal_user_id,))
+            
+            # Create a mock topic for testing Python certificate
+            execute_query(conn, "DELETE FROM content WHERE language = ? AND topic_slug = ?", ("python", "test-python-topic"))
+            execute_query(conn, "INSERT INTO content (language, topic_slug, topic_title, content_html, order_index) VALUES (?, ?, ?, ?, ?)",
+                          ("python", "test-python-topic", "Test Python Topic", "<p>Python core topic</p>", 1))
+            
+            # Ensure progress is clean
+            execute_query(conn, "DELETE FROM user_progress WHERE user_id = ? AND language = ?", (self.normal_user_id, "python"))
+            
             conn.commit()
         finally:
             release_db_connection(conn)
@@ -45,6 +54,8 @@ class TestCertificatesAPI(unittest.TestCase):
         try:
             execute_query(conn, "DELETE FROM user_stats WHERE user_id = ?", (self.normal_user_id,))
             execute_query(conn, "DELETE FROM users WHERE id IN (?, ?)", (self.normal_user_id, self.admin_user_id))
+            execute_query(conn, "DELETE FROM content WHERE language = ? AND topic_slug = ?", ("python", "test-python-topic"))
+            execute_query(conn, "DELETE FROM user_progress WHERE user_id = ? AND language = ?", (self.normal_user_id, "python"))
             conn.commit()
         finally:
             release_db_connection(conn)
@@ -120,6 +131,64 @@ class TestCertificatesAPI(unittest.TestCase):
             stats = execute_query(conn, "SELECT certificates FROM user_stats WHERE user_id = ?", (self.normal_user_id,)).fetchone()
             self.assertEqual(stats['certificates'], 2)
             release_db_connection(conn)
+
+    def test_student_certificate_anonymous_denied(self):
+        # Accessing student certificate page as guest redirects to signin
+        response = self.app.get('/certificate/python')
+        self.assertEqual(response.status_code, 302)
+
+    def test_student_certificate_not_completed_redirect(self):
+        with self.app as client:
+            with client.session_transaction() as sess:
+                sess['user_id'] = self.normal_user_id
+                sess['user_name'] = "Normal Student"
+                sess['user_email'] = "test_cert_user@example.com"
+                sess['is_admin'] = False
+
+            # Accessing certificate page without completing the course should redirect to dashboard
+            response = client.get('/certificate/python')
+            self.assertEqual(response.status_code, 302)
+            self.assertTrue(response.headers['Location'].endswith('/dashboard'))
+
+    def test_student_certificate_invalid_course_404(self):
+        with self.app as client:
+            with client.session_transaction() as sess:
+                sess['user_id'] = self.normal_user_id
+                sess['user_name'] = "Normal Student"
+                sess['user_email'] = "test_cert_user@example.com"
+                sess['is_admin'] = False
+
+            # Accessing invalid course should return 404
+            response = client.get('/certificate/invalid_course')
+            self.assertEqual(response.status_code, 404)
+
+    def test_student_certificate_success(self):
+        # Complete all Python topics for the user in the test database
+        conn = get_db_connection()
+        try:
+            topics = execute_query(conn, "SELECT topic_slug FROM content WHERE language = ?", ("python",)).fetchall()
+            for t in topics:
+                execute_query(conn, """
+                    INSERT INTO user_progress (user_id, language, topic_slug)
+                    VALUES (?, ?, ?)
+                    ON CONFLICT(user_id, language, topic_slug) DO NOTHING
+                """, (self.normal_user_id, "python", t['topic_slug']))
+            conn.commit()
+        finally:
+            release_db_connection(conn)
+
+        with self.app as client:
+            with client.session_transaction() as sess:
+                sess['user_id'] = self.normal_user_id
+                sess['user_name'] = "Normal Student"
+                sess['user_email'] = "test_cert_user@example.com"
+                sess['is_admin'] = False
+
+            # Accessing Python certificate after completion
+            response = client.get('/certificate/python')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b"Normal Student", response.data)
+            self.assertIn(b"Python Core Lesson Suite", response.data)
 
 if __name__ == '__main__':
     unittest.main()

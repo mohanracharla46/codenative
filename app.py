@@ -863,6 +863,18 @@ def dashboard():
             course_data['last_topic'] = last_topic['topic_title'] if last_topic else "Not started yet"
             user_courses.append(course_data)
 
+    # Dynamic update of certificates earned based on 100% course completions
+    completed_certs = sum(1 for c in user_courses if c.get('progress', 0) >= 100)
+    stats['certificates'] = completed_certs
+    
+    # Save the updated count to the DB
+    has_stats_row = execute_query(conn, "SELECT 1 FROM user_stats WHERE user_id = ?", (user_id,)).fetchone()
+    if has_stats_row:
+        execute_query(conn, "UPDATE user_stats SET certificates = ? WHERE user_id = ?", (completed_certs, user_id))
+    else:
+        execute_query(conn, "INSERT INTO user_stats (user_id, study_minutes, certificates, current_streak, max_streak) VALUES (?, 0, ?, 0, 0)", (user_id, completed_certs))
+    conn.commit()
+
     release_db_connection(conn)
     
     total_practices = sum([a['practice_count'] for a in activities])
@@ -1327,6 +1339,80 @@ def admin_feedback():
     }
     
     return render_template("admin/feedback.html", feedbacks=feedbacks, stats=stats)
+
+@app.route("/certificate/<course_id>")
+@login_required
+def certificate_page(course_id):
+    user_id = session.get('user_id')
+    user_name = session.get('user_name', 'Student')
+    
+    # Map course_id to program names
+    course_name_map = {
+        'python': 'Python Core Lesson Suite',
+        'c': 'C Architecture Suite',
+        'java': 'Java Masterclass',
+        'web': 'Web Development Basics',
+        'js': 'JavaScript Expert Roadmap'
+    }
+    
+    if course_id not in course_name_map:
+        return "Course not found", 404
+        
+    course_name = course_name_map[course_id]
+    
+    # Verify completion
+    conn = get_db_connection()
+    try:
+        # Total topics in this language
+        total_topics = execute_query(conn, "SELECT COUNT(*) as count FROM content WHERE language = ?", (course_id,)).fetchone()
+        total_topics = total_topics['count'] if total_topics else 0
+        
+        if total_topics == 0:
+            release_db_connection(conn)
+            return "No content for this course.", 400
+            
+        # Topics completed by user
+        completed = execute_query(conn, "SELECT COUNT(*) as count FROM user_progress WHERE user_id = ? AND language = ?", (user_id, course_id)).fetchone()
+        completed_count = completed['count'] if completed else 0
+        
+        progress = int((completed_count / total_topics) * 100) if total_topics > 0 else 0
+        
+        if progress < 100:
+            release_db_connection(conn)
+            return redirect(url_for('dashboard'))
+            
+        # Get completion date
+        last_completed = execute_query(conn, """
+            SELECT completed_at 
+            FROM user_progress 
+            WHERE user_id = ? AND language = ?
+            ORDER BY completed_at DESC LIMIT 1
+        """, (user_id, course_id)).fetchone()
+        
+        formatted_date = None
+        if last_completed and last_completed['completed_at']:
+            completed_dt = last_completed['completed_at']
+            if isinstance(completed_dt, str):
+                try:
+                    dt = datetime.strptime(completed_dt[:19], '%Y-%m-%d %H:%M:%S')
+                    formatted_date = dt.strftime('%B %d, %Y')
+                except Exception:
+                    try:
+                        dt = datetime.fromisoformat(completed_dt.replace('Z', '+00:00'))
+                        formatted_date = dt.strftime('%B %d, %Y')
+                    except Exception:
+                        formatted_date = completed_dt
+            else:
+                formatted_date = completed_dt.strftime('%B %d, %Y')
+        
+        if not formatted_date:
+            formatted_date = datetime.today().strftime('%B %d, %Y')
+            
+        release_db_connection(conn)
+        return render_template("certificate.html", course_id=course_id, course_name=course_name, student_name=user_name, date=formatted_date)
+    except Exception as e:
+        release_db_connection(conn)
+        return str(e), 500
 
 # Admin Certificates Route
 @app.route("/admin/certificates")

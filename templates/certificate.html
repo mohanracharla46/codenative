@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course_name }} Certificate | Code Native</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Great+Vibes&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --success-hover: #059669;
+            --bg: #0f172a; /* Premium Dark Mode Background */
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cert-page-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .cert-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .cert-header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(135deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cert-header p {
+            margin: 0.25rem 0 0 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        /* Action Buttons bar */
+        .actions-wrapper {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-action.btn-download {
+            background: linear-gradient(135deg, var(--success), #059669);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-action.btn-download:hover {
+            box-shadow: 0 8px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Live Preview Styles */
+        .print-wrapper {
+            background-color: rgba(255, 255, 255, 0.03);
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.2);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        /* Certificate Renders */
+        .certificate-container {
+            width: 800px;
+            height: 600px;
+            padding: 40px;
+            border: 16px solid #5d46e2; /* Brand Indigo */
+            background: #fffdf9; /* Warm premium paper */
+            position: relative;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+            flex-shrink: 0;
+            color: #0f172a;
+        }
+
+        /* Brand purple inner border */
+        .certificate-container::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 2px solid #8b5cf6; /* Brand Purple */
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Inner thin border */
+        .certificate-container::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Corner ornaments */
+        .corner-ornament {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #8b5cf6; /* Brand Purple */
+            z-index: 2;
+        }
+        .corner-ornament.top-left {
+            top: 20px;
+            left: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+        .corner-ornament.top-right {
+            top: 20px;
+            right: 20px;
+            border-left: none;
+            border-bottom: none;
+        }
+        .corner-ornament.bottom-left {
+            bottom: 20px;
+            left: 20px;
+            border-right: none;
+            border-top: none;
+        }
+        .corner-ornament.bottom-right {
+            bottom: 20px;
+            right: 20px;
+            border-left: none;
+            border-top: none;
+        }
+
+        .title {
+            font-family: 'Cinzel', serif;
+            font-size: 38px;
+            color: #5d46e2; /* Brand Indigo */
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: 500;
+            z-index: 2;
+            position: relative;
+        }
+
+        .student-name-container {
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .student-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 54px;
+            font-weight: 400;
+            color: #5d46e2; /* Brand Indigo */
+            display: inline-block;
+            line-height: 1.1;
+        }
+
+        .student-name-line {
+            width: 300px;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #8b5cf6, transparent); /* Brand Purple */
+            margin: 8px auto 0 auto;
+        }
+
+        .award-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #475569;
+            margin-top: 15px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .program-title {
+            font-family: 'Cinzel', serif;
+            color: #5d46e2; /* Brand Indigo */
+            font-size: 24px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .award-date {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 400;
+            z-index: 2;
+            position: relative;
+        }
+
+        .footer-section {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: 1fr 120px 1fr;
+            align-items: flex-end;
+            padding: 0 30px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .signature-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .signature-line {
+            border-top: 1.5px solid #5d46e2; /* Brand Indigo */
+            width: 160px;
+            margin-top: 25px;
+            margin-bottom: 5px;
+        }
+
+        .signature-group p {
+            margin: 0;
+            font-size: 13px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        /* Brand Ribbon Gold Seal Ribbon Stamp */
+        .cert-seal {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .seal-ribbon-left, .seal-ribbon-right {
+            position: absolute;
+            width: 16px;
+            height: 45px;
+            background: #5d46e2; /* Brand Indigo */
+            top: 45px;
+            z-index: 1;
+            clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+        }
+        .seal-ribbon-left {
+            left: 22px;
+            transform: rotate(15deg);
+            background: #4338ca; /* Darker Indigo for shadow */
+        }
+        .seal-ribbon-right {
+            right: 22px;
+            transform: rotate(-15deg);
+        }
+        .seal-body {
+            position: absolute;
+            width: 65px;
+            height: 65px;
+            background: radial-gradient(circle, #fce08f 0%, #c5a85c 70%, #a38234 100%); /* Gold seal body */
+            border-radius: 50%;
+            border: 2px dashed #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12), inset 0 2px 4px rgba(255,255,255,0.4);
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .seal-body::before {
+            content: '★';
+            color: #ffffff;
+            font-size: 22px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Certificate Badge watermark decoration */
+        .cert-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.05;
+            width: 320px;
+            pointer-events: none;
+            z-index: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cert-watermark img {
+            width: 100%;
+            height: auto;
+        }
+
+        /* PRINT MEDIA STYLES */
+        @media print {
+            body {
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* Hide everything that is NOT the print wrapper */
+            body > :not(.cert-page-container),
+            .cert-page-container > :not(.print-wrapper) {
+                display: none !important;
+            }
+
+            .cert-page-container {
+                padding: 0 !important;
+                margin: 0 !important;
+                display: block !important;
+                width: auto !important;
+                max-width: none !important;
+            }
+
+            .print-wrapper {
+                background: transparent !important;
+                padding: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+                display: block !important;
+            }
+
+            .certificate-container {
+                border: 16px solid #5d46e2 !important;
+                background: #fffdf9 !important;
+                box-shadow: none !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                margin: 0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cert-page-container">
+        <div class="cert-header">
+            <div>
+                <h1>Course Certificate</h1>
+                <p>Verify and download your earned certificate of completion</p>
+            </div>
+            <a href="/dashboard" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        </div>
+
+        <div class="actions-wrapper">
+            <button class="btn-action btn-download" onclick="downloadCertificate()">
+                <i class="fas fa-download"></i> Download PNG
+            </button>
+            <button class="btn-action" onclick="window.print()">
+                <i class="fas fa-print"></i> Print / Save PDF
+            </button>
+        </div>
+
+        <div class="print-wrapper">
+            <div class="certificate-container" id="printableCertificate">
+                <!-- Corner Ornaments -->
+                <div class="corner-ornament top-left"></div>
+                <div class="corner-ornament top-right"></div>
+                <div class="corner-ornament bottom-left"></div>
+                <div class="corner-ornament bottom-right"></div>
+
+                <!-- Watermark -->
+                <div class="cert-watermark">
+                    <img src="/static/images/CodeNative.png" alt="CodeNative Logo Watermark">
+                </div>
+                
+                <h1 class="title">Certificate of Achievement</h1>
+                <p class="subtitle">This is to certify that</p>
+                
+                <div class="student-name-container">
+                    <div class="student-name">{{ student_name }}</div>
+                    <div class="student-name-line"></div>
+                </div>
+                
+                <p class="award-text">has successfully completed the</p>
+                <h2 class="program-title">{{ course_name }}</h2>
+                <p class="award-date">Awarded by CodeNative on <span>{{ date }}</span></p>
+
+                <div class="footer-section">
+                    <div class="signature-group">
+                        <div class="signature-line"></div>
+                        <p>{{ date }}</p>
+                        <p style="font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-top: 2px;">Date</p>
+                    </div>
+                    
+                    <!-- Gold Seal Stamp -->
+                    <div class="cert-seal">
+                        <div class="seal-ribbon-left"></div>
+                        <div class="seal-ribbon-right"></div>
+                        <div class="seal-body"></div>
+                    </div>
+
+                    <div class="signature-group">
+                        <div class="signature-line"></div>
+                        <p>Director, CodeNative</p>
+                        <p style="font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-top: 2px;">Authorized Signature</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.downloadCertificate = function() {
+            const element = document.getElementById('printableCertificate');
+            if (!element) return;
+            
+            html2canvas(element, {
+                scale: 3, 
+                useCORS: true,
+                backgroundColor: null,
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                const filename = '{{ student_name }}'.replace(/[^a-zA-Z0-9]/g, '_') + '_{{ course_id }}_Certificate.png';
+                link.download = filename;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                console.error('Error generating image:', err);
+                alert('Failed to generate download. Please use Print / Save PDF instead.');
+            });
+        };
+    </script>
+</body>
+</html>
