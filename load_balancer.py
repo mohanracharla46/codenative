@@ -1,117 +1,143 @@
-import os
-import time
-import threading
-import requests
-from flask import Flask, request, Response
+"""
+CodeNative Load Balancer — migrated from Flask to FastAPI.
 
-app = Flask(__name__)
+Distributes traffic across backend instances using round-robin, with
+background health checks every 5 seconds using asyncio.
+"""
+import os
+import asyncio
+import threading
+
+import httpx
+
+from fastapi import FastAPI, Request
+from fastapi.responses import Response, StreamingResponse
+
+app = FastAPI()
 
 # Configurable backend ports (can be overridden by environment variables)
 BACKENDS = [
-    "http://127.0.0.1:5001",
-    "http://127.0.0.1:5002",
-    "http://127.0.0.1:5003"
+    "http://127.0.0.1:8001",
+    "http://127.0.0.1:8002",
+    "http://127.0.0.1:8003",
 ]
 
 # Thread safety lock for active_backends list
-backends_lock = threading.Lock()
-active_backends = list(BACKENDS)
-current_index = 0
+_backends_lock = threading.Lock()
+_active_backends: list = list(BACKENDS)
+_current_index: int = 0
 
-def run_health_checks():
-    """Periodically check the health of each backend server to keep active_backends updated."""
-    global active_backends
+
+# ─── Background health checker ────────────────────────────────────────────────
+async def _health_check_loop():
+    """Periodically check the health of each backend server."""
+    global _active_backends
     print("[Health Checker] Started background check daemon.")
     while True:
         healthy = []
-        for backend in BACKENDS:
-            try:
-                # Ping the root path of the backend with a short timeout
-                resp = requests.get(backend, timeout=2.0)
-                # Any status code less than 500 indicates the server is up and responsive
-                if resp.status_code < 500:
-                    healthy.append(backend)
-            except requests.exceptions.RequestException:
-                pass
-        
-        with backends_lock:
-            active_backends = healthy
-            
-        time.sleep(5)  # Re-check every 5 seconds
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            for backend in BACKENDS:
+                try:
+                    resp = await client.get(backend)
+                    if resp.status_code < 500:
+                        healthy.append(backend)
+                except Exception:
+                    pass  # backend is down — skip
 
-# Start health checker as a daemon thread
-checker_thread = threading.Thread(target=run_health_checks, daemon=True)
-checker_thread.start()
+        with _backends_lock:
+            _active_backends = healthy
 
-@app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
-@app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
-def load_balancer_proxy(path):
-    global current_index
-    
-    with backends_lock:
-        healthy_servers = list(active_backends)
-        
+        await asyncio.sleep(5)  # re-check every 5 seconds
+
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(_health_check_loop())
+
+
+# ─── Proxy route ──────────────────────────────────────────────────────────────
+@app.api_route(
+    "/{path:path}",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
+)
+async def load_balancer_proxy(path: str, request: Request):
+    global _current_index
+
+    with _backends_lock:
+        healthy_servers = list(_active_backends)
+
     if not healthy_servers:
         return Response(
-            "Service Temporarily Unavailable - No healthy backend server instances found.",
-            status=503,
-            content_type="text/plain"
-        )
-        
-    # Get backend under round-robin
-    backend = healthy_servers[current_index % len(healthy_servers)]
-    current_index = (current_index + 1) % len(healthy_servers)
-    
-    # Construct destination URL
-    url = f"{backend}/{path}"
-    if request.query_string:
-        url += f"?{request.query_string.decode('utf-8')}"
-        
-    # Prepare headers to forward (filtering hop-by-hop headers to prevent connection errors)
-    excluded_headers = {'host', 'content-length', 'connection', 'keep-alive', 'proxy-authenticate', 'proxy-authorization', 'te', 'trailers', 'transfer-encoding', 'upgrade'}
-    headers = {key: value for key, value in request.headers.items() if key.lower() not in excluded_headers}
-    
-    try:
-        # Proxy request to chosen backend
-        resp = requests.request(
-            method=request.method,
-            url=url,
-            headers=headers,
-            data=request.get_data(),
-            cookies=request.cookies,
-            allow_redirects=False,
-            stream=True
-        )
-        
-        # Prepare response headers to forward back to client
-        resp_headers = [
-            (key, value) for key, value in resp.headers.items()
-            if key.lower() not in excluded_headers
-        ]
-        
-        return Response(
-            resp.iter_content(chunk_size=4096),
-            status=resp.status_code,
-            headers=resp_headers
-        )
-        
-    except requests.exceptions.RequestException as e:
-        # If the request fails, remove it from active backends immediately and retry once on another server
-        print(f"[Load Balancer] Failed to connect to backend {backend}: {e}")
-        with backends_lock:
-            if backend in active_backends:
-                active_backends.remove(backend)
-        return Response(
-            f"Bad Gateway - Connection to backend instance {backend} failed.",
-            status=502,
-            content_type="text/plain"
+            content="Service Temporarily Unavailable — No healthy backend server instances found.",
+            status_code=503,
+            media_type="text/plain",
         )
 
-if __name__ == '__main__':
-    # Load balancer listens on port 5000 by default
-    port = int(os.environ.get('PORT', 5000))
-    print(f"============================================================")
+    # Round-robin backend selection
+    backend = healthy_servers[_current_index % len(healthy_servers)]
+    _current_index = (_current_index + 1) % len(healthy_servers)
+
+    # Build destination URL
+    url = f"{backend}/{path}"
+    qs  = request.url.query
+    if qs:
+        url += f"?{qs}"
+
+    # Forward all headers except hop-by-hop
+    excluded_headers = {
+        "host", "content-length", "connection", "keep-alive",
+        "proxy-authenticate", "proxy-authorization", "te",
+        "trailers", "transfer-encoding", "upgrade",
+    }
+    headers = {
+        k: v for k, v in request.headers.items()
+        if k.lower() not in excluded_headers
+    }
+
+    body = await request.body()
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.request(
+                method=request.method,
+                url=url,
+                headers=headers,
+                content=body,
+                cookies=dict(request.cookies),
+                follow_redirects=False,
+            )
+
+        # Strip hop-by-hop headers from the response before returning
+        resp_headers = {
+            k: v for k, v in resp.headers.items()
+            if k.lower() not in excluded_headers
+        }
+
+        return Response(
+            content=resp.content,
+            status_code=resp.status_code,
+            headers=resp_headers,
+        )
+
+    except httpx.RequestError as e:
+        print(f"[Load Balancer] Failed to connect to backend {backend}: {e}")
+        with _backends_lock:
+            if backend in _active_backends:
+                _active_backends.remove(backend)
+        return Response(
+            content=f"Bad Gateway — Connection to backend instance {backend} failed.",
+            status_code=502,
+            media_type="text/plain",
+        )
+
+
+# ─── Entrypoint ───────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    import uvicorn
+
+    port = int(os.environ.get("PORT", 8000))
+    print("=" * 60)
     print(f"CodeNative Load Balancer initialized on http://127.0.0.1:{port}")
     print(f"Distributing requests across: {', '.join(BACKENDS)}")
-    print(f"============================================================")
-    app.run(host='0.0.0.0', port=port, debug=False)
+    print("=" * 60)
+    uvicorn.run("load_balancer:app", host="0.0.0.0", port=port, reload=False)
