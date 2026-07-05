@@ -43,6 +43,10 @@ def init_db():
             google_id TEXT UNIQUE,
             otp_code TEXT,
             otp_expiry TIMESTAMP,
+            referral_code TEXT UNIQUE,
+            referred_by INTEGER,
+            verified_referrals INTEGER DEFAULT 0,
+            referral_verified INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''' if is_pg else '''
@@ -56,6 +60,10 @@ def init_db():
             google_id TEXT UNIQUE,
             otp_code TEXT,
             otp_expiry TIMESTAMP,
+            referral_code TEXT UNIQUE,
+            referred_by INTEGER,
+            verified_referrals INTEGER DEFAULT 0,
+            referral_verified INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     '''
@@ -216,21 +224,28 @@ def init_db():
             cover_letter TEXT,
             applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
+    '''
+    
+    referrals_sql = '''
+        CREATE TABLE IF NOT EXISTS referrals (
+            id SERIAL PRIMARY KEY,
+            referrer_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            referred_user_id INTEGER UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+            status TEXT DEFAULT 'Pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            verified_at TIMESTAMP
+        )
     ''' if is_pg else '''
-        CREATE TABLE IF NOT EXISTS career_applications (
+        CREATE TABLE IF NOT EXISTS referrals (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            career_id INTEGER REFERENCES careers(id) ON DELETE CASCADE,
-            name TEXT NOT NULL,
-            email TEXT NOT NULL,
-            whatsapp TEXT,
-            college TEXT,
-            passout_year TEXT,
-            resume_link TEXT,
-            cover_letter TEXT,
-            applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            referrer_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            referred_user_id INTEGER UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+            status TEXT DEFAULT 'Pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            verified_at TIMESTAMP
         )
     '''
-
+ 
     if is_pg:
         cursor = conn.cursor()
         cursor.execute(users_sql)
@@ -241,11 +256,13 @@ def init_db():
         cursor.execute(stats_sql)
         cursor.execute(careers_sql)
         cursor.execute(career_applications_sql)
+        cursor.execute(referrals_sql)
         
         # Create indexes
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_career_applications_career_id ON career_applications(career_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)")
         
         # Check and add missing columns to users table
         cols_to_check = {
@@ -253,7 +270,11 @@ def init_db():
             'mobile': 'TEXT',
             'google_id': 'TEXT UNIQUE',
             'otp_code': 'TEXT',
-            'otp_expiry': 'TIMESTAMP'
+            'otp_expiry': 'TIMESTAMP',
+            'referral_code': 'TEXT UNIQUE',
+            'referred_by': 'INTEGER',
+            'verified_referrals': 'INTEGER DEFAULT 0',
+            'referral_verified': 'INTEGER DEFAULT 0'
         }
         
         for col, col_type in cols_to_check.items():
@@ -272,11 +293,13 @@ def init_db():
         conn.execute(stats_sql)
         conn.execute(careers_sql)
         conn.execute(career_applications_sql)
+        conn.execute(referrals_sql)
         
         # Create indexes
         conn.execute("CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_career_applications_career_id ON career_applications(career_id)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)")
         
         cursor = conn.execute("PRAGMA table_info(users)")
         existing_cols = [col[1] for col in cursor.fetchall()]
@@ -286,7 +309,11 @@ def init_db():
             'mobile': 'TEXT',
             'google_id': 'TEXT UNIQUE',
             'otp_code': 'TEXT',
-            'otp_expiry': 'TIMESTAMP'
+            'otp_expiry': 'TIMESTAMP',
+            'referral_code': 'TEXT',
+            'referred_by': 'INTEGER',
+            'verified_referrals': 'INTEGER DEFAULT 0',
+            'referral_verified': 'INTEGER DEFAULT 0'
         }
         
         for col, col_type in cols_to_check.items():
@@ -294,6 +321,40 @@ def init_db():
                 conn.execute(f"ALTER TABLE users ADD COLUMN {col} {col_type}")
         
         conn.commit()
+    
+    # Sync existing referred users into the referrals table if not already present
+    try:
+        if is_pg:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, referred_by, referral_verified, created_at FROM users WHERE referred_by IS NOT NULL")
+            referred_users = cursor.fetchall()
+            for ru in referred_users:
+                # Check if already exists in referrals
+                cursor.execute("SELECT id FROM referrals WHERE referred_user_id = %s", (ru['id'],))
+                if not cursor.fetchone():
+                    status = 'Verified' if ru['referral_verified'] else 'Pending'
+                    verified_at = ru['created_at'] if ru['referral_verified'] else None
+                    cursor.execute(
+                        "INSERT INTO referrals (referrer_id, referred_user_id, status, created_at, verified_at) VALUES (%s, %s, %s, %s, %s)",
+                        (ru['referred_by'], ru['id'], status, ru['created_at'], verified_at)
+                    )
+            conn.commit()
+        else:
+            cursor = conn.execute("SELECT id, referred_by, referral_verified, created_at FROM users WHERE referred_by IS NOT NULL")
+            referred_users = cursor.fetchall()
+            for ru in referred_users:
+                # Check if already exists in referrals
+                check = conn.execute("SELECT id FROM referrals WHERE referred_user_id = ?", (ru['id'],)).fetchone()
+                if not check:
+                    status = 'Verified' if ru['referral_verified'] else 'Pending'
+                    verified_at = ru['created_at'] if ru['referral_verified'] else None
+                    conn.execute(
+                        "INSERT INTO referrals (referrer_id, referred_user_id, status, created_at, verified_at) VALUES (?, ?, ?, ?, ?)",
+                        (ru['referred_by'], ru['id'], status, ru['created_at'], verified_at)
+                    )
+            conn.commit()
+    except Exception as e:
+        print(f"Error syncing referrals: {e}")
     
     conn.close()
     print("Database initialized successfully!")

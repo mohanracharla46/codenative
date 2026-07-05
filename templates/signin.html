@@ -407,10 +407,15 @@
 
             // Google OAuth handler that preserves ?next= param
             window.handleGoogleLogin = function() {
-                const nextParam = new URLSearchParams(window.location.search).get('next');
-                const googleUrl = nextParam
+                const urlParams = new URLSearchParams(window.location.search);
+                const nextParam = urlParams.get('next');
+                const refParam = urlParams.get('ref');
+                let googleUrl = nextParam
                     ? `/login/google?next=${encodeURIComponent(nextParam)}`
                     : '/login/google';
+                if (refParam) {
+                    googleUrl += (googleUrl.includes('?') ? '&' : '?') + `ref=${encodeURIComponent(refParam)}`;
+                }
                 window.location.href = googleUrl;
             };
 
@@ -465,10 +470,13 @@
                     return;
                 }
 
+                const urlParams = new URLSearchParams(window.location.search);
+                const refCode = urlParams.get('ref');
                 const signupData = {
                     name: formData.get('name'),
                     email: formData.get('email'),
-                    password: password
+                    password: password,
+                    ref: refCode
                 };
 
                 try {

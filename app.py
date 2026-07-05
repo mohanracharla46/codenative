@@ -160,6 +160,81 @@ def hash_password(password):
     return generate_password_hash(password, method='pbkdf2:sha256')
 
 
+def check_and_verify_referral(referred_user_id, conn=None):
+    """
+    Check if the referred user meets verification criteria:
+    - Registered (inherent)
+    - Started at least one course (has >=1 entries in user_progress) OR
+    - Spent at least 5 minutes learning (study_minutes >= 5 in user_stats)
+    If yes, mark their referral record as 'Verified' and update referrer's verified_referrals.
+    """
+    close_conn = False
+    if not conn:
+        conn = get_db_connection()
+        close_conn = True
+    try:
+        # Check user's referral status in referrals table
+        ref_record = execute_query(conn, "SELECT referrer_id, status FROM referrals WHERE referred_user_id = ?", (referred_user_id,)).fetchone()
+        if not ref_record or ref_record['status'] == 'Verified':
+            if close_conn:
+                release_db_connection(conn)
+            return False
+
+        referrer_id = ref_record['referrer_id']
+
+        # Check progress
+        progress_count = execute_query(conn, "SELECT COUNT(*) as count FROM user_progress WHERE user_id = ?", (referred_user_id,)).fetchone()
+        progress_count = progress_count['count'] if progress_count else 0
+
+        # Check study minutes
+        stats = execute_query(conn, "SELECT study_minutes FROM user_stats WHERE user_id = ?", (referred_user_id,)).fetchone()
+        study_minutes = stats['study_minutes'] if stats else 0
+
+        if progress_count >= 1 or study_minutes >= 5:
+            # Verify referral
+            execute_query(conn, "UPDATE referrals SET status = 'Verified', verified_at = ? WHERE referred_user_id = ?", (datetime.now(), referred_user_id))
+            execute_query(conn, "UPDATE users SET referral_verified = 1 WHERE id = ?", (referred_user_id,))
+            
+            # Recalculate referrer's count
+            verified_count = execute_query(conn, "SELECT COUNT(*) as count FROM referrals WHERE referrer_id = ? AND status = 'Verified'", (referrer_id,)).fetchone()
+            count = verified_count['count'] if verified_count else 0
+            
+            execute_query(conn, "UPDATE users SET verified_referrals = ? WHERE id = ?", (count, referrer_id))
+            conn.commit()
+            print(f"[Referral] Verified referral: user {referred_user_id} referred by {referrer_id}")
+            return True
+    except Exception as e:
+        print(f"[Referral] Error verifying referral: {e}")
+    finally:
+        if close_conn:
+            release_db_connection(conn)
+
+
+def refresh_all_referrals_for_user(referrer_id, conn=None):
+    """
+    Check and update all pending referrals for the given referrer.
+    """
+    close_conn = False
+    if not conn:
+        conn = get_db_connection()
+        close_conn = True
+    try:
+        pending_users = execute_query(conn, "SELECT referred_user_id FROM referrals WHERE referrer_id = ? AND status = 'Pending'", (referrer_id,)).fetchall()
+        for pu in pending_users:
+            check_and_verify_referral(pu['referred_user_id'], conn)
+            
+        # Re-sync referrer's count
+        verified_count = execute_query(conn, "SELECT COUNT(*) as count FROM referrals WHERE referrer_id = ? AND status = 'Verified'", (referrer_id,)).fetchone()
+        count = verified_count['count'] if verified_count else 0
+        execute_query(conn, "UPDATE users SET verified_referrals = ? WHERE id = ?", (count, referrer_id))
+        conn.commit()
+    except Exception as e:
+        print(f"[Referral] Error refreshing referrals: {e}")
+    finally:
+        if close_conn:
+            release_db_connection(conn)
+
+
 # ─── Database initialisation ─────────────────────────────────────────────────
 def init_db():
     """Initialize the database with users and content tables"""
@@ -328,16 +403,37 @@ def init_db():
         )
     '''
 
+    referrals_sql = '''
+        CREATE TABLE IF NOT EXISTS referrals (
+            id SERIAL PRIMARY KEY,
+            referrer_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            referred_user_id INTEGER UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+            status TEXT DEFAULT 'Pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            verified_at TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS referrals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            referrer_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            referred_user_id INTEGER UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+            status TEXT DEFAULT 'Pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            verified_at TIMESTAMP
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
-                    feedback_sql, careers_sql, career_applications_sql]:
+                    feedback_sql, careers_sql, career_applications_sql, referrals_sql]:
             cursor.execute(sql)
 
         for idx_sql in [
             "CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)",
             "CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id)",
             "CREATE INDEX IF NOT EXISTS idx_career_applications_career_id ON career_applications(career_id)",
+            "CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)",
         ]:
             cursor.execute(idx_sql)
 
@@ -347,7 +443,9 @@ def init_db():
                 cursor.execute(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}")
 
         for col, t in [('is_admin','INTEGER DEFAULT 0'),('mobile','TEXT'),('otp_code','TEXT'),
-                       ('otp_expiry','TIMESTAMP'),('google_id','TEXT UNIQUE')]:
+                       ('otp_expiry','TIMESTAMP'),('google_id','TEXT UNIQUE'),
+                       ('referral_code','TEXT UNIQUE'),('referred_by','INTEGER'),
+                       ('verified_referrals','INTEGER DEFAULT 0'),('referral_verified','INTEGER DEFAULT 0')]:
             _pg_add_col('users', col, t)
         for col, t in [('mobile','TEXT'),('college','TEXT')]:
             _pg_add_col('feedback', col, t)
@@ -358,19 +456,22 @@ def init_db():
         conn.commit()
     else:
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
-                    feedback_sql, careers_sql, career_applications_sql]:
+                    feedback_sql, careers_sql, career_applications_sql, referrals_sql]:
             conn.execute(sql)
         for idx_sql in [
             "CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)",
             "CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON feedback(user_id)",
             "CREATE INDEX IF NOT EXISTS idx_career_applications_career_id ON career_applications(career_id)",
+            "CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)",
         ]:
             conn.execute(idx_sql)
 
         cur = conn.execute("PRAGMA table_info(users)")
         cols = [c[1] for c in cur.fetchall()]
         for col, t in [('is_admin','INTEGER DEFAULT 0'),('mobile','TEXT'),('otp_code','TEXT'),
-                       ('otp_expiry','TIMESTAMP'),('google_id','TEXT')]:
+                       ('otp_expiry','TIMESTAMP'),('google_id','TEXT'),
+                       ('referral_code','TEXT'),('referred_by','INTEGER'),
+                       ('verified_referrals','INTEGER DEFAULT 0'),('referral_verified','INTEGER DEFAULT 0')]:
             if col not in cols:
                 conn.execute(f"ALTER TABLE users ADD COLUMN {col} {t}")
 
@@ -386,6 +487,38 @@ def init_db():
             if col not in cols:
                 conn.execute(f"ALTER TABLE career_applications ADD COLUMN {col} TEXT")
         conn.commit()
+
+    # Sync existing referred users into the referrals table if not already present
+    try:
+        if is_pg:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, referred_by, referral_verified, created_at FROM users WHERE referred_by IS NOT NULL")
+            referred_users = cursor.fetchall()
+            for ru in referred_users:
+                cursor.execute("SELECT id FROM referrals WHERE referred_user_id = %s", (ru['id'],))
+                if not cursor.fetchone():
+                    status = 'Verified' if ru['referral_verified'] else 'Pending'
+                    verified_at = ru['created_at'] if ru['referral_verified'] else None
+                    cursor.execute(
+                        "INSERT INTO referrals (referrer_id, referred_user_id, status, created_at, verified_at) VALUES (%s, %s, %s, %s, %s)",
+                        (ru['referred_by'], ru['id'], status, ru['created_at'], verified_at)
+                    )
+            conn.commit()
+        else:
+            cursor = conn.execute("SELECT id, referred_by, referral_verified, created_at FROM users WHERE referred_by IS NOT NULL")
+            referred_users = cursor.fetchall()
+            for ru in referred_users:
+                check = conn.execute("SELECT id FROM referrals WHERE referred_user_id = ?", (ru['id'],)).fetchone()
+                if not check:
+                    status = 'Verified' if ru['referral_verified'] else 'Pending'
+                    verified_at = ru['created_at'] if ru['referral_verified'] else None
+                    conn.execute(
+                        "INSERT INTO referrals (referrer_id, referred_user_id, status, created_at, verified_at) VALUES (?, ?, ?, ?, ?)",
+                        (ru['referred_by'], ru['id'], status, ru['created_at'], verified_at)
+                    )
+            conn.commit()
+    except Exception as e:
+        print(f"Error syncing referrals in app: {e}")
 
     release_db_connection(conn)
     print("Database initialized successfully!")
@@ -545,6 +678,7 @@ def update_user_activity(user_id: int, is_practice: bool = False):
                 "UPDATE user_stats SET study_minutes = study_minutes + ?, current_streak = ?, max_streak = ?, last_active_date = ? WHERE user_id = ?",
                 (study_inc, new_streak, new_max, today_str, user_id))
 
+        check_and_verify_referral(user_id, conn)
         conn.commit()
     except Exception as e:
         print("Error tracking activity:", e)
@@ -617,16 +751,56 @@ async def signup(request: Request, _rl=rl_5_per_hour):
         email    = data.get('email')
         mobile   = data.get('mobile')
         password = data.get('password')
+        ref_code = data.get('ref')
 
         if not name or not email or not password:
             return JSONResponse({"message": "All fields are required"}, status_code=400)
 
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         conn = get_db_connection()
+        referred_by_id = None
+        if ref_code:
+            try:
+                # Basic validation: check code starts with CN
+                if ref_code.startswith("CN"):
+                    ref_user = execute_query(conn, "SELECT id, email FROM users WHERE referral_code = ?", (ref_code,)).fetchone()
+                    if ref_user:
+                        # Prevent self-referrals
+                        if ref_user['email'].lower() != email.lower():
+                            referred_by_id = ref_user['id']
+            except Exception as e:
+                print(f"[Referral] Error parsing ref_code: {e}")
+
         try:
-            execute_query(conn,
-                'INSERT INTO users (name, email, mobile, password) VALUES (?, ?, ?, ?)',
-                (name, email, mobile, hashed_password))
+            is_pg = hasattr(conn, 'cursor_factory')
+            cursor = conn.cursor()
+            if is_pg:
+                cursor.execute(
+                    'INSERT INTO users (name, email, mobile, password, referred_by) VALUES (%s, %s, %s, %s, %s) RETURNING id',
+                    (name, email, mobile, hashed_password, referred_by_id)
+                )
+                new_user_id = cursor.fetchone()['id']
+            else:
+                cursor.execute(
+                    'INSERT INTO users (name, email, mobile, password, referred_by) VALUES (?, ?, ?, ?, ?)',
+                    (name, email, mobile, hashed_password, referred_by_id)
+                )
+                new_user_id = cursor.lastrowid
+            
+            # Generate and save referral code
+            new_ref_code = f"CN{10000 + new_user_id}"
+            cursor.execute(
+                "UPDATE users SET referral_code = ? WHERE id = ?".replace('?', '%s' if is_pg else '?'),
+                (new_ref_code, new_user_id)
+            )
+            
+            # Record referral history if referred by someone
+            if referred_by_id:
+                cursor.execute(
+                    "INSERT INTO referrals (referrer_id, referred_user_id, status) VALUES (?, ?, 'Pending')".replace('?', '%s' if is_pg else '?'),
+                    (referred_by_id, new_user_id)
+                )
+
             conn.commit()
             release_db_connection(conn)
             return JSONResponse({"message": "Account created successfully"}, status_code=201)
@@ -792,6 +966,9 @@ async def login_google(request: Request):
     request.session['oauth_state']   = state
     request.session['code_verifier'] = flow.code_verifier
     request.session['oauth_next']    = request.query_params.get('next', '')
+    ref = request.query_params.get('ref')
+    if ref:
+        request.session['oauth_ref'] = ref
     return _redirect(authorization_url)
 
 
@@ -835,9 +1012,46 @@ async def google_callback(request: Request):
             execute_query(conn, "UPDATE users SET google_id = ? WHERE id = ?", (google_id, user['id']))
             conn.commit()
         else:
-            execute_query(conn, "INSERT INTO users (name, email, google_id) VALUES (?, ?, ?)", (name, email, google_id))
+            ref_code = request.session.pop('oauth_ref', None)
+            referred_by_id = None
+            if ref_code:
+                try:
+                    ref_user = execute_query(conn, "SELECT id, email FROM users WHERE referral_code = ?", (ref_code,)).fetchone()
+                    if ref_user and ref_user['email'].lower() != email.lower():
+                        referred_by_id = ref_user['id']
+                except Exception as e:
+                    print(f"[Referral] Google callback ref lookup error: {e}")
+            
+            is_pg = hasattr(conn, 'cursor_factory')
+            cursor = conn.cursor()
+            if is_pg:
+                cursor.execute(
+                    "INSERT INTO users (name, email, google_id, referred_by) VALUES (%s, %s, %s, %s) RETURNING id",
+                    (name, email, google_id, referred_by_id)
+                )
+                new_user_id = cursor.fetchone()['id']
+            else:
+                cursor.execute(
+                    "INSERT INTO users (name, email, google_id, referred_by) VALUES (?, ?, ?, ?)",
+                    (name, email, google_id, referred_by_id)
+                )
+                new_user_id = cursor.lastrowid
+                
+            new_ref_code = f"CN{10000 + new_user_id}"
+            cursor.execute(
+                "UPDATE users SET referral_code = ? WHERE id = ?".replace('?', '%s' if is_pg else '?'),
+                (new_ref_code, new_user_id)
+            )
+            
+            if referred_by_id:
+                cursor.execute(
+                    "INSERT INTO referrals (referrer_id, referred_user_id, status) VALUES (?, ?, 'Pending')".replace('?', '%s' if is_pg else '?'),
+                    (referred_by_id, new_user_id)
+                )
+                
             conn.commit()
-            user = execute_query(conn, "SELECT * FROM users WHERE google_id = ?", (google_id,)).fetchone()
+            
+            user = execute_query(conn, "SELECT * FROM users WHERE id = ?", (new_user_id,)).fetchone()
     release_db_connection(conn)
 
     request.session['user_id']    = user['id']
@@ -861,6 +1075,14 @@ async def logout(request: Request):
     return _redirect("/")
 
 
+@app.get("/register")
+async def register_page_redirect(request: Request):
+    ref = request.query_params.get('ref')
+    if ref:
+        return _redirect(f"/signin.html?ref={ref}")
+    return _redirect("/signin.html")
+
+
 # ─── Dashboard ────────────────────────────────────────────────────────────────
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request):
@@ -869,6 +1091,7 @@ async def dashboard(request: Request):
 
     user_id = request.session.get('user_id')
     conn = get_db_connection()
+    check_and_verify_referral(user_id, conn)
     stats = execute_query(conn, "SELECT * FROM user_stats WHERE user_id = ?", (user_id,)).fetchone()
     stats_existed = stats is not None
     if stats:
@@ -934,6 +1157,251 @@ async def dashboard(request: Request):
         activity_data=_jsonify_dates([dict(a) for a in activities]),
         user_courses=user_courses
     ))
+
+
+@app.get("/referrals", response_class=HTMLResponse)
+async def referrals_page_redirect(request: Request):
+    return _redirect("/my-referrals")
+
+
+@app.get("/my-referrals", response_class=HTMLResponse)
+async def referrals_page(request: Request):
+    if 'user_id' not in request.session:
+        return _redirect("/signin.html")
+    
+    user_id = request.session.get('user_id')
+    conn = get_db_connection()
+    try:
+        # Check and verify if there are any pending referrals for this user that can be verified now
+        refresh_all_referrals_for_user(user_id, conn)
+
+        # Get user details
+        user_info = execute_query(conn, "SELECT referral_code, verified_referrals FROM users WHERE id = ?", (user_id,)).fetchone()
+        
+        referral_code = user_info['referral_code'] if user_info and user_info['referral_code'] else None
+        if not referral_code:
+            referral_code = f"CN{10000 + user_id}"
+            execute_query(conn, "UPDATE users SET referral_code = ? WHERE id = ?", (referral_code, user_id))
+            conn.commit()
+            
+        verified_referrals = user_info['verified_referrals'] if user_info and user_info['verified_referrals'] else 0
+        
+        # Get referred users list from referrals table
+        referred_users = execute_query(conn, """
+            SELECT u.name, u.email, r.status, r.created_at 
+            FROM referrals r 
+            JOIN users u ON r.referred_user_id = u.id 
+            WHERE r.referrer_id = ? 
+            ORDER BY r.created_at DESC
+        """, (user_id,)).fetchall()
+        
+        # Mask details for privacy
+        masked_users = []
+        for u in referred_users:
+            name_parts = u['name'].split()
+            masked_name = " ".join([p[0] + "*"*max(1, len(p)-1) for p in name_parts]) if name_parts else "User"
+            
+            email_parts = u['email'].split('@')
+            masked_email = email_parts[0][:2] + "*"*max(1, len(email_parts[0])-2) + "@" + email_parts[1] if len(email_parts) == 2 else "user@example.com"
+            
+            # Format date
+            date_str = u['created_at']
+            date_display = date_str
+            if isinstance(date_str, str):
+                try:
+                    dt = datetime.strptime(date_str[:19], '%Y-%m-%d %H:%M:%S')
+                    date_display = dt.strftime('%d %b %Y')
+                except Exception:
+                    pass
+            elif hasattr(date_str, 'strftime'):
+                date_display = date_str.strftime('%d %b %Y')
+                
+            masked_users.append({
+                'name': masked_name,
+                'email': masked_email,
+                'verified': u['status'] == 'Verified',
+                'date': date_display
+            })
+
+        referral_link = str(request.base_url).rstrip('/') + f"/register?ref={referral_code}"
+        
+        remaining = max(0, 3 - verified_referrals)
+        progress_pct = min(100, int((verified_referrals / 3) * 100))
+        
+        # Get active courses for sidebar
+        courses = [
+            {'id': 'python', 'name': 'Python Core', 'icon': 'fab fa-python', 'bg': 'python-bg', 'header_bg': '#3776ab', 'link': '/python.html'},
+            {'id': 'c', 'name': 'C Architecture', 'icon': 'fas fa-code-branch', 'bg': 'c-bg', 'header_bg': '#00599c', 'link': '/c.html'},
+            {'id': 'java', 'name': 'Java Masterclass', 'icon': 'fab fa-java', 'bg': 'java-bg', 'header_bg': '#ed8b00', 'link': '/java.html'},
+            {'id': 'web', 'name': 'Web Development', 'icon': 'fab fa-html5', 'bg': 'web-bg', 'header_bg': '#e34f26', 'link': '/web.html'},
+            {'id': 'js', 'name': 'JavaScript Expert', 'icon': 'fab fa-js', 'bg': 'js-bg', 'header_bg': '#f7df1e', 'link': '/js.html'}
+        ]
+        
+        total_topics_rows = execute_query(conn, "SELECT language, COUNT(*) as count FROM content GROUP BY language").fetchall()
+        total_topics_map = {row['language']: row['count'] for row in total_topics_rows}
+
+        completed_topics_rows = execute_query(conn, "SELECT language, COUNT(*) as count FROM user_progress WHERE user_id = ? GROUP BY language", (user_id,)).fetchall()
+        completed_topics_map = {row['language']: row['count'] for row in completed_topics_rows}
+
+        user_courses = []
+        for course in courses:
+            total_topics = total_topics_map.get(course['id'], 0)
+            if total_topics > 0:
+                completed_count = completed_topics_map.get(course['id'], 0)
+                course_data = course.copy()
+                course_data['progress'] = int((completed_count / total_topics) * 100)
+                user_courses.append(course_data)
+                
+        release_db_connection(conn)
+        return _render(request, "referrals.html", dict(
+            referral_code=referral_code, 
+            referral_link=referral_link, 
+            verified_referrals=verified_referrals, 
+            remaining=remaining, 
+            progress_pct=progress_pct, 
+            masked_users=masked_users, 
+            user_courses=user_courses
+        ))
+    except Exception as e:
+        release_db_connection(conn)
+        return HTMLResponse(content=str(e), status_code=500)
+
+
+@app.get("/referral-status")
+async def referral_status(request: Request):
+    if 'user_id' not in request.session:
+        return JSONResponse({"message": "Unauthorized"}, status_code=401)
+        
+    user_id = request.session['user_id']
+    conn = get_db_connection()
+    try:
+        # Auto-refresh first
+        refresh_all_referrals_for_user(user_id, conn)
+        
+        user_info = execute_query(conn, "SELECT referral_code, verified_referrals FROM users WHERE id = ?", (user_id,)).fetchone()
+        referral_code = user_info['referral_code'] if user_info and user_info['referral_code'] else f"CN{10000 + user_id}"
+        verified_referrals = user_info['verified_referrals'] if user_info and user_info['verified_referrals'] else 0
+        
+        referred_users = execute_query(conn, """
+            SELECT u.name, u.email, r.status, r.created_at 
+            FROM referrals r 
+            JOIN users u ON r.referred_user_id = u.id 
+            WHERE r.referrer_id = ? 
+            ORDER BY r.created_at DESC
+        """, (user_id,)).fetchall()
+        
+        masked_users = []
+        for u in referred_users:
+            name_parts = u['name'].split()
+            masked_name = " ".join([p[0] + "*"*max(1, len(p)-1) for p in name_parts]) if name_parts else "User"
+            
+            email_parts = u['email'].split('@')
+            masked_email = email_parts[0][:2] + "*"*max(1, len(email_parts[0])-2) + "@" + email_parts[1] if len(email_parts) == 2 else "user@example.com"
+            
+            date_str = u['created_at']
+            date_display = date_str
+            if isinstance(date_str, str):
+                try:
+                    dt = datetime.strptime(date_str[:19], '%Y-%m-%d %H:%M:%S')
+                    date_display = dt.strftime('%d %b %Y')
+                except Exception:
+                    pass
+            elif hasattr(date_str, 'strftime'):
+                date_display = date_str.strftime('%d %b %Y')
+                
+            masked_users.append({
+                'name': masked_name,
+                'email': masked_email,
+                'status': u['status'],
+                'date': date_display
+            })
+            
+        referral_link = str(request.base_url).rstrip('/') + f"/register?ref={referral_code}"
+        remaining = max(0, 3 - verified_referrals)
+        progress_pct = min(100, int((verified_referrals / 3) * 100))
+        
+        release_db_connection(conn)
+        return JSONResponse({
+            "referral_code": referral_code,
+            "referral_link": referral_link,
+            "verified_referrals": verified_referrals,
+            "remaining": remaining,
+            "progress_pct": progress_pct,
+            "referrals": masked_users
+        })
+    except Exception as e:
+        release_db_connection(conn)
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+
+@app.get("/certificate-status")
+async def certificate_status(request: Request):
+    if 'user_id' not in request.session:
+        return JSONResponse({"message": "Unauthorized"}, status_code=401)
+        
+    user_id = request.session['user_id']
+    conn = get_db_connection()
+    try:
+        user_info = execute_query(conn, "SELECT verified_referrals FROM users WHERE id = ?", (user_id,)).fetchone()
+        verified_referrals = user_info['verified_referrals'] if user_info and user_info['verified_referrals'] else 0
+        unlocked = verified_referrals >= 3
+        release_db_connection(conn)
+        return JSONResponse({
+            "unlocked": unlocked,
+            "verified_referrals": verified_referrals
+        })
+    except Exception as e:
+        release_db_connection(conn)
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+
+@app.post("/verify-referral")
+async def verify_referral(request: Request):
+    if 'user_id' not in request.session:
+        return JSONResponse({"message": "Unauthorized"}, status_code=401)
+        
+    try:
+        data = await request.json()
+        referred_user_id = data.get("referred_user_id")
+        if not referred_user_id:
+            return JSONResponse({"message": "Missing referred_user_id"}, status_code=400)
+            
+        conn = get_db_connection()
+        verified = check_and_verify_referral(referred_user_id, conn)
+        release_db_connection(conn)
+        
+        return JSONResponse({
+            "verified": verified,
+            "message": "Referral verified successfully." if verified else "Criteria not met yet or already verified."
+        })
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+
+@app.post("/refresh-referrals")
+async def refresh_referrals(request: Request):
+    if 'user_id' not in request.session:
+        return JSONResponse({"message": "Unauthorized"}, status_code=401)
+        
+    user_id = request.session['user_id']
+    conn = get_db_connection()
+    try:
+        refresh_all_referrals_for_user(user_id, conn)
+        user_info = execute_query(conn, "SELECT verified_referrals FROM users WHERE id = ?", (user_id,)).fetchone()
+        verified_referrals = user_info['verified_referrals'] if user_info and user_info['verified_referrals'] else 0
+        remaining = max(0, 3 - verified_referrals)
+        progress_pct = min(100, int((verified_referrals / 3) * 100))
+        release_db_connection(conn)
+        
+        return JSONResponse({
+            "verified_referrals": verified_referrals,
+            "remaining": remaining,
+            "progress_pct": progress_pct,
+            "message": "Referrals refreshed successfully."
+        })
+    except Exception as e:
+        release_db_connection(conn)
+        return JSONResponse({"message": str(e)}, status_code=500)
 
 
 @app.post("/api/complete_topic")
@@ -1216,10 +1684,24 @@ async def certificate_page(course_id: str, request: Request):
                 formatted_date = dt_val.strftime('%B %d, %Y')
         if not formatted_date:
             formatted_date = datetime.today().strftime('%B %d, %Y')
+        # Get referral details
+        refresh_all_referrals_for_user(user_id, conn)
+        user_info = execute_query(conn, "SELECT verified_referrals, referral_code FROM users WHERE id = ?", (user_id,)).fetchone()
+        verified_referrals = user_info['verified_referrals'] if user_info and user_info['verified_referrals'] else 0
+        referral_code = user_info['referral_code'] if user_info and user_info['referral_code'] else None
+        if not referral_code:
+            referral_code = f"CN{10000 + user_id}"
+            execute_query(conn, "UPDATE users SET referral_code = ? WHERE id = ?", (referral_code, user_id))
+            conn.commit()
+            
+        referral_link = str(request.base_url).rstrip('/') + f"/register?ref={referral_code}"
+            
         release_db_connection(conn)
         return _render(request, "certificate.html", dict(
             course_id=course_id, course_name=course_name_map[course_id],
-            student_name=user_name, date=formatted_date
+            student_name=user_name, date=formatted_date,
+            verified_referrals=verified_referrals, referral_code=referral_code,
+            referral_link=referral_link
         ))
     except Exception as e:
         release_db_connection(conn)

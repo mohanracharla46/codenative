@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Referrals | Code Native</title>
+    <meta name="description" content="Invite friends to Code Native and unlock your certificates.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/dashboard.css">
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/static/theme.js"></script>
+
+    <style>
+        /* Scoped overrides to blend Bootstrap 5 with CodeNative Dark Mode */
+        body.dark-mode {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+        }
+        body.dark-mode .dashboard-container {
+            background-color: #0f172a !important;
+        }
+        body.dark-mode .card {
+            background: rgba(30, 41, 59, 0.7) !important;
+            border: 1px solid #334155 !important;
+            color: #f8fafc !important;
+            backdrop-filter: blur(12px);
+        }
+        body.dark-mode .text-muted {
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .table {
+            color: #f8fafc !important;
+        }
+        body.dark-mode .table th {
+            border-bottom: 2px solid #334155 !important;
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .table td {
+            border-bottom: 1px solid #334155 !important;
+        }
+        body.dark-mode .form-control-read {
+            background: rgba(15, 23, 42, 0.6) !important;
+            border: 1px solid #334155 !important;
+            color: #f8fafc !important;
+        }
+        
+        .ref-card {
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        body.dark-mode .ref-card {
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .ref-card:hover {
+            transform: translateY(-2px);
+        }
+        .btn-share {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-share:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .badge-pending {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge-verified {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .progress {
+            background-color: rgba(0, 0, 0, 0.1) !important;
+        }
+        body.dark-mode .progress {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-inner">
+            <div class="header-left">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo">
+                    <a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="/dashboard" class="btn-dashboard">
+                    <i class="fas fa-user-circle"></i> <span>Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-profile">
+                    <div class="profile-avatar">
+                        <img src="https://ui-avatars.com/api/?name={{ session.get('user_name', 'User') }}&background=6366f1&color=fff" alt="Avatar">
+                    </div>
+                    <div class="profile-info">
+                        <h3>{{ session.get('user_name', 'Guest') }}</h3>
+                        <span>{{ session.get('user_email', 'guest@example.com') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-group">
+                    <span class="menu-title">Main Menu</span>
+                    <a href="/dashboard" class="menu-item">
+                        <i class="fas fa-th-large"></i> Overview
+                    </a>
+                    <a href="/roadmap.html" class="menu-item">
+                        <i class="fas fa-route"></i> Roadmap
+                    </a>
+                    <a href="/compiler.html" class="menu-item">
+                        <i class="fas fa-terminal"></i> Playgrounds
+                    </a>
+                    <a href="/videos.html" class="menu-item">
+                        <i class="fas fa-play-circle"></i> Video Tutorials
+                    </a>
+                    <a href="/feedback.html" class="menu-item">
+                        <i class="fas fa-comment-dots"></i> Feedback
+                    </a>
+                    <a href="/my-referrals" class="menu-item active">
+                        <i class="fas fa-users"></i> My Referrals
+                    </a>
+                </div>
+
+                <div class="menu-group">
+                    <span class="menu-title">My Courses</span>
+                    {% for course in user_courses %}
+                    <a href="{{ course.link }}" class="course-nav-item">
+                        <div class="course-icon {{ course.bg }}">
+                            <i class="{{ course.icon }}"></i>
+                        </div>
+                        <div class="course-details">
+                            <span class="course-name">{{ course.name }}</span>
+                            <div class="course-progress-wrapper">
+                                <div class="course-progress-bar">
+                                    <div class="course-progress-fill" style="width: {{ course.progress }}%;"></div>
+                                </div>
+                                <span class="course-progress-text">{{ course.progress }}%</span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-content container-fluid py-4 px-md-5">
+            <div class="welcome-section mb-4">
+                <div class="welcome-content d-flex justify-content-between align-items-center w-100 flex-wrap gap-3">
+                    <div>
+                        <span class="welcome-eyebrow">Rewards Program</span>
+                        <h1 class="mb-1">Invite Friends, Earn Certificates! 🚀</h1>
+                        <p class="text-muted mb-0">Refer 3 friends to immediately unlock certificate downloads once they start learning.</p>
+                    </div>
+                    <div>
+                        <button id="btnRefresh" class="btn btn-outline-primary px-4 py-2" onclick="refreshReferrals()">
+                            <span id="spinnerRefresh" class="spinner-border spinner-border-sm d-none me-2" role="status"></span>
+                            <i id="iconRefresh" class="fas fa-sync-alt me-1"></i> Refresh Status
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Main Stats Panel -->
+                <div class="col-lg-7">
+                    <div class="card p-4 ref-card h-100">
+                        <h4 class="fw-bold mb-4"><i class="fas fa-share-nodes text-primary me-2"></i> Share Referral Link</h4>
+                        
+                        <!-- Referral Code & Copy Link -->
+                        <div class="mb-4">
+                            <label class="form-label text-muted fw-semibold">My Referral Code</label>
+                            <h3 id="displayRefCode" class="fw-extrabold text-primary mb-3">{{ referral_code }}</h3>
+                            
+                            <label class="form-label text-muted fw-semibold">Referral Link</label>
+                            <div class="input-group">
+                                <input type="text" id="refLink" class="form-control form-control-read" value="{{ referral_link }}" readonly>
+                                <button class="btn btn-primary" onclick="copyReferralLink()">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Share Buttons -->
+                        <div class="mb-2">
+                            <label class="form-label text-muted fw-semibold mb-3">Share Instantly</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a id="shareWA" href="https://api.whatsapp.com/send?text=Hey!%20Join%20CodeNative%20with%20me%20and%20learn%20programming%20for%20free.%20Here%27s%20my%20link:%20{{ referral_link|urlencode }}" target="_blank" class="btn btn-share text-white px-3 py-2" style="background-color: #25D366; border: none;">
+                                    <i class="fab fa-whatsapp me-2"></i> WhatsApp
+                                </a>
+                                <a id="shareTG" href="https://t.me/share/url?url={{ referral_link|urlencode }}&text=Hey!%20Join%20CodeNative%20and%20learn%20programming%20for%20free." target="_blank" class="btn btn-share text-white px-3 py-2" style="background-color: #0088cc; border: none;">
+                                    <i class="fab fa-telegram-plane me-2"></i> Telegram
+                                </a>
+                                <a id="shareLN" href="https://www.linkedin.com/sharing/share-offsite/?url={{ referral_link|urlencode }}" target="_blank" class="btn btn-share text-white px-3 py-2" style="background-color: #0077b5; border: none;">
+                                    <i class="fab fa-linkedin me-2"></i> LinkedIn
+                                </a>
+                                <a id="shareFB" href="https://www.facebook.com/sharer/sharer.php?u={{ referral_link|urlencode }}" target="_blank" class="btn btn-share text-white px-3 py-2" style="background-color: #1877f2; border: none;">
+                                    <i class="fab fa-facebook me-2"></i> Facebook
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Circle / Card -->
+                <div class="col-lg-5">
+                    <div class="card p-4 ref-card h-100 text-center d-flex flex-column justify-content-between">
+                        <div>
+                            <h4 class="fw-bold mb-3"><i class="fas fa-chart-line text-success me-2"></i> Referral Progress</h4>
+                            <p class="text-muted small mb-4">Referral status updates as soon as friends start a course or spend 5 minutes learning.</p>
+                            
+                            <!-- Large Circular-styled Stats -->
+                            <div class="py-3">
+                                <div id="displayCount" style="font-size: 3.5rem; font-weight: 800; color: #10b981;">{{ verified_referrals }}</div>
+                                <div class="text-muted fw-semibold">Verified Referrals</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <!-- Progress Bar -->
+                            <div class="d-flex justify-content-between text-muted small mb-2">
+                                <span id="displayProgressText">{{ verified_referrals }} / 3 Friends</span>
+                                <span id="displayProgressPct">{{ progress_pct }}% Complete</span>
+                            </div>
+                            <div class="progress mb-3" style="height: 12px; border-radius: 6px;">
+                                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ progress_pct }}%; background-color: #10b981;" aria-valuenow="{{ progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+
+                            <div id="statusAlert">
+                                {% if remaining > 0 %}
+                                <div class="alert alert-warning py-2 mb-0 small" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: #f59e0b;">
+                                    <i class="fas fa-lock me-1"></i> You need <strong id="displayRemaining">{{ remaining }}</strong> more verified referrals to unlock certificate downloads.
+                                </div>
+                                {% else %}
+                                <div class="alert alert-success py-2 mb-0 small" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981;">
+                                    <i class="fas fa-unlock me-1"></i> Congratulations! Certificate downloads are fully unlocked! 🎓
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referral Tracking List -->
+            <div class="card p-4 ref-card mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <h4 class="fw-bold mb-0"><i class="fas fa-list-check text-primary me-2"></i> Referred Friends</h4>
+                    <span id="loadingSpinner" class="spinner-border spinner-border-sm text-primary d-none" role="status"></span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Joined On</th>
+                                <th class="text-end">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="referralsTableBody">
+                            {% for user in masked_users %}
+                            <tr>
+                                <td class="fw-semibold">{{ user.name }}</td>
+                                <td class="text-muted">{{ user.email }}</td>
+                                <td class="text-muted">{{ user.date }}</td>
+                                <td class="text-end">
+                                    {% if user.verified %}
+                                    <span class="badge-verified"><i class="fas fa-check-circle me-1"></i> Verified</span>
+                                    {% else %}
+                                    <span class="badge-pending"><i class="fas fa-hourglass-half me-1"></i> Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr id="emptyRow">
+                                <td colspan="4" class="text-center text-muted py-5">
+                                    <div style="font-size: 2.5rem; opacity: 0.3;" class="mb-2">👥</div>
+                                    No referrals yet. Share your link above to get started!
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+        <div id="statusToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastMessage"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        let currentVerifiedCount = {{ verified_referrals }};
+        const toastElement = document.getElementById('statusToast');
+        const toast = new bootstrap.Toast(toastElement);
+
+        function showToast(message, isSuccess = true) {
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toastElement.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-primary');
+            toastElement.classList.add(isSuccess ? 'bg-success' : 'bg-danger');
+            toast.show();
+        }
+
+        // Copy referral link to clipboard
+        function copyReferralLink() {
+            const copyText = document.getElementById("refLink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // For mobile devices
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                showToast("Referral link copied to clipboard! 📋", true);
+            }).catch(err => {
+                console.error("Failed to copy text: ", err);
+                showToast("Failed to copy link.", false);
+            });
+        }
+
+        // Fetch referral status asynchronously and update UI
+        async function fetchReferralStatus() {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.classList.remove('d-none');
+            
+            try {
+                const response = await fetch('/referral-status');
+                if (!response.ok) throw new Error("Failed to fetch referral status");
+                
+                const data = await response.json();
+                
+                // Update stats
+                document.getElementById('displayCount').textContent = data.verified_referrals;
+                document.getElementById('displayProgressText').textContent = `${data.verified_referrals} / 3 Friends`;
+                document.getElementById('displayProgressPct').textContent = `${data.progress_pct}% Complete`;
+                document.getElementById('progressBar').style.width = `${data.progress_pct}%`;
+                document.getElementById('progressBar').setAttribute('aria-valuenow', data.progress_pct);
+                
+                // Update alert
+                const alertContainer = document.getElementById('statusAlert');
+                if (data.remaining > 0) {
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-warning py-2 mb-0 small" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: #f59e0b;">
+                            <i class="fas fa-lock me-1"></i> You need <strong>${data.remaining}</strong> more verified referrals to unlock certificate downloads.
+                        </div>
+                    `;
+                } else {
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-success py-2 mb-0 small" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981;">
+                            <i class="fas fa-unlock me-1"></i> Congratulations! Certificate downloads are fully unlocked! 🎓
+                        </div>
+                    `;
+                    // Confetti if unlocked now
+                    if (currentVerifiedCount < 3 && data.verified_referrals >= 3) {
+                        triggerCelebration();
+                    }
+                }
+                
+                currentVerifiedCount = data.verified_referrals;
+                
+                // Update table
+                const tableBody = document.getElementById('referralsTableBody');
+                if (data.referrals.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr id="emptyRow">
+                            <td colspan="4" class="text-center text-muted py-5">
+                                <div style="font-size: 2.5rem; opacity: 0.3;" class="mb-2">👥</div>
+                                No referrals yet. Share your link above to get started!
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    tableBody.innerHTML = data.referrals.map(user => `
+                        <tr>
+                            <td class="fw-semibold">${user.name}</td>
+                            <td class="text-muted">${user.email}</td>
+                            <td class="text-muted">${user.date}</td>
+                            <td class="text-end">
+                                ${user.status === 'Verified' 
+                                    ? '<span class="badge-verified"><i class="fas fa-check-circle me-1"></i> Verified</span>' 
+                                    : '<span class="badge-pending"><i class="fas fa-hourglass-half me-1"></i> Pending</span>'
+                                }
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+                
+            } catch (err) {
+                console.error("Error fetching status:", err);
+            } finally {
+                spinner.classList.add('d-none');
+            }
+        }
+
+        // Manually trigger server-side sync check and update UI
+        async function refreshReferrals() {
+            const btn = document.getElementById('btnRefresh');
+            const spinner = document.getElementById('spinnerRefresh');
+            const icon = document.getElementById('iconRefresh');
+            
+            btn.disabled = true;
+            spinner.classList.remove('d-none');
+            icon.classList.add('d-none');
+            
+            try {
+                const response = await fetch('/refresh-referrals', { method: 'POST' });
+                if (!response.ok) throw new Error("Failed to refresh status");
+                const data = await response.json();
+                
+                showToast("Referral status refreshed successfully! 🔄", true);
+                await fetchReferralStatus();
+            } catch (err) {
+                console.error("Error refreshing referrals:", err);
+                showToast("Failed to refresh referral status.", false);
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('d-none');
+                icon.classList.remove('d-none');
+            }
+        }
+
+        // Celebrate unlock
+        function triggerCelebration() {
+            if (typeof confetti !== 'undefined') {
+                var duration = 4 * 1000;
+                var end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({
+                        particleCount: 4,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0, y: 0.8 }
+                    });
+                    confetti({
+                        particleCount: 4,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1, y: 0.8 }
+                    });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+            }
+        }
+
+        // Initial setup for mobile sidebar toggler
+        const sidebar = document.getElementById('dashboardSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const toggleBtn = document.getElementById('mobileMenuToggle');
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                overlay.style.display = 'block';
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.style.display = 'none';
+            });
+        }
+
+        // Automatically reload status periodically (every 30 seconds)
+        setInterval(fetchReferralStatus, 30000);
+    </script>
+</body>
+
+</html>
