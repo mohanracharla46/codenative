@@ -6,6 +6,8 @@
 import os
 import time
 import sqlite3
+import csv
+import io
 import hashlib          # kept for migrating existing SHA-256 hashed passwords
 import random
 import tempfile
@@ -30,7 +32,7 @@ from fastapi import (
     UploadFile, File, Form
 )
 from fastapi.responses import (
-    HTMLResponse, RedirectResponse
+    HTMLResponse, RedirectResponse, StreamingResponse
 )
 from starlette.responses import JSONResponse as _StarletteJSONResponse
 import json as _json
@@ -1760,6 +1762,50 @@ async def admin_increment_certificate(request: Request):
         return JSONResponse({"message": str(e)}, status_code=500)
 
 
+@app.get("/admin/export_users")
+async def export_users(request: Request):
+    if not _admin_check(request):
+        return RedirectResponse(url="/", status_code=303)
+    
+    conn = get_db_connection()
+    users = execute_query(conn, "SELECT id, name, email, mobile, is_admin, referral_code, referred_by, verified_referrals, created_at FROM users ORDER BY id ASC").fetchall()
+    release_db_connection(conn)
+    
+    output = io.StringIO()
+    # Write UTF-8 BOM to support Unicode in Excel
+    output.write('\ufeff')
+    writer = csv.writer(output)
+    
+    # Header
+    writer.writerow([
+        "User ID", "Name", "Email", "Mobile", "Role", "Referral Code", "Referred By ID", "Verified Referrals", "Joined At"
+    ])
+    
+    # Rows
+    for u in users:
+        role = "Admin" if u['is_admin'] else "User"
+        writer.writerow([
+            u['id'],
+            u['name'],
+            u['email'],
+            u['mobile'] or '',
+            role,
+            u['referral_code'] or '',
+            u['referred_by'] or '',
+            u['verified_referrals'] or 0,
+            u['created_at']
+        ])
+    
+    output.seek(0)
+    
+    response = StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv"
+    )
+    response.headers["Content-Disposition"] = "attachment; filename=users_export.csv"
+    return response
+
+
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_dashboard(request: Request):
     if not _admin_check(request): return _redirect("/")
@@ -1785,7 +1831,7 @@ async def admin_dashboard(request: Request):
         active_7d  = execute_query(conn, "SELECT COUNT(*) as count FROM user_stats WHERE last_active_date >= date('now', '-7 days')").fetchone()
         this_week  = execute_query(conn, "SELECT COUNT(*) as count FROM users WHERE created_at > date('now', '-7 days')").fetchone()
         last_week  = execute_query(conn, "SELECT COUNT(*) as count FROM users WHERE created_at BETWEEN date('now', '-14 days') AND date('now', '-7 days')").fetchone()
-    all_users   = execute_query(conn, 'SELECT id, name, email, is_admin, created_at FROM users ORDER BY id DESC').fetchall()
+    all_users   = execute_query(conn, 'SELECT id, name, email, mobile, is_admin, created_at FROM users ORDER BY id DESC').fetchall()
     careers     = execute_query(conn, "SELECT * FROM careers ORDER BY id DESC").fetchall()
     career_apps = execute_query(conn, "SELECT ca.*, c.title as career_title, c.type as career_type FROM career_applications ca LEFT JOIN careers c ON ca.career_id = c.id ORDER BY ca.id DESC").fetchall()
     release_db_connection(conn)
