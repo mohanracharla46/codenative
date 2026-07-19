@@ -23,6 +23,7 @@
             <li data-tab="tab-tutorials"><i class="fas fa-book"></i><span>Tutorials</span></li>
             <li data-tab="tab-careers"><i class="fas fa-briefcase"></i><span>Careers</span></li>
             <li data-tab="tab-users"><i class="fas fa-users"></i><span>Users</span></li>
+            <li data-tab="tab-online-classes"><i class="fas fa-chalkboard-teacher"></i><span>Online Classes</span></li>
             <li onclick="location.href='/admin/certificates'"><i class="fas fa-certificate"></i><span>Certificates</span></li>
             <li onclick="location.href='/admin/feedback'"><i class="fas fa-comments"></i><span>Feedback</span></li>
             <li onclick="location.href='/'"><i class="fas fa-home"></i><span>View Site</span></li>
@@ -632,6 +633,140 @@
             </div>
         </div>
 
+        <!-- ONLINE CLASSES TAB -->
+        <div id="tab-online-classes" class="tab-pane">
+
+            <!-- Classes Management -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div>
+                        <h2 style="margin:0;">Online Classes</h2>
+                        <p style="margin:0;font-size:0.8rem;color:var(--admin-text-dim);">Create and manage online class offerings</p>
+                    </div>
+                    <button class="btn-action btn-primary" onclick="openAddClassModal()">
+                        <i class="fas fa-plus"></i> Add New Class
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Language</th>
+                                <th>Level</th>
+                                <th>Schedule</th>
+                                <th>Instructor</th>
+                                <th>Status</th>
+                                <th>Registration Link</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for oc in online_classes %}
+                            <tr>
+                                <td><div style="font-weight:600;">{{ oc.title }}</div>
+                                    {% if oc.description %}<div style="font-size:0.78rem;color:var(--admin-text-dim);margin-top:2px;">{{ oc.description[:60] }}{% if oc.description|length > 60 %}…{% endif %}</div>{% endif %}
+                                </td>
+                                <td>{{ oc.language or '—' }}</td>
+                                <td>
+                                    {% if oc.level == 'Beginner' %}<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);">Beginner</span>
+                                    {% elif oc.level == 'Intermediate' %}<span class="badge" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.3);">Intermediate</span>
+                                    {% elif oc.level == 'Advanced' %}<span class="badge" style="background:rgba(139,92,246,0.15);color:#8b5cf6;border:1px solid rgba(139,92,246,0.3);">Advanced</span>
+                                    {% else %}<span style="color:var(--admin-text-dim);">{{ oc.level or '—' }}</span>{% endif %}
+                                </td>
+                                <td><span style="font-size:0.85rem;color:var(--admin-text-dim);">{{ oc.schedule or '—' }}</span></td>
+                                <td>{{ oc.instructor or '—' }}</td>
+                                <td>
+                                    {% if oc.is_active %}
+                                    <span class="badge badge-admin" style="background:rgba(16,185,129,0.15);color:#10b981;">Active</span>
+                                    {% else %}
+                                    <span class="badge" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.3);">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn-action btn-sm" style="background:rgba(99,102,241,0.1);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);"
+                                            onclick="copyRegLink({{ oc.id }})" title="Copy registration link">
+                                        <i class="fas fa-link"></i> Copy Link
+                                    </button>
+                                </td>
+                                <td>
+                                    <div style="display:flex;gap:0.5rem;">
+                                        <button class="btn-action btn-sm btn-edit" onclick="editClass({{ oc.id }})" title="Edit">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                        <button class="btn-action btn-sm" style="background:rgba(6,182,212,0.1);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);"
+                                                onclick="toggleClass({{ oc.id }})" title="Toggle Active">
+                                            <i class="fas fa-power-off"></i>
+                                        </button>
+                                        <button class="btn-action btn-sm btn-delete" onclick="deleteClass({{ oc.id }})" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not online_classes %}
+                            <tr><td colspan="8" class="empty-row"><i class="fas fa-chalkboard-teacher" style="font-size:2rem;margin-bottom:0.5rem;opacity:0.3;display:block;"></i>No online classes yet. Click "Add New Class" to get started!</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Registrations -->
+            <div class="section-card" style="margin-top:30px;">
+                <div class="section-header">
+                    <div>
+                        <h2 style="margin:0;">Class Registrations</h2>
+                        <p style="margin:0;font-size:0.8rem;color:var(--admin-text-dim);">All submitted registration forms</p>
+                    </div>
+                    <a href="/admin/export_registrations" class="btn-action btn-primary" style="text-decoration:none;">
+                        <i class="fas fa-file-excel"></i> Export CSV
+                    </a>
+                </div>
+                <div class="table-container">
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Language</th>
+                                <th>Level</th>
+                                <th>Message</th>
+                                <th>Registered At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in online_registrations %}
+                            <tr>
+                                <td><div style="font-weight:600;font-size:0.85rem;">{{ r.class_title or 'N/A' }}</div></td>
+                                <td><div style="font-weight:600;">{{ r.full_name }}</div></td>
+                                <td>{{ r.email }}</td>
+                                <td>{{ r.phone }}</td>
+                                <td>
+                                    <span style="font-size:0.82rem;background:rgba(99,102,241,0.08);color:#a5b4fc;padding:3px 10px;border-radius:6px;">{{ r.language }}</span>
+                                </td>
+                                <td>
+                                    {% if r.level == 'Beginner' %}<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;">Beginner</span>
+                                    {% elif r.level == 'Intermediate' %}<span class="badge" style="background:rgba(6,182,212,0.12);color:#06b6d4;">Intermediate</span>
+                                    {% elif r.level == 'Advanced' %}<span class="badge" style="background:rgba(139,92,246,0.15);color:#8b5cf6;">Advanced</span>
+                                    {% else %}{{ r.level }}{% endif %}
+                                </td>
+                                <td><div style="max-width:200px;font-size:0.82rem;color:var(--admin-text-dim);white-space:pre-wrap;">{{ r.message or '—' }}</div></td>
+                                <td><div style="font-size:0.8rem;color:var(--admin-text-dim);">{{ r.registered_at }}</div></td>
+                            </tr>
+                            {% endfor %}
+                            {% if not online_registrations %}
+                            <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--admin-text-dim);">No registrations yet.</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Add/Edit Modal -->
@@ -756,7 +891,73 @@
         </div>
     </div>
 
-    <!-- Code Snippet Modal -->
+    <!-- Online Class Add/Edit Modal -->
+    <div class="modal" id="onlineClassModal">
+        <div class="modal-content" style="max-width:560px;">
+            <div class="modal-header">
+                <h2 id="classModalTitle">Add Online Class</h2>
+                <span class="close-modal" onclick="closeClassModal()"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="modal-body">
+                <form id="classForm">
+                    <input type="hidden" id="class_id">
+                    <div class="form-group">
+                        <label>Class Title <span style="color:#ef4444;">*</span></label>
+                        <input type="text" id="class_title" class="form-control" placeholder="e.g. Python for Beginners Batch 1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="class_description" class="form-control" style="height:90px;" placeholder="Brief description of the class..."></textarea>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <div class="form-group">
+                            <label>Language / Course</label>
+                            <select id="class_language" class="form-control">
+                                <option value="">Select language</option>
+                                <option value="Python">Python</option>
+                                <option value="Java">Java</option>
+                                <option value="C Language">C Language</option>
+                                <option value="Web Development">Web Development</option>
+                                <option value="JavaScript">JavaScript</option>
+                                <option value="Data Structures">Data Structures</option>
+                                <option value="SQL">SQL & Databases</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Level</label>
+                            <select id="class_level" class="form-control">
+                                <option value="">Select level</option>
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                                <option value="All Levels">All Levels</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <div class="form-group">
+                            <label>Schedule / Date</label>
+                            <input type="text" id="class_schedule" class="form-control" placeholder="e.g. Mon & Wed 6PM IST">
+                        </div>
+                        <div class="form-group">
+                            <label>Instructor Name</label>
+                            <input type="text" id="class_instructor" class="form-control" placeholder="Instructor name">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Max Seats (0 = unlimited)</label>
+                        <input type="number" id="class_max_seats" class="form-control" placeholder="0" min="0" value="0">
+                    </div>
+                    <button type="submit" class="btn-action btn-primary" style="width:100%;justify-content:center;margin-top:8px;">
+                        <i class="fas fa-save"></i> Save Class
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
     <div class="modal" id="codeModal">
         <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
@@ -1171,5 +1372,132 @@
         });
     </script>
     <script src="/static/theme.js"></script>
+
+    <script>
+    // ── Online Classes admin JS ─────────────────────────────────────────────
+    const onlineClassesData = {{ online_classes | tojson | safe }};
+
+    function openAddClassModal() {
+        document.getElementById('classModalTitle').textContent = 'Add New Online Class';
+        document.getElementById('class_id').value = '';
+        document.getElementById('classForm').reset();
+        document.getElementById('class_max_seats').value = '0';
+        document.getElementById('onlineClassModal').style.display = 'flex';
+    }
+
+    function closeClassModal() {
+        document.getElementById('onlineClassModal').style.display = 'none';
+    }
+
+    function editClass(id) {
+        const oc = onlineClassesData.find(c => c.id === id);
+        if (!oc) return;
+        document.getElementById('classModalTitle').textContent = 'Edit Online Class';
+        document.getElementById('class_id').value = oc.id;
+        document.getElementById('class_title').value = oc.title || '';
+        document.getElementById('class_description').value = oc.description || '';
+        document.getElementById('class_language').value = oc.language || '';
+        document.getElementById('class_level').value = oc.level || '';
+        document.getElementById('class_schedule').value = oc.schedule || '';
+        document.getElementById('class_instructor').value = oc.instructor || '';
+        document.getElementById('class_max_seats').value = oc.max_seats || 0;
+        document.getElementById('onlineClassModal').style.display = 'flex';
+    }
+
+    document.getElementById('classForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            id:          document.getElementById('class_id').value || null,
+            title:       document.getElementById('class_title').value.trim(),
+            description: document.getElementById('class_description').value.trim(),
+            language:    document.getElementById('class_language').value,
+            level:       document.getElementById('class_level').value,
+            schedule:    document.getElementById('class_schedule').value.trim(),
+            instructor:  document.getElementById('class_instructor').value.trim(),
+            max_seats:   parseInt(document.getElementById('class_max_seats').value) || 0,
+        };
+        try {
+            const res = await fetch('/admin/online_classes/add', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                closeClassModal();
+                showAdminToast(data.message || 'Saved!', 'success');
+                setTimeout(() => location.reload(), 900);
+            } else {
+                showAdminToast(data.message || 'Error saving class.', 'error');
+            }
+        } catch (err) {
+            showAdminToast('Network error.', 'error');
+        }
+    });
+
+    async function deleteClass(id) {
+        if (!confirm('Delete this online class? All registrations will remain in the database.')) return;
+        try {
+            const res = await fetch(`/admin/online_classes/delete/${id}`, { method: 'POST' });
+            const data = await res.json();
+            if (res.ok) {
+                showAdminToast('Class deleted.', 'success');
+                setTimeout(() => location.reload(), 800);
+            } else {
+                showAdminToast(data.message || 'Error.', 'error');
+            }
+        } catch (err) {
+            showAdminToast('Network error.', 'error');
+        }
+    }
+
+    async function toggleClass(id) {
+        try {
+            const res = await fetch(`/admin/online_classes/toggle/${id}`, { method: 'POST' });
+            const data = await res.json();
+            if (res.ok) {
+                showAdminToast('Status updated.', 'success');
+                setTimeout(() => location.reload(), 800);
+            } else {
+                showAdminToast(data.message || 'Error.', 'error');
+            }
+        } catch (err) {
+            showAdminToast('Network error.', 'error');
+        }
+    }
+
+    function copyRegLink(id) {
+        const link = window.location.origin + '/online-class/' + id;
+        navigator.clipboard.writeText(link).then(() => {
+            showAdminToast('Registration link copied to clipboard! \uD83D\uDCCB', 'success');
+        }).catch(() => {
+            prompt('Copy this link:', link);
+        });
+    }
+
+    function showAdminToast(msg, type = 'success') {
+        let t = document.getElementById('adminToast');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'adminToast';
+            t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--admin-card,#1e1e2e);border:1px solid rgba(99,102,241,0.3);border-radius:12px;padding:12px 24px;font-size:0.88rem;font-weight:500;z-index:99999;box-shadow:0 12px 40px rgba(0,0,0,0.5);transition:all 0.3s;max-width:360px;text-align:center;color:#f1f5f9;';
+            document.body.appendChild(t);
+        }
+        t.textContent = msg;
+        t.style.transform = 'translateX(-50%) translateY(0)';
+        t.style.opacity = '1';
+        if (type === 'error') t.style.borderColor = '#ef4444';
+        else t.style.borderColor = '#10b981';
+        setTimeout(() => {
+            t.style.transform = 'translateX(-50%) translateY(20px)';
+            t.style.opacity = '0';
+        }, 3500);
+    }
+
+    // Close modal on outside click
+    document.getElementById('onlineClassModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('onlineClassModal')) closeClassModal();
+    });
+    </script>
 </body>
 </html>

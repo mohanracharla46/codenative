@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if not_found %}Class Not Found{% else %}Register — {{ oc.title }}{% endif %} | Code Native</title>
+    <meta name="description" content="Register for online coding classes at Code Native. Learn Python, Java, C, Web Development and more.">
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-deep:      #0a0a14;
+            --bg-card:      #12121f;
+            --bg-input:     #1a1a2e;
+            --border:       rgba(99,102,241,0.18);
+            --primary:      #6366f1;
+            --primary-glow: rgba(99,102,241,0.35);
+            --accent:       #8b5cf6;
+            --accent2:      #06b6d4;
+            --success:      #10b981;
+            --error:        #ef4444;
+            --text:         #f1f5f9;
+            --text-muted:   #94a3b8;
+            --radius:       16px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px 48px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background blobs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+            animation: blobFloat 8s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+            animation: blobFloat 10s ease-in-out infinite alternate-reverse;
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes blobFloat {
+            0%   { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 30px) scale(1.1); }
+        }
+
+        /* Logo bar */
+        .logo-bar {
+            position: relative;
+            z-index: 10;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-bar img { height: 38px; }
+        .logo-bar span {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Card */
+        .card {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 620px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.06);
+        }
+
+        /* Card header */
+        .card-header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #1a1a2e 100%);
+            padding: 36px 40px 28px;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+        }
+        .class-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(99,102,241,0.15);
+            border: 1px solid rgba(99,102,241,0.3);
+            color: #a5b4fc;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 5px 14px;
+            border-radius: 999px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .card-header h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff 30%, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card-header p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        /* Meta pills */
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+        .meta-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 5px 13px;
+            border-radius: 999px;
+        }
+        .meta-pill i { color: var(--primary); font-size: 0.75rem; }
+
+        /* Form body */
+        .card-body { padding: 36px 40px 40px; }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .form-grid .full { grid-column: 1 / -1; }
+
+        .form-group { display: flex; flex-direction: column; gap: 7px; }
+        .form-group label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+        .form-group label span.req { color: var(--primary); margin-left: 2px; }
+
+        .input-wrap {
+            position: relative;
+        }
+        .input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92rem;
+            padding: 12px 14px 12px 40px;
+            transition: border-color 0.25s, box-shadow 0.25s;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .form-group textarea {
+            padding: 12px 14px;
+            resize: vertical;
+            min-height: 88px;
+        }
+        .form-group textarea + i { display: none; }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+        .form-group input:focus ~ i,
+        .form-group select:focus ~ i {
+            color: var(--primary);
+        }
+        .form-group select option { background: #1a1a2e; }
+
+        /* Level selector */
+        .level-selector {
+            display: flex;
+            gap: 10px;
+        }
+        .level-btn {
+            flex: 1;
+            border: 1.5px solid var(--border);
+            background: var(--bg-input);
+            border-radius: 12px;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .level-btn i { font-size: 1.1rem; }
+        .level-btn:hover { border-color: var(--primary); color: var(--text); }
+        .level-btn.selected {
+            border-color: var(--primary);
+            background: rgba(99,102,241,0.15);
+            color: #a5b4fc;
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+        .level-btn.selected.intermediate { border-color: var(--accent2); background: rgba(6,182,212,0.12); color: #67e8f9; box-shadow: 0 0 0 3px rgba(6,182,212,0.25); }
+        .level-btn.selected.advanced { border-color: var(--accent); background: rgba(139,92,246,0.15); color: #c4b5fd; box-shadow: 0 0 0 3px rgba(139,92,246,0.25); }
+
+        input[type="hidden"] {}
+
+        /* Submit button */
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            margin-top: 8px;
+            letter-spacing: 0.02em;
+        }
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.5s;
+        }
+        .btn-submit:hover::before { left: 100%; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(99,102,241,0.4); }
+        .btn-submit:active { transform: translateY(0); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-submit .spinner {
+            display: none;
+            width: 18px; height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast */
+        #toast {
+            display: none;
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 24px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 9999;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+            max-width: 380px;
+            text-align: center;
+        }
+        #toast.show { display: block; transform: translateX(-50%) translateY(0); }
+        #toast.success { border-color: var(--success); color: var(--success); }
+        #toast.error   { border-color: var(--error);   color: var(--error);   }
+
+        /* Success screen */
+        .success-screen {
+            text-align: center;
+            padding: 24px 0 16px;
+        }
+        .success-icon {
+            width: 80px; height: 80px;
+            background: rgba(16,185,129,0.12);
+            border: 2px solid var(--success);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            color: var(--success);
+            animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+        @keyframes popIn {
+            0%   { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .success-screen h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
+        .success-screen p  { color: var(--text-muted); line-height: 1.6; }
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 28px;
+            padding: 12px 28px;
+            background: rgba(99,102,241,0.15);
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            color: #a5b4fc;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.25s;
+        }
+        .btn-home:hover { background: rgba(99,102,241,0.3); transform: translateY(-2px); }
+
+        /* Not found */
+        .not-found { text-align: center; padding: 20px 0; }
+        .not-found i { font-size: 3rem; color: var(--text-muted); margin-bottom: 16px; }
+        .not-found h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; }
+        .not-found p  { color: var(--text-muted); }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 24px 0;
+        }
+
+        /* Footer */
+        .footer-note {
+            position: relative;
+            z-index: 10;
+            margin-top: 28px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        .footer-note a { color: var(--primary); text-decoration: none; }
+        .footer-note a:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+            .card-header, .card-body { padding: 24px 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-grid .full { grid-column: 1; }
+            .card-header h1 { font-size: 1.35rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-bar">
+        <img src="/static/images/CodeNative.png" alt="Code Native Logo">
+        <span>Code Native</span>
+    </div>
+
+    <div class="card">
+        {% if not_found %}
+        <!-- ── Not Found ── -->
+        <div class="card-body">
+            <div class="not-found">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h2>Class Not Found</h2>
+                <p>This online class is no longer available or the link may have expired.</p>
+                <a href="/" class="btn-home" style="margin-top: 24px; display: inline-flex;">
+                    <i class="fas fa-home"></i> Go to Homepage
+                </a>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- ── Class Header ── -->
+        <div class="card-header">
+            <div class="class-badge"><i class="fas fa-graduation-cap"></i> Online Class Registration</div>
+            <h1>{{ oc.title }}</h1>
+            {% if oc.description %}
+            <p>{{ oc.description }}</p>
+            {% endif %}
+            <div class="meta-row">
+                {% if oc.language %}
+                <div class="meta-pill"><i class="fas fa-code"></i> {{ oc.language }}</div>
+                {% endif %}
+                {% if oc.level %}
+                <div class="meta-pill"><i class="fas fa-layer-group"></i> {{ oc.level }}</div>
+                {% endif %}
+                {% if oc.schedule %}
+                <div class="meta-pill"><i class="fas fa-calendar-alt"></i> {{ oc.schedule }}</div>
+                {% endif %}
+                {% if oc.instructor %}
+                <div class="meta-pill"><i class="fas fa-chalkboard-teacher"></i> {{ oc.instructor }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ── Form Body ── -->
+        <div class="card-body">
+            <!-- Success state (shown via JS after submit) -->
+            <div class="success-screen" id="successScreen" style="display:none;">
+                <div class="success-icon"><i class="fas fa-check"></i></div>
+                <h2>You're Registered! 🎉</h2>
+                <p>Thank you for registering for <strong>{{ oc.title }}</strong>.<br>
+                   We'll reach out to you soon with further details.</p>
+                <a href="/" class="btn-home"><i class="fas fa-home"></i> Back to Homepage</a>
+            </div>
+
+            <!-- Registration form -->
+            <form id="regForm" autocomplete="off">
+                <div class="section-label">Your Information</div>
+
+                <div class="form-grid">
+                    <!-- Full Name -->
+                    <div class="form-group full">
+                        <label for="full_name">Full Name <span class="req">*</span></label>
+                        <div class="input-wrap">
+                            <input type="text" id="full_name" name="full_name"
+                                   placeholder="Enter your full name" required autocomplete="name">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email">Email Address <span class="req">*</span></label>
+                        <div class="input-wrap">
+                            <input type="email" id="email" name="email"
+                                   placeholder="you@example.com" required autocomplete="email">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="form-group">
+                        <label for="phone">Phone Number <span class="req">*</span></label>
+                        <div class="input-wrap">
+                            <input type="tel" id="phone" name="phone"
+                                   placeholder="+91 98765 43210" required autocomplete="tel">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                    </div>
+
+                    <!-- Language -->
+                    <div class="form-group full">
+                        <label for="language">Language / Course <span class="req">*</span></label>
+                        <div class="input-wrap">
+                            <select id="language" name="language" required>
+                                <option value="" disabled selected>Select a language or course</option>
+                                <option value="Python">Python</option>
+                                <option value="Java">Java</option>
+                                <option value="C Language">C Language</option>
+                                <option value="Web Development">Web Development (HTML/CSS/JS)</option>
+                                <option value="JavaScript">JavaScript</option>
+                                <option value="Data Structures">Data Structures & Algorithms</option>
+                                <option value="SQL">SQL & Databases</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <i class="fas fa-code"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Level -->
+                <div class="section-label">Your Current Level <span style="color:var(--primary)">*</span></div>
+                <div class="level-selector" id="levelSelector">
+                    <button type="button" class="level-btn beginner" data-val="Beginner"
+                            onclick="selectLevel(this)">
+                        <i class="fas fa-seedling" style="color:#10b981;"></i>
+                        Beginner
+                    </button>
+                    <button type="button" class="level-btn intermediate" data-val="Intermediate"
+                            onclick="selectLevel(this)">
+                        <i class="fas fa-fire" style="color:#06b6d4;"></i>
+                        Intermediate
+                    </button>
+                    <button type="button" class="level-btn advanced" data-val="Advanced"
+                            onclick="selectLevel(this)">
+                        <i class="fas fa-bolt" style="color:#8b5cf6;"></i>
+                        Advanced
+                    </button>
+                </div>
+                <input type="hidden" id="level" name="level" value="">
+
+                <div class="divider"></div>
+
+                <!-- Message -->
+                <div class="form-group" style="margin-bottom: 22px;">
+                    <label for="message">Message <span style="color:var(--text-muted); font-weight:400;">(optional)</span></label>
+                    <div class="input-wrap">
+                        <textarea id="message" name="message"
+                                  placeholder="Any questions or specific topics you'd like to cover?"></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span id="btnText"><i class="fas fa-paper-plane" style="margin-right:8px;"></i>Register Now</span>
+                    <div class="spinner" id="btnSpinner"></div>
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="footer-note">
+        Powered by <a href="/">Code Native</a> &mdash; Learning in your language 🚀
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        // ── Level selector ──────────────────────────────────────────────────
+        function selectLevel(btn) {
+            document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('level').value = btn.dataset.val;
+        }
+
+        // ── Toast ────────────────────────────────────────────────────────────
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'show ' + type;
+            setTimeout(() => { t.className = ''; }, 4000);
+        }
+
+        // ── Form submit ──────────────────────────────────────────────────────
+        const form = document.getElementById('regForm');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const level = document.getElementById('level').value;
+                if (!level) {
+                    showToast('Please select your current level.', 'error');
+                    return;
+                }
+
+                const btn    = document.getElementById('submitBtn');
+                const text   = document.getElementById('btnText');
+                const spin   = document.getElementById('btnSpinner');
+
+                btn.disabled = true;
+                text.style.display  = 'none';
+                spin.style.display  = 'block';
+
+                const payload = {
+                    full_name: document.getElementById('full_name').value.trim(),
+                    email:     document.getElementById('email').value.trim(),
+                    phone:     document.getElementById('phone').value.trim(),
+                    language:  document.getElementById('language').value,
+                    level:     level,
+                    message:   document.getElementById('message').value.trim(),
+                };
+
+                try {
+                    const classId = window.location.pathname.split('/').filter(Boolean)[1];
+                    const res = await fetch(`/online-class/${classId}/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        form.style.display = 'none';
+                        document.getElementById('successScreen').style.display = 'block';
+                    } else {
+                        showToast(data.message || 'Something went wrong. Please try again.', 'error');
+                        btn.disabled = false;
+                        text.style.display = 'inline';
+                        spin.style.display = 'none';
+                    }
+                } catch (err) {
+                    showToast('Network error. Please check your connection.', 'error');
+                    btn.disabled = false;
+                    text.style.display = 'inline';
+                    spin.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -425,10 +425,65 @@ def init_db():
         )
     '''
 
+    online_classes_sql = '''
+        CREATE TABLE IF NOT EXISTS online_classes (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT,
+            language TEXT,
+            level TEXT,
+            schedule TEXT,
+            instructor TEXT,
+            max_seats INTEGER DEFAULT 0,
+            is_active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS online_classes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            description TEXT,
+            language TEXT,
+            level TEXT,
+            schedule TEXT,
+            instructor TEXT,
+            max_seats INTEGER DEFAULT 0,
+            is_active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
+    online_class_registrations_sql = '''
+        CREATE TABLE IF NOT EXISTS online_class_registrations (
+            id SERIAL PRIMARY KEY,
+            class_id INTEGER,
+            full_name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            phone TEXT NOT NULL,
+            language TEXT NOT NULL,
+            level TEXT NOT NULL,
+            message TEXT,
+            registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''' if is_pg else '''
+        CREATE TABLE IF NOT EXISTS online_class_registrations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            class_id INTEGER,
+            full_name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            phone TEXT NOT NULL,
+            language TEXT NOT NULL,
+            level TEXT NOT NULL,
+            message TEXT,
+            registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    '''
+
     if is_pg:
         cursor = conn.cursor()
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
-                    feedback_sql, careers_sql, career_applications_sql, referrals_sql]:
+                    feedback_sql, careers_sql, career_applications_sql, referrals_sql,
+                    online_classes_sql, online_class_registrations_sql]:
             cursor.execute(sql)
 
         for idx_sql in [
@@ -458,7 +513,8 @@ def init_db():
         conn.commit()
     else:
         for sql in [users_sql, content_sql, stats_sql, activity_sql, progress_sql,
-                    feedback_sql, careers_sql, career_applications_sql, referrals_sql]:
+                    feedback_sql, careers_sql, career_applications_sql, referrals_sql,
+                    online_classes_sql, online_class_registrations_sql]:
             conn.execute(sql)
         for idx_sql in [
             "CREATE INDEX IF NOT EXISTS idx_user_progress_language ON user_progress(language)",
@@ -1860,15 +1916,153 @@ async def admin_dashboard(request: Request):
         "user_growth_rate": growth_rate, "dau": dau, "wau": wau,
         "engagement_rate": engagement_rate, "top_lang": top_lang, "avg_session": avg_session
     }
+    conn2 = get_db_connection()
+    online_classes_list = execute_query(conn2, "SELECT * FROM online_classes ORDER BY id DESC").fetchall()
+    online_registrations = execute_query(conn2, """
+        SELECT r.*, c.title as class_title FROM online_class_registrations r
+        LEFT JOIN online_classes c ON r.class_id = c.id
+        ORDER BY r.registered_at DESC
+    """).fetchall()
+    release_db_connection(conn2)
     return _render(request, "admin/dashboard.html", dict(
         contents=_jsonify_dates([dict(c) for c in contents]),
         users_count=users_count,
         all_users=_jsonify_dates([dict(u) for u in all_users]),
         analytics=analytics,
         careers=_jsonify_dates([dict(c) for c in careers]),
-        career_apps=_jsonify_dates([dict(ca) for ca in career_apps])
+        career_apps=_jsonify_dates([dict(ca) for ca in career_apps]),
+        online_classes=_jsonify_dates([dict(oc) for oc in online_classes_list]),
+        online_registrations=_jsonify_dates([dict(r) for r in online_registrations])
     ))
 
+
+
+
+# ─── Online Classes Routes ────────────────────────────────────────────────────
+@app.get("/online-class/{class_id}", response_class=HTMLResponse)
+async def online_class_register_page(class_id: int, request: Request):
+    conn = get_db_connection()
+    oc = execute_query(conn, "SELECT * FROM online_classes WHERE id = ? AND is_active = 1", (class_id,)).fetchone()
+    release_db_connection(conn)
+    if not oc:
+        return _render(request, "online-class-register.html", dict(not_found=True, oc=None))
+    return _render(request, "online-class-register.html", dict(not_found=False, oc=dict(oc), success=False))
+
+
+@app.post("/online-class/{class_id}/register")
+async def online_class_register_submit(class_id: int, request: Request):
+    try:
+        data = await request.json()
+        full_name = data.get('full_name', '').strip()
+        email     = data.get('email', '').strip()
+        phone     = data.get('phone', '').strip()
+        language  = data.get('language', '').strip()
+        level     = data.get('level', '').strip()
+        message   = data.get('message', '').strip()
+        if not full_name or not email or not phone or not language or not level:
+            return JSONResponse({"message": "Please fill in all required fields."}, status_code=400)
+        conn = get_db_connection()
+        oc = execute_query(conn, "SELECT id, is_active FROM online_classes WHERE id = ?", (class_id,)).fetchone()
+        if not oc or not oc['is_active']:
+            release_db_connection(conn)
+            return JSONResponse({"message": "This class is no longer accepting registrations."}, status_code=400)
+        execute_query(conn, """
+            INSERT INTO online_class_registrations (class_id, full_name, email, phone, language, level, message)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (class_id, full_name, email, phone, language, level, message))
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "Registration successful! We will contact you soon."}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+
+@app.post("/admin/online_classes/add")
+async def admin_add_online_class(request: Request):
+    if not _admin_check(request):
+        return JSONResponse({"message": "Admin access required."}, status_code=403)
+    try:
+        data = await request.json()
+        class_id    = data.get('id')
+        title       = data.get('title', '').strip()
+        description = data.get('description', '').strip()
+        language    = data.get('language', '').strip()
+        level       = data.get('level', '').strip()
+        schedule    = data.get('schedule', '').strip()
+        instructor  = data.get('instructor', '').strip()
+        max_seats   = int(data.get('max_seats', 0) or 0)
+        if not title:
+            return JSONResponse({"message": "Title is required."}, status_code=400)
+        conn = get_db_connection()
+        if class_id:
+            execute_query(conn, """
+                UPDATE online_classes SET title=?, description=?, language=?, level=?, schedule=?, instructor=?, max_seats=?
+                WHERE id=?
+            """, (title, description, language, level, schedule, instructor, max_seats, class_id))
+        else:
+            execute_query(conn, """
+                INSERT INTO online_classes (title, description, language, level, schedule, instructor, max_seats)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (title, description, language, level, schedule, instructor, max_seats))
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "Online class saved successfully."}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+
+@app.post("/admin/online_classes/delete/{id}")
+async def admin_delete_online_class(id: int, request: Request):
+    if not _admin_check(request):
+        return JSONResponse({"message": "Admin access required."}, status_code=403)
+    try:
+        conn = get_db_connection()
+        execute_query(conn, "DELETE FROM online_classes WHERE id = ?", (id,))
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "Online class deleted."}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+
+@app.post("/admin/online_classes/toggle/{id}")
+async def admin_toggle_online_class(id: int, request: Request):
+    if not _admin_check(request):
+        return JSONResponse({"message": "Admin access required."}, status_code=403)
+    try:
+        conn = get_db_connection()
+        execute_query(conn, "UPDATE online_classes SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END WHERE id = ?", (id,))
+        conn.commit()
+        release_db_connection(conn)
+        return JSONResponse({"message": "Status toggled."}, status_code=200)
+    except Exception as e:
+        return JSONResponse({"message": str(e)}, status_code=500)
+
+
+@app.get("/admin/export_registrations")
+async def export_registrations(request: Request):
+    if not _admin_check(request):
+        return RedirectResponse(url="/", status_code=303)
+    conn = get_db_connection()
+    rows = execute_query(conn, """
+        SELECT r.id, c.title as class_title, r.full_name, r.email, r.phone,
+               r.language, r.level, r.message, r.registered_at
+        FROM online_class_registrations r
+        LEFT JOIN online_classes c ON r.class_id = c.id
+        ORDER BY r.registered_at DESC
+    """).fetchall()
+    release_db_connection(conn)
+    output = io.StringIO()
+    output.write('\ufeff')
+    writer = csv.writer(output)
+    writer.writerow(["ID", "Class", "Full Name", "Email", "Phone", "Language", "Level", "Message", "Registered At"])
+    for r in rows:
+        writer.writerow([r['id'], r['class_title'] or '', r['full_name'], r['email'], r['phone'],
+                         r['language'], r['level'], r['message'] or '', r['registered_at']])
+    output.seek(0)
+    response = StreamingResponse(iter([output.getvalue()]), media_type="text/csv")
+    response.headers["Content-Disposition"] = "attachment; filename=online_class_registrations.csv"
+    return response
 
 
 @app.post("/admin/add_career")
