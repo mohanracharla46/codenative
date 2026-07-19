@@ -1019,6 +1019,7 @@
                     if (tabId === 'tab-dashboard') mainTitle.innerText += ' Overview';
                     else if (tabId === 'tab-tutorials') mainTitle.innerText = 'Tutorial Management';
                     else if (tabId === 'tab-careers') mainTitle.innerText = 'Careers Management';
+                    else if (tabId === 'tab-online-classes') mainTitle.innerText = 'Online Classes Management';
                     else mainTitle.innerText = 'Users Management';
                 }
             });
@@ -1382,11 +1383,15 @@
         document.getElementById('class_id').value = '';
         document.getElementById('classForm').reset();
         document.getElementById('class_max_seats').value = '0';
-        document.getElementById('onlineClassModal').style.display = 'flex';
+        const m = document.getElementById('onlineClassModal');
+        m.style.display = 'flex';
+        setTimeout(() => m.classList.add('show'), 10);
     }
 
     function closeClassModal() {
-        document.getElementById('onlineClassModal').style.display = 'none';
+        const m = document.getElementById('onlineClassModal');
+        m.classList.remove('show');
+        setTimeout(() => m.style.display = 'none', 300);
     }
 
     function editClass(id) {
@@ -1401,7 +1406,9 @@
         document.getElementById('class_schedule').value = oc.schedule || '';
         document.getElementById('class_instructor').value = oc.instructor || '';
         document.getElementById('class_max_seats').value = oc.max_seats || 0;
-        document.getElementById('onlineClassModal').style.display = 'flex';
+        const m = document.getElementById('onlineClassModal');
+        m.style.display = 'flex';
+        setTimeout(() => m.classList.add('show'), 10);
     }
 
     document.getElementById('classForm').addEventListener('submit', async (e) => {
