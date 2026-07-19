@@ -453,13 +453,99 @@
         }
         .trust-item i { color: var(--success); font-size: 0.7rem; }
 
+        /* ── Responsive ─────────────────────────────────────────────── */
+
+        /* Tablet & small desktop */
+        @media (max-width: 768px) {
+            body { padding: 20px 12px 48px; }
+            .card { border-radius: 20px; }
+            .card-header { padding: 28px 28px 22px; }
+            .card-body  { padding: 28px 28px 32px; }
+            .card-header h1 { font-size: 1.5rem; }
+        }
+
+        /* Large phones */
         @media (max-width: 600px) {
-            .card-header, .card-body { padding: 24px 20px; }
-            .form-grid { grid-template-columns: 1fr; }
+            body { padding: 16px 0 40px; }
+
+            .logo-bar { margin-bottom: 16px; }
+            .logo-bar img { height: 28px; }
+            .logo-bar span { font-size: 1rem; }
+
+            /* Card becomes full-width, flush on sides */
+            .card {
+                border-radius: 16px;
+                margin: 0 8px;
+                width: calc(100% - 16px);
+                box-shadow: 0 8px 30px rgba(60,72,120,0.10);
+            }
+            .card-header { padding: 22px 20px 18px; }
+            .card-body   { padding: 22px 20px 28px; }
+
+            .card-header h1 { font-size: 1.3rem; letter-spacing: -0.3px; }
+            .card-header p  { font-size: 0.86rem; }
+
+            /* Stack the 2-column grid to 1 column */
+            .form-grid { grid-template-columns: 1fr; gap: 12px; }
             .form-grid .full { grid-column: 1; }
-            .card-header h1 { font-size: 1.4rem; }
+
+            /* Taller touch targets */
+            .form-group input,
+            .form-group select { padding: 13px 14px 13px 40px; font-size: 1rem; }
+            .form-group textarea { font-size: 1rem; min-height: 80px; }
+
+            /* Level buttons: row of 3, equal width */
             .level-selector { gap: 8px; }
-            .level-btn { font-size: 0.76rem; padding: 12px 4px; }
+            .level-btn {
+                font-size: 0.78rem;
+                padding: 12px 4px;
+                border-radius: 10px;
+                gap: 5px;
+            }
+            .level-btn i { font-size: 1.1rem; }
+
+            .divider { margin: 18px 0; }
+
+            .btn-submit { padding: 15px; font-size: 0.95rem; border-radius: 12px; }
+
+            /* Trust badges: wrap to 2 per row */
+            .trust-row { gap: 10px 16px; }
+            .trust-item { font-size: 0.72rem; }
+
+            .footer-note { font-size: 0.74rem; margin-top: 20px; }
+
+            /* Toast full-width on phone */
+            #toast {
+                left: 12px;
+                right: 12px;
+                bottom: 16px;
+                max-width: none;
+                transform: translateY(20px);
+            }
+            #toast.show { transform: translateY(0); }
+        }
+
+        /* Small phones (320px–400px) */
+        @media (max-width: 400px) {
+            .card { margin: 0 4px; width: calc(100% - 8px); }
+            .card-header { padding: 18px 16px 14px; }
+            .card-body   { padding: 18px 16px 22px; }
+            .card-header h1 { font-size: 1.15rem; }
+            .class-badge { font-size: 0.62rem; padding: 4px 10px; }
+            .meta-pill   { font-size: 0.72rem; padding: 4px 10px; }
+            .section-label { font-size: 0.65rem; }
+
+            /* Stack level buttons vertically on very small screens */
+            .level-selector { flex-direction: column; gap: 8px; }
+            .level-btn { flex-direction: row; justify-content: center; padding: 12px 16px; gap: 10px; }
+
+            .trust-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+        }
+
+        /* Notched/safe-area support (iPhone X+) */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            body { padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
+            #toast { bottom: calc(16px + env(safe-area-inset-bottom)); }
         }
     </style>
 </head>
