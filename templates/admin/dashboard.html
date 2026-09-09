@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Code Native</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/admin.css">
+    <link rel="stylesheet" href="/static/admin.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         if (typeof Chart === 'undefined') {
@@ -24,7 +25,7 @@
 
     <div class="admin-sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="/static/images/CodeNative.png" alt="Logo" style="height: 32px">
+            <img src="/static/images/CodeNative.webp" width="180" height="45" decoding="async" alt="Logo" style="height: 32px">
             <h2>Admin</h2>
         </div>
         <ul id="sidebar-menu">
@@ -2079,7 +2080,7 @@
             location.reload(); 
         });
     </script>
-    <script src="/static/theme.js"></script>
+    <script src="/static/theme.min.js" defer></script>
 
     <script>
     // ── Doubts admin JS ──────────────────────────────────────────────────────

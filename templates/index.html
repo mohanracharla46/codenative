@@ -23,7 +23,7 @@
       "@type": "Organization",
       "name": "Code Native",
       "url": "https://codenative.co.in/",
-      "logo": "https://codenative.co.in/static/images/CodeNative.png",
+      "logo": "https://codenative.co.in/static/images/CodeNative.webp",
       "description": "India's Leading Telugu Coding & Programming Platform. Learn Python, Java, C, and Web Development in Telugu for free.",
       "sameAs": [
         "https://www.linkedin.com/company/codenative-edu",
@@ -182,14 +182,14 @@
     <meta property="og:url" content="https://codenative.co.in/">
     <meta property="og:title" content="Code Native | Learn Coding in Telugu - Free & AI Powered">
     <meta property="og:description" content="India's First Telugu Coding Platform — Learn C, Java, Python, HTML & JavaScript in Telugu. AI powered doubt solving. 100% Free. 100+ students already learning!">
-    <meta property="og:image" content="{{ url_for('static', filename='images/LMS image.jpg') }}">
+    <meta property="og:image" content="{{ url_for('static', filename='images/LMS image.webp') }}">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://codenative.co.in/">
     <meta name="twitter:title" content="Code Native | Learn Coding in Telugu - Free & AI Powered">
     <meta name="twitter:description" content="India's First Telugu Coding Platform — Learn coding in Telugu with AI powered doubt solving. 100% Free forever!">
-    <meta name="twitter:image" content="{{ url_for('static', filename='images/LMS image.jpg') }}">
+    <meta name="twitter:image" content="{{ url_for('static', filename='images/LMS image.webp') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -200,7 +200,7 @@
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
-    <script src="{{ url_for('static', filename='theme.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='theme.min.js') }}" defer></script>
     <style>
         @keyframes cursorBlink {
 
@@ -1012,7 +1012,7 @@
             <a href="/" class="logo">
                 <picture>
                     <source srcset="{{ url_for('static', filename='images/CodeNative.webp') }}" type="image/webp">
-                    <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native - Learn Coding in Telugu" width="180" height="45" decoding="async">
+                    <img src="{{ url_for('static', filename='images/CodeNative.webp') }}" alt="Code Native - Learn Coding in Telugu" width="180" height="45" decoding="async">
                 </picture>
             </a>
 
@@ -1700,7 +1700,7 @@
                 <div class="footer-logo">
                     <picture>
                         <source srcset="{{ url_for('static', filename='images/CodeNative.webp') }}" type="image/webp">
-                        <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native Free Telugu Coding Platform Logo"
+                        <img src="{{ url_for('static', filename='images/CodeNative.webp') }}" alt="Code Native Free Telugu Coding Platform Logo"
                             style="height: 48px; margin-bottom: 15px;" width="160" height="48" loading="lazy" decoding="async">
                     </picture>
                     <p>Empowering the next generation of developers with localized learning.</p>
@@ -1838,7 +1838,7 @@
             function loadFloatingWidgets() {
                 if (window._widgetsLoaded) return;
                 window._widgetsLoaded = true;
-                ['/static/chatbot.js', '/static/whatsapp-widget.js'].forEach(function(src) {
+                ['/static/chatbot.min.js', '/static/whatsapp-widget.js'].forEach(function(src) {
                     var s = document.createElement('script');
                     s.src = src;
                     s.async = true;

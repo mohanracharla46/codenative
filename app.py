@@ -135,11 +135,11 @@ app.add_middleware(
     https_only=False,
 )
 
-# Custom StaticFiles implementation with 30-day Cache-Control header
+# Custom StaticFiles implementation with 1-year Cache-Control header
 class CachedStaticFiles(StaticFiles):
     async def get_response(self, path: str, scope):
         response = await super().get_response(path, scope)
-        response.headers["Cache-Control"] = "public, max-age=2592000"
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
         return response
 
 # Static files and templates

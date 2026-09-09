@@ -19,30 +19,31 @@
     <meta property="og:url" content="https://codenative.co.in/roadmap.html">
     <meta property="og:title" content="Developer Roadmaps in Telugu | Code Native">
     <meta property="og:description" content="Check out our step-by-step developer roadmaps. Learn the exact order to master C, Java, Python, HTML, CSS, and JavaScript in Telugu.">
-    <meta property="og:image" content="/static/images/LMS image.jpg">
+    <meta property="og:image" content="/static/images/LMS image.webp">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://codenative.co.in/roadmap.html">
     <meta name="twitter:title" content="Developer Roadmaps in Telugu | Code Native">
     <meta name="twitter:description" content="Find developer learning roadmaps in Telugu for free with Code Native's structured guide.">
-    <meta name="twitter:image" content="/static/images/LMS image.jpg">
+    <meta name="twitter:image" content="/static/images/LMS image.webp">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="/static/roadmap.css">
+    <link rel="stylesheet" href="/static/style.min.css">
+    <link rel="stylesheet" href="/static/roadmap.min.css">
     <link rel="icon" href="/static/images/favicon.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="/static/theme.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+    <script src="/static/theme.min.js" defer></script>
 </head>
 
 <body>
 
     <header class="header">
         <div class="container header-inner">
-            <div class="logo"><a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a></div>
+            <div class="logo"><a href="/"><img src="/static/images/CodeNative.webp" width="180" height="45" decoding="async" alt="Code Native"></a></div>
             <div class="header-actions">
                 {% if session.get('is_admin') %}
                 <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock" style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
@@ -527,7 +528,8 @@
             if (e.key === 'Escape') closeLoginModal();
         });
 
-        // Rocket Scroll Logic
+        // Rocket Scroll Logic (Optimized with requestAnimationFrame & passive listeners to eliminate forced reflow)
+        let rocketTicking = false;
         function updateRocket() {
             const rocket = document.getElementById('scrollRocket');
             const activeTimeline = document.querySelector('.roadmap-content.active .timeline');
@@ -556,8 +558,18 @@
             rocket.style.top = `${targetTop}px`;
         }
 
-        window.addEventListener('scroll', updateRocket);
-        window.addEventListener('resize', updateRocket);
+        function requestRocketUpdate() {
+            if (!rocketTicking) {
+                requestAnimationFrame(() => {
+                    updateRocket();
+                    rocketTicking = false;
+                });
+                rocketTicking = true;
+            }
+        }
+
+        window.addEventListener('scroll', requestRocketUpdate, { passive: true });
+        window.addEventListener('resize', requestRocketUpdate, { passive: true });
         // Initial call
         setTimeout(updateRocket, 500);
     </script>

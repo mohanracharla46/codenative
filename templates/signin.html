@@ -20,23 +20,24 @@
     <meta property="og:url" content="https://codenative.co.in/signin.html">
     <meta property="og:title" content="Code Native | Learn Coding in Telugu - Free & AI Powered">
     <meta property="og:description" content="India's First Telugu Coding Platform — Learn C, Java, Python, HTML & JavaScript in Telugu. AI powered doubt solving. 100% Free. 100+ students already learning!">
-    <meta property="og:image" content="{{ url_for('static', filename='images/LMS image.jpg') }}">
+    <meta property="og:image" content="{{ url_for('static', filename='images/LMS image.webp') }}">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://codenative.co.in/signin.html">
     <meta name="twitter:title" content="Code Native | Learn Coding in Telugu - Free & AI Powered">
     <meta name="twitter:description" content="India's First Telugu Coding Platform — Learn coding in Telugu with AI powered doubt solving. 100% Free forever!">
-    <meta name="twitter:image" content="{{ url_for('static', filename='images/LMS image.jpg') }}">
+    <meta name="twitter:image" content="{{ url_for('static', filename='images/LMS image.webp') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.min.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+    <script src="{{ url_for('static', filename='theme.min.js') }}"></script>
     <style>
         /* Custom Alert Styles */
         .custom-alert {
@@ -138,7 +139,7 @@
         <div class="auth-card glass" id="signinCard">
             <div class="auth-header">
                 <div class="logo-section">
-                    <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="CodeNative Logo"
+                    <img src="{{ url_for('static', filename='images/CodeNative.webp') }}" alt="CodeNative Logo"
                         class="auth-logo">
                 </div>
                 <h1 class="auth-title">Welcome Back</h1>
@@ -203,7 +204,7 @@
         <div class="auth-card glass" id="signupCard" style="display: none;">
             <div class="auth-header">
                 <div class="logo-section">
-                    <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="CodeNative Logo"
+                    <img src="{{ url_for('static', filename='images/CodeNative.webp') }}" alt="CodeNative Logo"
                         class="auth-logo">
                 </div>
                 <h1 class="auth-title">Create Account</h1>
@@ -278,7 +279,7 @@
         <div class="auth-card glass" id="forgotPasswordCard" style="display: none;">
             <div class="auth-header">
                 <div class="logo-section">
-                    <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="CodeNative Logo" class="auth-logo">
+                    <img src="{{ url_for('static', filename='images/CodeNative.webp') }}" alt="CodeNative Logo" class="auth-logo">
                 </div>
                 <h1 class="auth-title">Reset Password</h1>
                 <p class="auth-subtitle" id="fpSubtitle">Enter your email to receive an OTP</p>

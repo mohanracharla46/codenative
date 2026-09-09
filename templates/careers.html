@@ -16,21 +16,22 @@
     <meta property="og:url" content="https://codenative.co.in/careers.html">
     <meta property="og:title" content="Careers & Opportunities | Code Native">
     <meta property="og:description" content="Apply for technical workshops, developer internships, and software jobs listed for students on the Code Native platform.">
-    <meta property="og:image" content="/static/images/LMS image.jpg">
+    <meta property="og:image" content="/static/images/LMS image.webp">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://codenative.co.in/careers.html">
     <meta name="twitter:title" content="Careers & Opportunities | Code Native">
     <meta name="twitter:description" content="Find active career listings, internships, and technical coding workshops on Code Native.">
-    <meta name="twitter:image" content="/static/images/LMS image.jpg">
+    <meta name="twitter:image" content="/static/images/LMS image.webp">
     {% include 'analytics.html' %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.min.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #4f46e5, #7c3aed);
@@ -236,7 +237,7 @@
 <body>
     <header class="header">
         <div class="container header-inner">
-            <a href="/" class="logo"><img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native"></a>
+            <a href="/" class="logo"><img src="{{ url_for('static', filename='images/CodeNative.webp') }}" alt="Code Native"></a>
             <div class="header-actions">
                 {% if session.get('is_admin') %}
                 <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock" style="margin-right: 8px; font-size: 11px;"></i>Admin</a>

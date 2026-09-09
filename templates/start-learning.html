@@ -13,10 +13,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.min.css">
     <link rel="icon" href="/static/images/favicon.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="/static/theme.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+    <script src="/static/theme.min.js" defer></script>
 
     <style>
         /* Modern Light Mode & Professional Clean Layout */
@@ -465,7 +466,7 @@
     <!-- Header -->
     <header class="header">
         <div class="container header-inner">
-            <div class="logo"><a href="/"><img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native"></a></div>
+            <div class="logo"><a href="/"><img src="{{ url_for('static', filename='images/CodeNative.webp') }}" alt="Code Native"></a></div>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle Menu"
@@ -711,7 +712,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native"
+                    <img src="{{ url_for('static', filename='images/CodeNative.webp') }}" alt="Code Native"
                         style="height: 48px; margin-bottom: 15px;">
                     <p>Empowering the next generation of developers with localized learning.</p>
                 </div>
@@ -804,6 +805,6 @@
             });
         }
     </script>
-    <script src="/static/chatbot.js" defer></script>
+    <script src="/static/chatbot.min.js" defer></script>
 </body>
 </html>

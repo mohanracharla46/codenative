@@ -16,24 +16,25 @@
     <meta property="og:url" content="https://codenative.co.in/about">
     <meta property="og:title" content="About Us & Contact | Code Native">
     <meta property="og:description" content="India's First Telugu Coding Platform — Learn C, Java, Python, HTML & JavaScript in Telugu.">
-    <meta property="og:image" content="/static/images/LMS image.jpg">
+    <meta property="og:image" content="/static/images/LMS image.webp">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://codenative.co.in/about">
     <meta name="twitter:title" content="About Us & Contact | Code Native">
     <meta name="twitter:description" content="Learn coding in Telugu with AI powered doubt solving. 100% Free forever!">
-    <meta name="twitter:image" content="/static/images/LMS image.jpg">
+    <meta name="twitter:image" content="/static/images/LMS image.webp">
 
     {% include 'analytics.html' %}
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.min.css">
     <link rel="icon" href="/static/images/favicon.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="/static/theme.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+    <script src="/static/theme.min.js" defer></script>
 
     <style>
         .legal-container {
@@ -102,7 +103,7 @@
 
     <header class="header">
         <div class="container header-inner">
-            <div class="logo"><a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a></div>
+            <div class="logo"><a href="/"><img src="/static/images/CodeNative.webp" width="180" height="45" decoding="async" alt="Code Native"></a></div>
             <div class="header-actions">
                 {% if session.get('is_admin') %}
                 <a href="/admin" class="btn-signup btn-admin"><i class="fas fa-lock" style="margin-right: 8px; font-size: 11px;"></i>Admin</a>
@@ -142,7 +143,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native"
+                    <img src="{{ url_for('static', filename='images/CodeNative.webp') }}" alt="Code Native"
                         style="height: 48px; margin-bottom: 15px;" width="70" height="48" loading="lazy" decoding="async">
                     <p>Empowering the next generation of developers with localized learning.</p>
                 </div>

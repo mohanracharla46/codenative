@@ -20,14 +20,14 @@
     <meta property="og:url" content="{{ canonical_url|default('https://codenative.co.in/compiler.html') }}">
     <meta property="og:title" content="{{ meta_title|default('Online Code Compiler & IDE | Code Native Telugu') }}">
     <meta property="og:description" content="{{ meta_desc|default('Use Code Native online multi-language IDE and code compiler. Run Python, Java, C, C++, and JavaScript code instantly in the browser.') }}">
-    <meta property="og:image" content="/static/images/LMS image.jpg">
+    <meta property="og:image" content="/static/images/LMS image.webp">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="{{ canonical_url|default('https://codenative.co.in/compiler.html') }}">
     <meta name="twitter:title" content="{{ meta_title|default('Online Code Compiler & IDE | Code Native Telugu') }}">
     <meta name="twitter:description" content="{{ meta_desc|default('Write, run, and test your code online in your browser with our fast, free multi-language compiler.') }}">
-    <meta name="twitter:image" content="/static/images/LMS image.jpg">
+    <meta name="twitter:image" content="/static/images/LMS image.webp">
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
@@ -73,13 +73,14 @@
     </script>
 
     <link rel="icon" href="/static/images/favicon.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="/static/theme.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+    <script src="/static/theme.min.js" defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="/static/compiler.css">
+    <link rel="stylesheet" href="/static/style.min.css">
+    <link rel="stylesheet" href="/static/compiler.min.css">
     <!-- Ace Editor -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js"></script>
 </head>
@@ -87,7 +88,7 @@
 <body>
     <header class="header">
         <div class="container header-inner">
-            <div class="logo"><a href="/"><img src="/static/images/CodeNative.png" alt="Code Native"></a></div>
+            <div class="logo"><a href="/"><img src="/static/images/CodeNative.webp" width="180" height="45" decoding="async" alt="Code Native"></a></div>
             
             <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle Menu" style="margin-left: auto; margin-right: 15px;">
                 <i class="fas fa-bars"></i>
@@ -246,8 +247,8 @@
         </div>
     </div>
 
-    <script src="/static/compiler.js"></script>
-    <script src="/static/chatbot.js"></script>
+    <script defer src="/static/compiler.min.js"></script>
+    <script defer src="/static/chatbot.min.js"></script>
 </body>
 
 </html>

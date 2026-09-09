@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+function initThemeApp() {
     // ── Active Study Session Logger ─────────────────────────────────────
     // Tracks study hours ONLY when the user is active on the website
     
@@ -61,4 +61,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeApp);
+} else {
+    initThemeApp();
+}
