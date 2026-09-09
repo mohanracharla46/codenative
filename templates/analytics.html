@@ -26,14 +26,14 @@
     }
 
     if (window.requestIdleCallback) {
-      window.requestIdleCallback(loadAnalyticsAndAds, { timeout: 3500 });
+      window.requestIdleCallback(loadAnalyticsAndAds, { timeout: 4500 });
     } else if (document.readyState === 'complete') {
-      loadAnalyticsAndAds();
+      setTimeout(loadAnalyticsAndAds, 3500);
     } else {
-      window.addEventListener('load', loadAnalyticsAndAds, { passive: true });
+      window.addEventListener('load', function() { setTimeout(loadAnalyticsAndAds, 3500); }, { passive: true });
     }
 
-    ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function(ev) {
+    ['click', 'keydown'].forEach(function(ev) {
       window.addEventListener(ev, loadAnalyticsAndAds, { passive: true, once: true });
     });
   })();
