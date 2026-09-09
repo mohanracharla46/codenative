@@ -24,189 +24,286 @@
     <script src="/static/theme.min.js" defer></script>
 
     <style>
-        /* Complete standalone styles for Referrals page components */
-        .btn {
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 10px 20px !important;
-            font-size: 14px !important;
-            font-weight: 600 !important;
-            line-height: 1.5 !important;
-            border-radius: 12px !important;
-            border: 1px solid transparent !important;
-            text-decoration: none !important;
-            cursor: pointer !important;
-            transition: all 0.25s ease !important;
-            box-shadow: none !important;
+        /* Premium Modern UI Styles for CodeNative Referrals Page */
+        :root {
+            --ref-primary: #6366f1;
+            --ref-primary-hover: #4f46e5;
+            --ref-gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --ref-gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --ref-card-bg: #ffffff;
+            --ref-card-border: #e2e8f0;
+            --ref-text-main: #0f172a;
+            --ref-text-muted: #64748b;
         }
-        .btn-primary {
-            background-color: #6366f1 !important;
-            border-color: #6366f1 !important;
-            color: #ffffff !important;
-            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25) !important;
-        }
-        .btn-primary:hover {
-            background-color: #4f46e5 !important;
-            border-color: #4f46e5 !important;
-            color: #ffffff !important;
-            transform: translateY(-1px) !important;
-        }
-        .btn-outline-primary {
-            background-color: transparent !important;
-            border: 1.5px solid #6366f1 !important;
-            color: #6366f1 !important;
-        }
-        .btn-outline-primary:hover {
-            background-color: #6366f1 !important;
-            color: #ffffff !important;
-        }
-        .btn-share {
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 8px !important;
-            padding: 10px 18px !important;
-            font-size: 14px !important;
-            font-weight: 600 !important;
-            border-radius: 12px !important;
-            text-decoration: none !important;
-            color: #ffffff !important;
-            border: none !important;
-        }
-        .btn-share:hover {
-            transform: translateY(-2px) !important;
-            opacity: 0.92 !important;
-            color: #ffffff !important;
-        }
-        .input-group {
-            display: flex !important;
-            align-items: stretch !important;
-            width: 100% !important;
-            border-radius: 12px !important;
-            overflow: hidden !important;
-        }
-        .input-group .form-control {
-            flex: 1 !important;
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-        }
-        .input-group .btn {
-            border-top-left-radius: 0 !important;
-            border-bottom-left-radius: 0 !important;
-        }
-        .form-control {
-            width: 100% !important;
-            padding: 12px 16px !important;
-            border: 1px solid #e2e8f0 !important;
-            border-radius: 12px !important;
-            background: #ffffff !important;
-            color: #1e293b !important;
-            font-family: inherit !important;
-            font-size: 15px !important;
-        }
-        .card, .ref-card {
-            background: #ffffff !important;
-            border: 1px solid #e2e8f0 !important;
-            border-radius: 20px !important;
-            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04) !important;
-        }
-        .d-flex { display: flex !important; }
-        .flex-wrap { flex-wrap: wrap !important; }
-        .gap-2 { gap: 0.5rem !important; }
-        .gap-3 { gap: 1rem !important; }
-        .gap-4 { gap: 1.5rem !important; }
-        .align-items-center { align-items: center !important; }
-        .justify-content-between { justify-content: space-between !important; }
-        .text-muted { color: #64748b !important; }
-        .text-primary { color: #6366f1 !important; }
-        .fw-bold { font-weight: 700 !important; }
-        .fw-semibold { font-weight: 600 !important; }
-        .fw-extrabold { font-weight: 800 !important; }
-        .px-3 { padding-left: 1rem !important; padding-right: 1rem !important; }
-        .px-4 { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
-        .py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-        .py-4 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
-        .mb-0 { margin-bottom: 0 !important; }
-        .mb-1 { margin-bottom: 0.25rem !important; }
-        .mb-2 { margin-bottom: 0.5rem !important; }
-        .mb-3 { margin-bottom: 1rem !important; }
-        .mb-4 { margin-bottom: 1.5rem !important; }
 
-        /* Scoped overrides to blend Bootstrap 5 with CodeNative Dark Mode */
         body.dark-mode {
+            --ref-card-bg: #1e293b;
+            --ref-card-border: #334155;
+            --ref-text-main: #f8fafc;
+            --ref-text-muted: #94a3b8;
             background-color: #0f172a !important;
             color: #f8fafc !important;
         }
+
         body.dark-mode .dashboard-container {
             background-color: #0f172a !important;
         }
-        body.dark-mode .card {
-            background: rgba(30, 41, 59, 0.7) !important;
-            border: 1px solid #334155 !important;
-            color: #f8fafc !important;
-            backdrop-filter: blur(12px);
+
+        .ref-hero-banner {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.04) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.18);
+            border-radius: 20px;
+            padding: 28px 32px;
         }
-        body.dark-mode .text-muted {
-            color: #94a3b8 !important;
+        body.dark-mode .ref-hero-banner {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.08) 100%);
+            border-color: rgba(99, 102, 241, 0.3);
         }
-        body.dark-mode .table {
-            color: #f8fafc !important;
-        }
-        body.dark-mode .table th {
-            border-bottom: 2px solid #334155 !important;
-            color: #94a3b8 !important;
-        }
-        body.dark-mode .table td {
-            border-bottom: 1px solid #334155 !important;
-        }
-        body.dark-mode .form-control-read {
-            background: rgba(15, 23, 42, 0.6) !important;
-            border: 1px solid #334155 !important;
-            color: #f8fafc !important;
-        }
-        
+
         .ref-card {
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: var(--ref-card-bg) !important;
+            border: 1px solid var(--ref-card-border) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         body.dark-mode .ref-card {
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3) !important;
         }
         .ref-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 15px 35px -5px rgba(99, 102, 241, 0.12) !important;
         }
-        .btn-share {
-            transition: transform 0.2s, box-shadow 0.2s;
+
+        /* Referral Code Badge Box */
+        .ref-code-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+            border: 2px dashed rgba(99, 102, 241, 0.35);
+            border-radius: 14px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            transition: all 0.2s ease;
         }
-        .btn-share:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        body.dark-mode .ref-code-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(139, 92, 246, 0.18) 100%);
+            border-color: rgba(99, 102, 241, 0.5);
         }
-        .badge-pending {
-            background-color: rgba(245, 158, 11, 0.15);
-            color: #f59e0b;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
+        .ref-code-val {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.65rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn-copy-code {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 10px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-copy-code:hover {
+            background: #6366f1;
+            color: #ffffff;
+        }
+
+        /* Input Group Copy */
+        .ref-input-group {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border: 1.5px solid var(--ref-card-border);
+            border-radius: 14px;
+            padding: 5px 6px 5px 16px;
+            transition: all 0.2s ease;
+        }
+        body.dark-mode .ref-input-group {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .ref-input-group:focus-within {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        .ref-input-field {
+            border: none !important;
+            background: transparent !important;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ref-text-main) !important;
+            outline: none !important;
+            box-shadow: none !important;
+            width: 100%;
+        }
+        .btn-gradient-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 10px 22px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3) !important;
+            transition: all 0.25s ease !important;
+            white-space: nowrap;
+        }
+        .btn-gradient-primary:hover {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4) !important;
+            color: #ffffff !important;
+        }
+
+        /* Share Pills */
+        .share-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: 600;
+            color: #ffffff !important;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
+        .share-pill:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+            color: #ffffff !important;
+        }
+        .share-wa { background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); }
+        .share-tg { background: linear-gradient(135deg, #0088cc 0%, #006699 100%); }
+        .share-ln { background: linear-gradient(135deg, #0077b5 0%, #0e4e73 100%); }
+        .share-fb { background: linear-gradient(135deg, #1877f2 0%, #0b51ad 100%); }
+
+        /* Stat Glowing Circle Counter */
+        .stat-circle-box {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.03) 100%);
+            border: 2px solid rgba(16, 185, 129, 0.35);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
+            transition: all 0.3s ease;
+        }
+        .stat-circle-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.25);
+        }
+        .stat-num {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Progress Bar Modern */
+        .ref-progress-track {
+            height: 12px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+        body.dark-mode .ref-progress-track {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .ref-progress-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Badges */
         .badge-verified {
-            background-color: rgba(16, 185, 129, 0.15);
+            background: rgba(16, 185, 129, 0.12);
             color: #10b981;
             border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
             font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
-        .progress {
-            background-color: rgba(0, 0, 0, 0.1) !important;
+        .badge-pending {
+            background: rgba(245, 158, 11, 0.12);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
-        body.dark-mode .progress {
-            background-color: rgba(255, 255, 255, 0.1) !important;
+
+        /* Refresh Button */
+        .btn-refresh {
+            background: rgba(99, 102, 241, 0.08);
+            border: 1.5px solid rgba(99, 102, 241, 0.25);
+            color: #6366f1;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-refresh:hover {
+            background: #6366f1;
+            color: #ffffff;
+            border-color: #6366f1;
+            transform: translateY(-1px);
+        }
+
+        /* Table Styling */
+        .ref-table {
+            color: var(--ref-text-main);
+        }
+        .ref-table th {
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--ref-text-muted);
+            border-bottom: 2px solid var(--ref-card-border);
+            padding: 14px 16px;
+        }
+        .ref-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--ref-card-border);
+            vertical-align: middle;
+        }
+        .ref-table tbody tr {
+            transition: background 0.2s ease;
+        }
+        .ref-table tbody tr:hover {
+            background: rgba(99, 102, 241, 0.03);
+        }
+        body.dark-mode .ref-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .letter-spacing-1 {
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -305,15 +402,18 @@
 
         <!-- Main Content -->
         <main class="dashboard-content container-fluid py-4 px-md-5">
-            <div class="welcome-section mb-4">
-                <div class="welcome-content d-flex justify-content-between align-items-center w-100 flex-wrap gap-3">
+            <!-- Hero Welcome Section -->
+            <div class="ref-hero-banner mb-4">
+                <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-3">
                     <div>
-                        <span class="welcome-eyebrow">Rewards Program</span>
-                        <h1 class="mb-1">Invite Friends, Earn Certificates! 🚀</h1>
-                        <p class="text-muted mb-0">Refer 3 friends to immediately unlock certificate downloads once they start learning.</p>
+                        <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-2 rounded-pill mb-2 display-inline-block">
+                            <i class="fas fa-gift me-1"></i> Rewards Program
+                        </span>
+                        <h1 class="fw-extrabold mb-1">Invite Friends, Earn Certificates! 🚀</h1>
+                        <p class="text-muted mb-0">Refer 3 friends to immediately unlock official certificate downloads once they start learning.</p>
                     </div>
                     <div>
-                        <button id="btnRefresh" class="btn btn-outline-primary px-4 py-2" onclick="refreshReferrals()">
+                        <button id="btnRefresh" class="btn btn-refresh" onclick="refreshReferrals()">
                             <span id="spinnerRefresh" class="spinner-border spinner-border-sm d-none me-2" role="status"></span>
                             <i id="iconRefresh" class="fas fa-sync-alt me-1"></i> Refresh Status
                         </button>
@@ -325,37 +425,52 @@
                 <!-- Main Stats Panel -->
                 <div class="col-lg-7">
                     <div class="card p-4 ref-card h-100">
-                        <h4 class="fw-bold mb-4"><i class="fas fa-share-nodes text-primary me-2"></i> Share Referral Link</h4>
+                        <div class="d-flex align-items-center gap-2 mb-4">
+                            <div class="rounded-circle p-2 bg-primary bg-opacity-10 text-primary">
+                                <i class="fas fa-share-nodes fa-lg"></i>
+                            </div>
+                            <h4 class="fw-bold mb-0">Share Referral Link</h4>
+                        </div>
                         
-                        <!-- Referral Code & Copy Link -->
+                        <!-- Referral Code Box -->
                         <div class="mb-4">
-                            <label class="form-label text-muted fw-semibold">My Referral Code</label>
-                            <h3 id="displayRefCode" class="fw-extrabold text-primary mb-3">{{ referral_code }}</h3>
-                            
-                            <label class="form-label text-muted fw-semibold">Referral Link</label>
-                            <div class="input-group">
-                                <input type="text" id="refLink" class="form-control form-control-read" value="{{ referral_link }}" readonly>
-                                <button class="btn btn-primary" onclick="copyReferralLink()">
-                                    <i class="fas fa-copy"></i> Copy
+                            <label class="form-label text-muted fw-semibold small text-uppercase letter-spacing-1">My Referral Code</label>
+                            <div class="ref-code-box">
+                                <div>
+                                    <span id="displayRefCode" class="ref-code-val">{{ referral_code }}</span>
+                                </div>
+                                <button class="btn-copy-code" onclick="copyCodeOnly('{{ referral_code }}')">
+                                    <i class="fas fa-copy me-1"></i> Copy Code
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Referral Link Input Group -->
+                        <div class="mb-4">
+                            <label class="form-label text-muted fw-semibold small text-uppercase letter-spacing-1">Referral Link</label>
+                            <div class="ref-input-group">
+                                <input type="text" id="refLink" class="ref-input-field" value="{{ referral_link }}" readonly>
+                                <button class="btn btn-gradient-primary ms-2" onclick="copyReferralLink()">
+                                    <i class="fas fa-link me-1"></i> Copy Link
                                 </button>
                             </div>
                         </div>
 
                         <!-- Share Buttons -->
-                        <div class="mb-2">
-                            <label class="form-label text-muted fw-semibold mb-3">Share Instantly</label>
+                        <div>
+                            <label class="form-label text-muted fw-semibold small text-uppercase letter-spacing-1 mb-3">Share Instantly</label>
                             <div class="d-flex flex-wrap gap-2">
-                                <a id="shareWA" href="https://api.whatsapp.com/send?text=Hey!%20Join%20CodeNative%20with%20me%20and%20learn%20programming%20for%20free.%20Here%27s%20my%20link:%20{{ referral_link|urlencode }}" target="_blank" class="btn btn-share text-white px-3 py-2" style="background-color: #25D366; border: none;">
-                                    <i class="fab fa-whatsapp me-2"></i> WhatsApp
+                                <a id="shareWA" href="https://api.whatsapp.com/send?text=Hey!%20Join%20CodeNative%20with%20me%20and%20learn%20programming%20for%20free.%20Here%27s%20my%20link:%20{{ referral_link|urlencode }}" target="_blank" class="share-pill share-wa">
+                                    <i class="fab fa-whatsapp me-1"></i> WhatsApp
                                 </a>
-                                <a id="shareTG" href="https://t.me/share/url?url={{ referral_link|urlencode }}&text=Hey!%20Join%20CodeNative%20and%20learn%20programming%20for%20free." target="_blank" class="btn btn-share text-white px-3 py-2" style="background-color: #0088cc; border: none;">
-                                    <i class="fab fa-telegram-plane me-2"></i> Telegram
+                                <a id="shareTG" href="https://t.me/share/url?url={{ referral_link|urlencode }}&text=Hey!%20Join%20CodeNative%20and%20learn%20programming%20for%20free." target="_blank" class="share-pill share-tg">
+                                    <i class="fab fa-telegram-plane me-1"></i> Telegram
                                 </a>
-                                <a id="shareLN" href="https://www.linkedin.com/sharing/share-offsite/?url={{ referral_link|urlencode }}" target="_blank" class="btn btn-share text-white px-3 py-2" style="background-color: #0077b5; border: none;">
-                                    <i class="fab fa-linkedin me-2"></i> LinkedIn
+                                <a id="shareLN" href="https://www.linkedin.com/sharing/share-offsite/?url={{ referral_link|urlencode }}" target="_blank" class="share-pill share-ln">
+                                    <i class="fab fa-linkedin me-1"></i> LinkedIn
                                 </a>
-                                <a id="shareFB" href="https://www.facebook.com/sharer/sharer.php?u={{ referral_link|urlencode }}" target="_blank" class="btn btn-share text-white px-3 py-2" style="background-color: #1877f2; border: none;">
-                                    <i class="fab fa-facebook me-2"></i> Facebook
+                                <a id="shareFB" href="https://www.facebook.com/sharer/sharer.php?u={{ referral_link|urlencode }}" target="_blank" class="share-pill share-fb">
+                                    <i class="fab fa-facebook me-1"></i> Facebook
                                 </a>
                             </div>
                         </div>
@@ -366,34 +481,43 @@
                 <div class="col-lg-5">
                     <div class="card p-4 ref-card h-100 text-center d-flex flex-column justify-content-between">
                         <div>
-                            <h4 class="fw-bold mb-3"><i class="fas fa-chart-line text-success me-2"></i> Referral Progress</h4>
+                            <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+                                <div class="rounded-circle p-2 bg-success bg-opacity-10 text-success">
+                                    <i class="fas fa-chart-line fa-lg"></i>
+                                </div>
+                                <h4 class="fw-bold mb-0">Referral Progress</h4>
+                            </div>
                             <p class="text-muted small mb-4">Referral status updates as soon as friends start a course or spend 5 minutes learning.</p>
                             
-                            <!-- Large Circular-styled Stats -->
-                            <div class="py-3">
-                                <div id="displayCount" style="font-size: 3.5rem; font-weight: 800; color: #10b981;">{{ verified_referrals }}</div>
-                                <div class="text-muted fw-semibold">Verified Referrals</div>
+                            <!-- Large Circular Stat Counter -->
+                            <div class="my-3">
+                                <div class="stat-circle-box">
+                                    <div id="displayCount" class="stat-num">{{ verified_referrals }}</div>
+                                </div>
+                                <div class="text-muted fw-bold mt-2 small text-uppercase">Verified Referrals</div>
                             </div>
                         </div>
 
-                        <div>
+                        <div class="mt-4">
                             <!-- Progress Bar -->
-                            <div class="d-flex justify-content-between text-muted small mb-2">
+                            <div class="d-flex justify-content-between text-muted small fw-semibold mb-2">
                                 <span id="displayProgressText">{{ verified_referrals }} / 3 Friends</span>
-                                <span id="displayProgressPct">{{ progress_pct }}% Complete</span>
+                                <span id="displayProgressPct" class="text-success fw-bold">{{ progress_pct }}% Complete</span>
                             </div>
-                            <div class="progress mb-3" style="height: 12px; border-radius: 6px;">
-                                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ progress_pct }}%; background-color: #10b981;" aria-valuenow="{{ progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="ref-progress-track mb-3">
+                                <div id="progressBar" class="ref-progress-fill" style="width: {{ progress_pct }}%;"></div>
                             </div>
 
                             <div id="statusAlert">
                                 {% if remaining > 0 %}
-                                <div class="alert alert-warning py-2 mb-0 small" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: #f59e0b;">
-                                    <i class="fas fa-lock me-1"></i> You need <strong id="displayRemaining">{{ remaining }}</strong> more verified referrals to unlock certificate downloads.
+                                <div class="alert py-2.5 px-3 mb-0 rounded-3 border-0 small text-start d-flex align-items-center gap-2" style="background: rgba(245, 158, 11, 0.12); color: #d97706;">
+                                    <i class="fas fa-lock fa-lg flex-shrink-0"></i>
+                                    <div>You need <strong id="displayRemaining" class="fw-bold">{{ remaining }}</strong> more verified referrals to unlock certificate downloads.</div>
                                 </div>
                                 {% else %}
-                                <div class="alert alert-success py-2 mb-0 small" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981;">
-                                    <i class="fas fa-unlock me-1"></i> Congratulations! Certificate downloads are fully unlocked! 🎓
+                                <div class="alert py-2.5 px-3 mb-0 rounded-3 border-0 small text-start d-flex align-items-center gap-2" style="background: rgba(16, 185, 129, 0.12); color: #059669;">
+                                    <i class="fas fa-award fa-lg flex-shrink-0"></i>
+                                    <div><strong>Congratulations!</strong> Certificate downloads are fully unlocked! 🎓</div>
                                 </div>
                                 {% endif %}
                             </div>
@@ -405,14 +529,19 @@
             <!-- Referral Tracking List -->
             <div class="card p-4 ref-card mt-4">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                    <h4 class="fw-bold mb-0"><i class="fas fa-list-check text-primary me-2"></i> Referred Friends</h4>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-circle p-2 bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-users-gear fa-lg"></i>
+                        </div>
+                        <h4 class="fw-bold mb-0">Referred Friends</h4>
+                    </div>
                     <span id="loadingSpinner" class="spinner-border spinner-border-sm text-primary d-none" role="status"></span>
                 </div>
                 <div class="table-responsive">
-                    <table class="table align-middle">
+                    <table class="table ref-table align-middle mb-0">
                         <thead>
                             <tr>
-                                <th>Name</th>
+                                <th>User</th>
                                 <th>Email</th>
                                 <th>Joined On</th>
                                 <th class="text-end">Status</th>
@@ -421,7 +550,14 @@
                         <tbody id="referralsTableBody">
                             {% for user in masked_users %}
                             <tr>
-                                <td class="fw-semibold">{{ user.name }}</td>
+                                <td class="fw-semibold">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-circle rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 13px;">
+                                            {{ user.name[0]|upper if user.name else 'U' }}
+                                        </div>
+                                        <span>{{ user.name }}</span>
+                                    </div>
+                                </td>
                                 <td class="text-muted">{{ user.email }}</td>
                                 <td class="text-muted">{{ user.date }}</td>
                                 <td class="text-end">
@@ -434,9 +570,12 @@
                             </tr>
                             {% else %}
                             <tr id="emptyRow">
-                                <td colspan="4" class="text-center text-muted py-5">
-                                    <div style="font-size: 2.5rem; opacity: 0.3;" class="mb-2">👥</div>
-                                    No referrals yet. Share your link above to get started!
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="py-3">
+                                        <i class="fas fa-user-plus display-4 text-muted opacity-25 mb-3 d-block"></i>
+                                        <h6 class="fw-bold text-muted mb-1">No referrals recorded yet</h6>
+                                        <p class="text-muted small mb-0">Share your referral link with friends to track their signup progress here.</p>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -475,6 +614,16 @@
             toast.show();
         }
 
+        // Copy referral code to clipboard
+        function copyCodeOnly(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                showToast("Referral code copied to clipboard! 📋", true);
+            }).catch(err => {
+                console.error("Failed to copy code: ", err);
+                showToast("Failed to copy code.", false);
+            });
+        }
+
         // Copy referral link to clipboard
         function copyReferralLink() {
             const copyText = document.getElementById("refLink");
@@ -504,20 +653,21 @@
                 document.getElementById('displayProgressText').textContent = `${data.verified_referrals} / 3 Friends`;
                 document.getElementById('displayProgressPct').textContent = `${data.progress_pct}% Complete`;
                 document.getElementById('progressBar').style.width = `${data.progress_pct}%`;
-                document.getElementById('progressBar').setAttribute('aria-valuenow', data.progress_pct);
                 
                 // Update alert
                 const alertContainer = document.getElementById('statusAlert');
                 if (data.remaining > 0) {
                     alertContainer.innerHTML = `
-                        <div class="alert alert-warning py-2 mb-0 small" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: #f59e0b;">
-                            <i class="fas fa-lock me-1"></i> You need <strong>${data.remaining}</strong> more verified referrals to unlock certificate downloads.
+                        <div class="alert py-2.5 px-3 mb-0 rounded-3 border-0 small text-start d-flex align-items-center gap-2" style="background: rgba(245, 158, 11, 0.12); color: #d97706;">
+                            <i class="fas fa-lock fa-lg flex-shrink-0"></i>
+                            <div>You need <strong class="fw-bold">${data.remaining}</strong> more verified referrals to unlock certificate downloads.</div>
                         </div>
                     `;
                 } else {
                     alertContainer.innerHTML = `
-                        <div class="alert alert-success py-2 mb-0 small" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981;">
-                            <i class="fas fa-unlock me-1"></i> Congratulations! Certificate downloads are fully unlocked! 🎓
+                        <div class="alert py-2.5 px-3 mb-0 rounded-3 border-0 small text-start d-flex align-items-center gap-2" style="background: rgba(16, 185, 129, 0.12); color: #059669;">
+                            <i class="fas fa-award fa-lg flex-shrink-0"></i>
+                            <div><strong>Congratulations!</strong> Certificate downloads are fully unlocked! 🎓</div>
                         </div>
                     `;
                     // Confetti if unlocked now
@@ -533,16 +683,26 @@
                 if (data.referrals.length === 0) {
                     tableBody.innerHTML = `
                         <tr id="emptyRow">
-                            <td colspan="4" class="text-center text-muted py-5">
-                                <div style="font-size: 2.5rem; opacity: 0.3;" class="mb-2">👥</div>
-                                No referrals yet. Share your link above to get started!
+                            <td colspan="4" class="text-center py-5">
+                                <div class="py-3">
+                                    <i class="fas fa-user-plus display-4 text-muted opacity-25 mb-3 d-block"></i>
+                                    <h6 class="fw-bold text-muted mb-1">No referrals recorded yet</h6>
+                                    <p class="text-muted small mb-0">Share your referral link with friends to track their signup progress here.</p>
+                                </div>
                             </td>
                         </tr>
                     `;
                 } else {
                     tableBody.innerHTML = data.referrals.map(user => `
                         <tr>
-                            <td class="fw-semibold">${user.name}</td>
+                            <td class="fw-semibold">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar-circle rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 13px;">
+                                        ${(user.name && user.name.charAt(0)) ? user.name.charAt(0).toUpperCase() : 'U'}
+                                    </div>
+                                    <span>${user.name}</span>
+                                </div>
+                            </td>
                             <td class="text-muted">${user.email}</td>
                             <td class="text-muted">${user.date}</td>
                             <td class="text-end">
