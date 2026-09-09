@@ -194,9 +194,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.5">
+    <link rel="preload" href="{{ url_for('static', filename='images/hero-girl.webp') }}" as="image" type="image/webp" fetchpriority="high">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.min.css') }}?v=1.6">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
@@ -1009,8 +1009,12 @@
 
     <header class="header">
         <div class="container header-inner">
-            <a href="/" class="logo"><img src="{{ url_for('static', filename='images/CodeNative.png') }}"
-                    alt="Code Native - Learn Coding in Telugu" width="180" height="45"></a>
+            <a href="/" class="logo">
+                <picture>
+                    <source srcset="{{ url_for('static', filename='images/CodeNative.webp') }}" type="image/webp">
+                    <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native - Learn Coding in Telugu" width="180" height="45" decoding="async">
+                </picture>
+            </a>
 
             <!-- Mobile Menu Toggle -->
             <button id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Toggle Menu"
@@ -1084,7 +1088,7 @@
                 </div>
 
                 <div class="hero-visual">
-                    <img src="{{ url_for('static', filename='images/hero-girl.webp') }}" alt="CodeNative Student" class="main-girl-img" width="500" height="500" fetchpriority="high">
+                    <img src="{{ url_for('static', filename='images/hero-girl.webp') }}" alt="CodeNative Student" class="main-girl-img" width="500" height="500" fetchpriority="high" decoding="async">
                     
                     <!-- Floating Cards -->
                     <div class="floating-card card-python">
@@ -1694,8 +1698,11 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native Free Telugu Coding Platform Logo"
-                        style="height: 48px; margin-bottom: 15px;" width="160" height="48" loading="lazy" decoding="async">
+                    <picture>
+                        <source srcset="{{ url_for('static', filename='images/CodeNative.webp') }}" type="image/webp">
+                        <img src="{{ url_for('static', filename='images/CodeNative.png') }}" alt="Code Native Free Telugu Coding Platform Logo"
+                            style="height: 48px; margin-bottom: 15px;" width="160" height="48" loading="lazy" decoding="async">
+                    </picture>
                     <p>Empowering the next generation of developers with localized learning.</p>
                 </div>
                 <div class="footer-links">
@@ -1772,12 +1779,20 @@
             let charIndex = 0;
             let typing = true;
 
+            // Frame-synced Typing Animation (delayed to prevent initial load main-thread contention)
             function type() {
+                if (document.hidden) {
+                    setTimeout(type, HOLD_DELAY);
+                    return;
+                }
                 const current = words[wordIndex];
                 if (typing) {
                     if (charIndex < current.length) {
-                        typedEl.textContent += current.charAt(charIndex);
+                        const nextChar = current.charAt(charIndex);
                         charIndex++;
+                        requestAnimationFrame(() => {
+                            typedEl.textContent += nextChar;
+                        });
                         setTimeout(type, TYPING_SPEED);
                     } else {
                         typing = false;
@@ -1785,8 +1800,11 @@
                     }
                 } else {
                     if (charIndex > 0) {
-                        typedEl.textContent = current.substring(0, charIndex - 1);
+                        const remaining = current.substring(0, charIndex - 1);
                         charIndex--;
+                        requestAnimationFrame(() => {
+                            typedEl.textContent = remaining;
+                        });
                         setTimeout(type, DELETING_SPEED);
                     } else {
                         typing = true;
@@ -1796,14 +1814,15 @@
                 }
             }
 
-            setTimeout(type, 500);
+            setTimeout(type, 1800);
 
-            // Scroll Reveal Animation
+            // Scroll Reveal Animation (unobserves elements once revealed to optimize scroll performance)
             const revealElements = document.querySelectorAll('.reveal-left, .reveal-right, .reveal-up');
-            const revealObserver = new IntersectionObserver((entries) => {
+            const revealObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('reveal-active');
+                        observer.unobserve(entry.target);
                     }
                 });
             }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
@@ -1813,8 +1832,31 @@
 
 
     </script>
-    <script src="/static/chatbot.js" defer></script>
-    <script src="/static/whatsapp-widget.js" defer></script>
+    <!-- Deferred Floating Widgets (eliminates unused JS from initial load bundle) -->
+    <script>
+        (function() {
+            function loadFloatingWidgets() {
+                if (window._widgetsLoaded) return;
+                window._widgetsLoaded = true;
+                ['/static/chatbot.js', '/static/whatsapp-widget.js'].forEach(function(src) {
+                    var s = document.createElement('script');
+                    s.src = src;
+                    s.async = true;
+                    document.body.appendChild(s);
+                });
+            }
+            if (window.requestIdleCallback) {
+                window.requestIdleCallback(loadFloatingWidgets, { timeout: 3000 });
+            } else if (document.readyState === 'complete') {
+                loadFloatingWidgets();
+            } else {
+                window.addEventListener('load', loadFloatingWidgets, { passive: true });
+            }
+            ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function(ev) {
+                window.addEventListener(ev, loadFloatingWidgets, { passive: true, once: true });
+            });
+        })();
+    </script>
 </body>
 
 </html>

@@ -4,8 +4,8 @@
  * Self-contained – just include this script and it auto-injects the UI
  */
 
-window.addEventListener('load', () => {
 (function () {
+    function initChatbot() {
     // ── Detect current language from the URL path or query string ──────
     const urlParams = new URLSearchParams(window.location.search);
     const queryLang = urlParams.get('lang');
@@ -255,10 +255,12 @@ window.addEventListener('load', () => {
         }
     });
 
-    // Auto-grow textarea
+    // Auto-grow textarea (batched via requestAnimationFrame to avoid forced reflow)
     input.addEventListener('input', () => {
-        input.style.height = 'auto';
-        input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+        requestAnimationFrame(() => {
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+        });
     });
 
     // Enter to send (Shift+Enter = newline)
@@ -398,5 +400,12 @@ window.addEventListener('load', () => {
             input.focus();
         }
     }
+
+    if (window.requestIdleCallback) {
+        window.requestIdleCallback(initChatbot, { timeout: 2000 });
+    } else if (document.readyState === 'complete') {
+        initChatbot();
+    } else {
+        window.addEventListener('load', initChatbot, { passive: true });
+    }
 })();
-});

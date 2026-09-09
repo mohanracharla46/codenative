@@ -1,14 +1,41 @@
-<!-- Google tag (gtag.js) -->
-<script defer src="https://www.googletagmanager.com/gtag/js?id={{ ga_id }}"></script>
+<!-- Google Tag Manager (gtag.js) & AdSense (Deferred to eliminate Unused JS & TBT) -->
+<meta name="google-adsense-account" content="ca-pub-1268674050644687">
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', '{{ ga_id }}');
-</script>
+  (function() {
+    function loadAnalyticsAndAds() {
+      if (window._analyticsLoaded) return;
+      window._analyticsLoaded = true;
 
-<!-- Google AdSense Account Verification & Ads Script -->
-<meta name="google-adsense-account" content="ca-pub-1268674050644687">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1268674050644687" crossorigin="anonymous"></script>
+      // Load GTag dynamically
+      var gtagScript = document.createElement('script');
+      gtagScript.async = true;
+      gtagScript.src = "https://www.googletagmanager.com/gtag/js?id={{ ga_id }}";
+      document.head.appendChild(gtagScript);
+      gtag('config', '{{ ga_id }}');
+
+      // Load AdSense dynamically
+      var adsScript = document.createElement('script');
+      adsScript.async = true;
+      adsScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1268674050644687";
+      adsScript.crossOrigin = "anonymous";
+      document.head.appendChild(adsScript);
+    }
+
+    if (window.requestIdleCallback) {
+      window.requestIdleCallback(loadAnalyticsAndAds, { timeout: 3500 });
+    } else if (document.readyState === 'complete') {
+      loadAnalyticsAndAds();
+    } else {
+      window.addEventListener('load', loadAnalyticsAndAds, { passive: true });
+    }
+
+    ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function(ev) {
+      window.addEventListener(ev, loadAnalyticsAndAds, { passive: true, once: true });
+    });
+  })();
+</script>
 

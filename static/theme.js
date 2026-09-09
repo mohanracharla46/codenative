@@ -3,14 +3,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tracks study hours ONLY when the user is active on the website
     
     let lastActivityTime = Date.now();
+    let lastUpdateThrottle = Date.now();
     const ACTIVITY_THRESHOLD = 5 * 60 * 1000; // 5 minutes of idle time allowed
 
-    // Update activity timestamp on user interaction
+    // Update activity timestamp on user interaction (throttled to at most once per 2 seconds)
     const updateActivity = () => {
-        lastActivityTime = Date.now();
+        const now = Date.now();
+        if (now - lastUpdateThrottle > 2000) {
+            lastActivityTime = now;
+            lastUpdateThrottle = now;
+        }
     };
 
-    ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'].forEach(event => {
+    ['mousedown', 'keydown', 'touchstart', 'click'].forEach(event => {
         window.addEventListener(event, updateActivity, { passive: true });
     });
 
