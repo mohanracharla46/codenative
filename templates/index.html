@@ -1838,7 +1838,7 @@
             function loadFloatingWidgets() {
                 if (window._widgetsLoaded) return;
                 window._widgetsLoaded = true;
-                ['/static/chatbot.min.js', '/static/whatsapp-widget.js'].forEach(function(src) {
+                ['/static/chatbot.min.js?v=2', '/static/whatsapp-widget.js'].forEach(function(src) {
                     var s = document.createElement('script');
                     s.src = src;
                     s.async = true;
@@ -1857,7 +1857,7 @@
             });
         })();
     </script>
-    <script src="/static/chatbot.min.js" defer></script>
+    <script src="/static/chatbot.min.js?v=2" defer></script>
 </body>
 
 </html>
