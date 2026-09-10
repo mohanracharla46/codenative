@@ -243,6 +243,7 @@
         hint.classList.toggle('cn-hidden', isOpen);
         if (isOpen) { input.focus(); scrollToBottom(); }
     }
+    window.toggleChat = toggleChat;
 
     fab.addEventListener('click', toggleChat);
     closeBtn.addEventListener('click', toggleChat);
