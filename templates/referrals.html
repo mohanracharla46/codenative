@@ -5,17 +5,16 @@
     {% include 'analytics.html' %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Referrals | Code Native</title>
-    <meta name="description" content="Invite friends to Code Native and unlock your certificates.">
+    <title>My Referrals & Rewards | Code Native</title>
+    <meta name="description" content="Invite friends to Code Native and unlock official certificates and exclusive rewards.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.min.css">
-    
     <link rel="stylesheet" href="/static/dashboard.min.css">
     
     <link rel="icon" href="/static/images/favicon.png" type="image/png">
@@ -24,23 +23,40 @@
     <script src="/static/theme.min.js" defer></script>
 
     <style>
-        /* Luxury Modern UI Styles for CodeNative Referrals Page */
+        /* Modern Luxury Design Tokens for Referrals Dashboard */
         :root {
             --ref-primary: #6366f1;
             --ref-primary-hover: #4f46e5;
-            --ref-gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            --ref-gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --ref-purple: #8b5cf6;
+            --ref-emerald: #10b981;
+            --ref-amber: #f59e0b;
+            
             --ref-card-bg: #ffffff;
             --ref-card-border: #e2e8f0;
+            --ref-card-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+            
+            --ref-hero-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.04) 50%, rgba(16, 185, 129, 0.06) 100%);
+            --ref-hero-border: rgba(99, 102, 241, 0.18);
+            
             --ref-text-main: #0f172a;
             --ref-text-muted: #64748b;
+            --ref-input-bg: #f8fafc;
+            --ref-code-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.07) 0%, rgba(139, 92, 246, 0.07) 100%);
         }
 
         body.dark-mode {
             --ref-card-bg: #1e293b;
             --ref-card-border: #334155;
+            --ref-card-shadow: 0 12px 32px -5px rgba(0, 0, 0, 0.35);
+            
+            --ref-hero-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.16) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(16, 185, 129, 0.08) 100%);
+            --ref-hero-border: rgba(99, 102, 241, 0.32);
+            
             --ref-text-main: #f8fafc;
             --ref-text-muted: #94a3b8;
+            --ref-input-bg: rgba(15, 23, 42, 0.7);
+            --ref-code-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.22) 0%, rgba(139, 92, 246, 0.18) 100%);
+            
             background-color: #0f172a !important;
             color: #f8fafc !important;
         }
@@ -49,91 +65,117 @@
             background-color: #0f172a !important;
         }
 
-        .ref-hero-banner {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.09) 0%, rgba(139, 92, 246, 0.05) 100%);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 20px;
-            padding: 30px 36px;
-            position: relative;
-            overflow: hidden;
-        }
-        body.dark-mode .ref-hero-banner {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(139, 92, 246, 0.1) 100%);
-            border-color: rgba(99, 102, 241, 0.35);
-        }
-
+        /* Glassmorphism Card Container */
         .ref-card {
             background: var(--ref-card-bg) !important;
             border: 1px solid var(--ref-card-border) !important;
             border-radius: 20px !important;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.02) !important;
+            box-shadow: var(--ref-card-shadow) !important;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        body.dark-mode .ref-card {
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3) !important;
+            position: relative;
+            overflow: hidden;
         }
         .ref-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 35px -5px rgba(99, 102, 241, 0.12) !important;
+            box-shadow: 0 16px 36px -6px rgba(99, 102, 241, 0.12) !important;
         }
 
-        /* Referral Code Badge Box */
+        /* Hero Banner */
+        .ref-hero-banner {
+            background: var(--ref-hero-bg);
+            border: 1px solid var(--ref-hero-border);
+            border-radius: 22px;
+            padding: 32px 38px;
+            position: relative;
+            overflow: hidden;
+        }
+        .ref-hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .ref-badge-gradient {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%);
+            color: #6366f1;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        body.dark-mode .ref-badge-gradient {
+            color: #818cf8;
+            border-color: rgba(129, 140, 248, 0.35);
+        }
+
+        /* Code Badge Box */
         .ref-code-box {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
-            border: 2px dashed rgba(99, 102, 241, 0.4);
-            border-radius: 14px;
-            padding: 14px 20px;
+            background: var(--ref-code-bg);
+            border: 2px dashed rgba(99, 102, 241, 0.45);
+            border-radius: 16px;
+            padding: 16px 22px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            transition: all 0.2s ease;
+            gap: 14px;
+            transition: all 0.25s ease;
         }
-        body.dark-mode .ref-code-box {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
-            border-color: rgba(99, 102, 241, 0.55);
+        .ref-code-box:hover {
+            border-color: rgba(99, 102, 241, 0.7);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%);
         }
         .ref-code-val {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1.7rem;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 1.85rem;
             font-weight: 800;
-            letter-spacing: 3px;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         .btn-copy-code {
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(99, 102, 241, 0.12);
             color: #6366f1;
-            border: 1px solid rgba(99, 102, 241, 0.25);
-            border-radius: 10px;
-            padding: 8px 16px;
+            border: 1px solid rgba(99, 102, 241, 0.28);
+            border-radius: 12px;
+            padding: 10px 18px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
         }
         .btn-copy-code:hover {
             background: #6366f1;
             color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
         }
 
         /* Input Group Copy */
         .ref-input-group {
             display: flex;
             align-items: center;
-            background: #f8fafc;
+            background: var(--ref-input-bg);
             border: 1.5px solid var(--ref-card-border);
-            border-radius: 14px;
-            padding: 5px 6px 5px 16px;
-            transition: all 0.2s ease;
-        }
-        body.dark-mode .ref-input-group {
-            background: rgba(15, 23, 42, 0.6);
+            border-radius: 16px;
+            padding: 6px 8px 6px 18px;
+            transition: all 0.25s ease;
         }
         .ref-input-group:focus-within {
             border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
         }
         .ref-input-field {
             border: none !important;
@@ -145,37 +187,41 @@
             box-shadow: none !important;
             width: 100%;
         }
+        
         .btn-gradient-primary {
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
             color: #ffffff !important;
             border: none !important;
-            border-radius: 10px !important;
-            padding: 10px 22px !important;
-            font-weight: 600 !important;
+            border-radius: 12px !important;
+            padding: 11px 24px !important;
+            font-weight: 700 !important;
             font-size: 14px !important;
-            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3) !important;
-            transition: all 0.25s ease !important;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
             white-space: nowrap;
         }
         .btn-gradient-primary:hover {
-            transform: translateY(-1px) scale(1.02);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4) !important;
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 8px 22px rgba(99, 102, 241, 0.45) !important;
             color: #ffffff !important;
         }
 
-        /* Share Pills */
+        /* Share Pills Grid */
         .share-pill {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 11px 20px;
+            border-radius: 14px;
+            font-size: 13.5px;
+            font-weight: 700;
             color: #ffffff !important;
             text-decoration: none;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            flex: 1 1 calc(33.333% - 10px);
+            min-width: 130px;
         }
         .share-pill:hover {
             transform: translateY(-3px);
@@ -185,102 +231,168 @@
         .share-wa { background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); }
         .share-tg { background: linear-gradient(135deg, #0088cc 0%, #006699 100%); }
         .share-ln { background: linear-gradient(135deg, #0077b5 0%, #0e4e73 100%); }
+        .share-x  { background: linear-gradient(135deg, #1da1f2 0%, #0c7abf 100%); }
         .share-fb { background: linear-gradient(135deg, #1877f2 0%, #0b51ad 100%); }
 
         /* Stat Glowing Pulse Circle Counter */
         @keyframes pulseGlow {
-            0% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); }
-            50% { box-shadow: 0 0 35px rgba(16, 185, 129, 0.35); }
-            100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); }
+            0% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.18), inset 0 0 15px rgba(16, 185, 129, 0.08); }
+            50% { box-shadow: 0 0 38px rgba(16, 185, 129, 0.38), inset 0 0 25px rgba(16, 185, 129, 0.18); }
+            100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.18), inset 0 0 15px rgba(16, 185, 129, 0.08); }
         }
 
         .stat-circle-box {
-            width: 125px;
-            height: 125px;
+            width: 132px;
+            height: 132px;
             border-radius: 50%;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.03) 100%);
-            border: 2.5px solid rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(16, 185, 129, 0.04) 100%);
+            border: 3px solid rgba(16, 185, 129, 0.45);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             margin: 0 auto;
-            animation: pulseGlow 3s infinite ease-in-out;
+            animation: pulseGlow 3.5s infinite ease-in-out;
             transition: all 0.3s ease;
         }
         .stat-circle-box:hover {
             transform: scale(1.06);
         }
         .stat-num {
-            font-size: 3.4rem;
-            font-weight: 800;
+            font-size: 3.6rem;
+            font-weight: 900;
             line-height: 1;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
+        /* Milestone Stepper Roadmap */
+        .milestone-stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            margin: 28px 0 16px 0;
+            padding: 0 10px;
+        }
+        .milestone-stepper::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            right: 30px;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.08);
+            z-index: 1;
+        }
+        body.dark-mode .milestone-stepper::before {
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .milestone-node {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .milestone-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--ref-card-bg);
+            border: 3px solid var(--ref-card-border);
+            color: var(--ref-text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .milestone-node.completed .milestone-circle {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: #10b981;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        }
+        .milestone-node.active .milestone-circle {
+            border-color: #6366f1;
+            color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+        .milestone-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ref-text-muted);
+            text-align: center;
+        }
+        .milestone-node.completed .milestone-label {
+            color: #10b981;
+        }
+
         /* Progress Bar Modern */
         .ref-progress-track {
             height: 14px;
             border-radius: 20px;
-            background: rgba(0, 0, 0, 0.06);
+            background: rgba(0, 0, 0, 0.07);
             overflow: hidden;
         }
         body.dark-mode .ref-progress-track {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.1);
         }
         .ref-progress-fill {
             height: 100%;
             border-radius: 20px;
             background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
             transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 0 14px rgba(16, 185, 129, 0.45);
         }
 
         /* How It Works Steps */
         .step-card {
             background: rgba(99, 102, 241, 0.04);
-            border: 1px solid rgba(99, 102, 241, 0.14);
-            border-radius: 16px;
-            padding: 20px 18px;
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 18px;
+            padding: 24px 20px;
             text-align: center;
             height: 100%;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         body.dark-mode .step-card {
             background: rgba(30, 41, 59, 0.5);
-            border-color: rgba(99, 102, 241, 0.22);
+            border-color: rgba(99, 102, 241, 0.25);
         }
         .step-card:hover {
             transform: translateY(-4px);
-            border-color: rgba(99, 102, 241, 0.4);
-            box-shadow: 0 12px 25px -5px rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.45);
+            box-shadow: 0 14px 30px -6px rgba(99, 102, 241, 0.18);
         }
-        .step-icon {
+        .step-badge {
             width: 44px;
             height: 44px;
-            border-radius: 50%;
+            border-radius: 14px;
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 12px auto;
+            margin: 0 auto 14px auto;
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
         }
 
-        /* Badges */
+        /* Status Badges */
         .badge-verified {
             background: rgba(16, 185, 129, 0.12);
             color: #10b981;
             border: 1px solid rgba(16, 185, 129, 0.3);
             padding: 6px 14px;
             border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12.5px;
+            font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -291,8 +403,8 @@
             border: 1px solid rgba(245, 158, 11, 0.3);
             padding: 6px 14px;
             border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12.5px;
+            font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -303,16 +415,18 @@
             background: rgba(99, 102, 241, 0.08);
             border: 1.5px solid rgba(99, 102, 241, 0.25);
             color: #6366f1;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 10px 20px;
-            font-weight: 600;
-            transition: all 0.2s ease;
+            font-weight: 700;
+            font-size: 13.5px;
+            transition: all 0.25s ease;
         }
         .btn-refresh:hover {
             background: #6366f1;
             color: #ffffff;
             border-color: #6366f1;
             transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
         }
 
         /* Table Styling */
@@ -320,16 +434,16 @@
             color: var(--ref-text-main);
         }
         .ref-table th {
-            font-weight: 600;
-            font-size: 13px;
+            font-weight: 700;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             color: var(--ref-text-muted);
             border-bottom: 2px solid var(--ref-card-border);
-            padding: 14px 16px;
+            padding: 16px;
         }
         .ref-table td {
-            padding: 16px;
+            padding: 18px 16px;
             border-bottom: 1px solid var(--ref-card-border);
             vertical-align: middle;
         }
@@ -337,14 +451,14 @@
             transition: background 0.2s ease;
         }
         .ref-table tbody tr:hover {
-            background: rgba(99, 102, 241, 0.03);
+            background: rgba(99, 102, 241, 0.04);
         }
         body.dark-mode .ref-table tbody tr:hover {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .letter-spacing-1 {
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
         }
     </style>
 </head>
@@ -447,11 +561,11 @@
             <div class="ref-hero-banner mb-4">
                 <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-3">
                     <div>
-                        <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-2 rounded-pill mb-2 display-inline-block">
-                            <i class="fas fa-gift me-1"></i> Rewards Program
+                        <span class="ref-badge-gradient mb-2 display-inline-block">
+                            <i class="fas fa-crown"></i> Exclusive Rewards Program
                         </span>
-                        <h1 class="fw-extrabold mb-1">Invite Friends, Earn Certificates! 🚀</h1>
-                        <p class="text-muted mb-0">Refer 3 friends to immediately unlock official certificate downloads once they start learning.</p>
+                        <h1 class="fw-extrabold mb-1 display-6">Invite Friends, Unlock Official Certificates! 🚀</h1>
+                        <p class="text-muted mb-0 fs-6">Refer 3 friends to permanently unlock official course certificate downloads once they start learning.</p>
                     </div>
                     <div>
                         <button id="btnRefresh" class="btn btn-refresh" onclick="refreshReferrals()">
@@ -463,19 +577,22 @@
             </div>
 
             <div class="row g-4">
-                <!-- Main Stats Panel -->
+                <!-- Main Referral Engine Card -->
                 <div class="col-lg-7">
                     <div class="card p-4 ref-card h-100">
-                        <div class="d-flex align-items-center gap-2 mb-4">
-                            <div class="rounded-circle p-2 bg-primary bg-opacity-10 text-primary">
-                                <i class="fas fa-share-nodes fa-lg"></i>
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div class="rounded-circle p-3 bg-primary bg-opacity-10 text-primary">
+                                <i class="fas fa-share-nodes fa-xl"></i>
                             </div>
-                            <h4 class="fw-bold mb-0">Share Referral Link</h4>
+                            <div>
+                                <h4 class="fw-bold mb-0">Referral Sharing Hub</h4>
+                                <span class="text-muted small">Share your personal link or code with peers</span>
+                            </div>
                         </div>
                         
                         <!-- Referral Code Box -->
                         <div class="mb-4">
-                            <label class="form-label text-muted fw-semibold small text-uppercase letter-spacing-1">My Referral Code</label>
+                            <label class="form-label text-muted fw-bold small text-uppercase letter-spacing-1">My Referral Code</label>
                             <div class="ref-code-box">
                                 <div>
                                     <span id="displayRefCode" class="ref-code-val">{{ referral_code }}</span>
@@ -488,7 +605,7 @@
 
                         <!-- Referral Link Input Group -->
                         <div class="mb-4">
-                            <label class="form-label text-muted fw-semibold small text-uppercase letter-spacing-1">Referral Link</label>
+                            <label class="form-label text-muted fw-bold small text-uppercase letter-spacing-1">Referral Link</label>
                             <div class="ref-input-group">
                                 <input type="text" id="refLink" class="ref-input-field" value="{{ referral_link }}" readonly>
                                 <button id="btnCopyLink" class="btn btn-gradient-primary ms-2" onclick="copyReferralLink()">
@@ -497,9 +614,9 @@
                             </div>
                         </div>
 
-                        <!-- Share Buttons -->
+                        <!-- Share Buttons Grid -->
                         <div>
-                            <label class="form-label text-muted fw-semibold small text-uppercase letter-spacing-1 mb-3">Share Instantly</label>
+                            <label class="form-label text-muted fw-bold small text-uppercase letter-spacing-1 mb-3">Share Instantly</label>
                             <div class="d-flex flex-wrap gap-2">
                                 <a id="shareWA" href="https://api.whatsapp.com/send?text=Hey!%20Join%20CodeNative%20with%20me%20and%20learn%20programming%20for%20free.%20Here%27s%20my%20link:%20{{ referral_link|urlencode }}" target="_blank" class="share-pill share-wa">
                                     <i class="fab fa-whatsapp me-1"></i> WhatsApp
@@ -510,6 +627,9 @@
                                 <a id="shareLN" href="https://www.linkedin.com/sharing/share-offsite/?url={{ referral_link|urlencode }}" target="_blank" class="share-pill share-ln">
                                     <i class="fab fa-linkedin me-1"></i> LinkedIn
                                 </a>
+                                <a id="shareX" href="https://twitter.com/intent/tweet?url={{ referral_link|urlencode }}&text=Learning%20programming%20on%20CodeNative!%20Join%20me:" target="_blank" class="share-pill share-x">
+                                    <i class="fab fa-x-twitter me-1"></i> X / Twitter
+                                </a>
                                 <a id="shareFB" href="https://www.facebook.com/sharer/sharer.php?u={{ referral_link|urlencode }}" target="_blank" class="share-pill share-fb">
                                     <i class="fab fa-facebook me-1"></i> Facebook
                                 </a>
@@ -518,7 +638,7 @@
                     </div>
                 </div>
 
-                <!-- Progress Circle / Card -->
+                <!-- Progress Circle & Reward Milestones Card -->
                 <div class="col-lg-5">
                     <div class="card p-4 ref-card h-100 text-center d-flex flex-column justify-content-between">
                         <div>
@@ -528,18 +648,40 @@
                                 </div>
                                 <h4 class="fw-bold mb-0">Referral Progress</h4>
                             </div>
-                            <p class="text-muted small mb-4">Referral status updates as soon as friends start a course or spend 5 minutes learning.</p>
+                            <p class="text-muted small mb-3">Status updates as soon as friends spend 5 minutes learning.</p>
                             
                             <!-- Large Circular Stat Counter -->
                             <div class="my-3">
                                 <div class="stat-circle-box">
                                     <div id="displayCount" class="stat-num">{{ verified_referrals }}</div>
                                 </div>
-                                <div class="text-muted fw-bold mt-2 small text-uppercase">Verified Referrals</div>
+                                <div class="text-muted fw-bold mt-2 small text-uppercase letter-spacing-1">Verified Referrals</div>
+                            </div>
+
+                            <!-- Milestone Roadmap Stepper -->
+                            <div class="milestone-stepper">
+                                <div class="milestone-node {% if verified_referrals >= 1 %}completed{% else %}active{% endif %}">
+                                    <div class="milestone-circle">
+                                        {% if verified_referrals >= 1 %}<i class="fas fa-check"></i>{% else %}1{% endif %}
+                                    </div>
+                                    <span class="milestone-label">1 Friend</span>
+                                </div>
+                                <div class="milestone-node {% if verified_referrals >= 2 %}completed{% elif verified_referrals == 1 %}active{% endif %}">
+                                    <div class="milestone-circle">
+                                        {% if verified_referrals >= 2 %}<i class="fas fa-check"></i>{% else %}2{% endif %}
+                                    </div>
+                                    <span class="milestone-label">2 Friends</span>
+                                </div>
+                                <div class="milestone-node {% if verified_referrals >= 3 %}completed{% elif verified_referrals == 2 %}active{% endif %}">
+                                    <div class="milestone-circle">
+                                        {% if verified_referrals >= 3 %}<i class="fas fa-award"></i>{% else %}3{% endif %}
+                                    </div>
+                                    <span class="milestone-label">Certificate 🎓</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mt-4">
+                        <div class="mt-3">
                             <!-- Progress Bar -->
                             <div class="d-flex justify-content-between text-muted small fw-semibold mb-2">
                                 <span id="displayProgressText">{{ verified_referrals }} / 3 Friends</span>
@@ -578,22 +720,22 @@
                 <div class="row g-3">
                     <div class="col-md-4">
                         <div class="step-card">
-                            <div class="step-icon">1</div>
-                            <h6 class="fw-bold mb-1">Share Your Link</h6>
-                            <p class="text-muted small mb-0">Send your referral link or code to friends via WhatsApp, Telegram, or social media.</p>
+                            <div class="step-badge">01</div>
+                            <h6 class="fw-bold mb-2">Share Your Link</h6>
+                            <p class="text-muted small mb-0">Send your unique referral link or code to friends via WhatsApp, Telegram, or social media.</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="step-card">
-                            <div class="step-icon">2</div>
-                            <h6 class="fw-bold mb-1">Friends Join & Learn</h6>
+                            <div class="step-badge">02</div>
+                            <h6 class="fw-bold mb-2">Friends Join & Learn</h6>
                             <p class="text-muted small mb-0">Your friends sign up for free and spend 5 minutes completing their first lesson.</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="step-card">
-                            <div class="step-icon">3</div>
-                            <h6 class="fw-bold mb-1">Unlock Certificates</h6>
+                            <div class="step-badge">03</div>
+                            <h6 class="fw-bold mb-2">Unlock Certificates</h6>
                             <p class="text-muted small mb-0">Once 3 friends get verified, official certificate downloads are permanently unlocked!</p>
                         </div>
                     </div>
@@ -607,7 +749,10 @@
                         <div class="rounded-circle p-2 bg-primary bg-opacity-10 text-primary">
                             <i class="fas fa-users-gear fa-lg"></i>
                         </div>
-                        <h4 class="fw-bold mb-0">Referred Friends</h4>
+                        <div>
+                            <h4 class="fw-bold mb-0">Referred Friends</h4>
+                            <span class="text-muted small">Live tracking of your referral invites</span>
+                        </div>
                     </div>
                     <span id="loadingSpinner" class="spinner-border spinner-border-sm text-primary d-none" role="status"></span>
                 </div>
@@ -625,8 +770,8 @@
                             {% for user in masked_users %}
                             <tr>
                                 <td class="fw-semibold">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="avatar-circle rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 13px;">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-circle rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 14px;">
                                             {{ user.name[0]|upper if user.name else 'U' }}
                                         </div>
                                         <span>{{ user.name }}</span>
@@ -734,7 +879,7 @@
         // Fetch referral status asynchronously and update UI
         async function fetchReferralStatus() {
             const spinner = document.getElementById('loadingSpinner');
-            spinner.classList.remove('d-none');
+            if (spinner) spinner.classList.remove('d-none');
             
             try {
                 const response = await fetch('/referral-status');
@@ -790,8 +935,8 @@
                     tableBody.innerHTML = data.referrals.map(user => `
                         <tr>
                             <td class="fw-semibold">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="avatar-circle rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 13px;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-circle rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 14px;">
                                         ${(user.name && user.name.charAt(0)) ? user.name.charAt(0).toUpperCase() : 'U'}
                                     </div>
                                     <span>${user.name}</span>
@@ -812,7 +957,7 @@
             } catch (err) {
                 console.error("Error fetching status:", err);
             } finally {
-                spinner.classList.add('d-none');
+                if (spinner) spinner.classList.add('d-none');
             }
         }
 
@@ -823,8 +968,8 @@
             const icon = document.getElementById('iconRefresh');
             
             btn.disabled = true;
-            spinner.classList.remove('d-none');
-            icon.classList.add('d-none');
+            if (spinner) spinner.classList.remove('d-none');
+            if (icon) icon.classList.add('d-none');
             
             try {
                 const response = await fetch('/refresh-referrals', { method: 'POST' });
@@ -838,8 +983,8 @@
                 showToast("Failed to refresh referral status.", false);
             } finally {
                 btn.disabled = false;
-                spinner.classList.add('d-none');
-                icon.classList.remove('d-none');
+                if (spinner) spinner.classList.add('d-none');
+                if (icon) icon.classList.remove('d-none');
             }
         }
 
