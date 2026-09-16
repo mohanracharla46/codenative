@@ -83,12 +83,13 @@ async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
     csp_policy = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://cdnjs.cloudflare.com https://accounts.google.com https://pagead2.googlesyndication.com https://adservice.google.com https://www.googletagservices.com https://tpc.googlesyndication.com https://googleads.g.doubleclick.net https://*.adtrafficquality.google; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://cdnjs.cloudflare.com https://accounts.google.com https://pagead2.googlesyndication.com https://adservice.google.com https://www.googletagservices.com https://tpc.googlesyndication.com https://googleads.g.doubleclick.net https://*.adtrafficquality.google https://3nbf4.com https://*.3nbf4.com; "
         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
         "img-src 'self' data: https: https://ui-avatars.com https://img.youtube.com https://i.ytimg.com https://www.google-analytics.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com; "
         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
-        "connect-src 'self' https://cdnjs.cloudflare.com https://www.google-analytics.com https://www.googletagmanager.com https://www.googleapis.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.adtrafficquality.google; "
-        "frame-src 'self' https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://pagead2.googlesyndication.com; "
+        "connect-src 'self' https://cdnjs.cloudflare.com https://www.google-analytics.com https://www.googletagmanager.com https://www.googleapis.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.adtrafficquality.google https://3nbf4.com https://*.3nbf4.com; "
+        "frame-src 'self' https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://pagead2.googlesyndication.com https://3nbf4.com https://*.3nbf4.com; "
+        "worker-src 'self' https://3nbf4.com https://*.3nbf4.com blob:; "
         "object-src 'none'; "
         "base-uri 'self'; "
         "form-action 'self'; "
@@ -981,6 +982,22 @@ async def ads_txt(request: Request):
     else:
         content = "google.com, pub-1268674050644687, DIRECT, f08c47fec0942fa0\n"
     return Response(content=content, media_type="text/plain")
+
+
+@app.get('/sw.js')
+@app.get('/service-worker.js')
+async def service_worker(request: Request):
+    sw_path = "sw.js"
+    if not os.path.exists(sw_path):
+        sw_path = os.path.join("static", "sw.js")
+    with open(sw_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    headers = {
+        "Service-Worker-Allowed": "/",
+        "Cache-Control": "no-cache, no-store, must-revalidate"
+    }
+    return Response(content=content, media_type="application/javascript", headers=headers)
+
 
 
 
